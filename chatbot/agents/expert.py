@@ -92,9 +92,13 @@ def expert_agent_node(state: ChatState) -> dict:
     # ── 长期记忆：近7天健康记录 ──────────────────────────────
     health_history = get_health_store().format_for_llm(state["user_id"], days=7)
 
-    # ── RAG：语义检索相关医学知识 ─────────────────────────────
-    rag_query   = f"{user_input} 血糖 {glucose_str} 饮食 {diet_str}"
-    rag_context = get_retriever().retrieve(rag_query, n=3)
+    # ── RAG：仅在医学相关查询时触发 ──────────────────────────
+    _RAG_KEYWORDS = ["药", "血糖", "饮食", "建议", "副作用", "怎么", "为什么", "能不能",
+                     "medicine", "glucose", "diet", "recommend", "why", "how"]
+    rag_context = ""
+    if any(kw in user_input for kw in _RAG_KEYWORDS):
+        rag_query   = f"{user_input} 血糖 {glucose_str} 饮食 {diet_str}"
+        rag_context = get_retriever().retrieve(rag_query, n=3)
 
     # ── 血糖预警 ─────────────────────────────────────────────
     alert_trigger = _check_alert(device_data, state["user_id"])

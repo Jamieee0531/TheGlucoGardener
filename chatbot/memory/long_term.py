@@ -75,7 +75,8 @@ class HealthEventStore:
         with sqlite3.connect(str(DB_PATH)) as conn:
             rows = conn.execute(
                 "SELECT event_type, content, timestamp FROM health_events "
-                "WHERE user_id=? AND timestamp>? ORDER BY timestamp DESC LIMIT 20",
+                "WHERE user_id=? AND event_type != 'emotion_summary' AND timestamp>? "
+                "ORDER BY timestamp DESC LIMIT 20",
                 (user_id, cutoff),
             ).fetchall()
         return [

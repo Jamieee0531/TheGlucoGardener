@@ -7,7 +7,7 @@ input_node → device_sync_node → triage_node → policy_node
   → [条件路由] → 各Agent → history_update → END
 """
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
 from chatbot.state.chat_state import ChatState
 from chatbot.agents.triage import input_node, triage_node, route_by_intent
 from chatbot.agents.device_sync import device_sync_node
@@ -74,4 +74,4 @@ def build_graph(checkpointer=None):
     return graph.compile(checkpointer=checkpointer)
 
 
-app = build_graph(MemorySaver())
+app = build_graph(SqliteSaver.from_conn_string("data/langgraph.db"))

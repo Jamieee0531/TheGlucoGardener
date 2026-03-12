@@ -48,7 +48,17 @@ def device_sync_node(state: ChatState) -> dict:
     today   = date.today().isoformat()
     store   = get_health_store()
 
-    # 写入血糖读数（带今日日期标记，避免重复写入）
+    # 今日已同步则跳过（避免每轮对话重复写入）
+    existing   = store.get_recent(user_id, days=1)
+    already_ok = any(
+        e["type"] == "glucose" and e["content"].get("date") == today
+        for e in existing
+    )
+    if already_ok:
+        print(f"[DeviceSync] 今日数据已存在，跳过写入")
+        return {"device_data": data}
+
+    # 写入血糖读数
     for r in data.get("glucose", []):
         store.log_event(user_id, "glucose", {**r, "date": today})
 
