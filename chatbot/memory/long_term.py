@@ -62,13 +62,22 @@ class HealthEventStore:
         events = self.get_recent(user_id, days)
         if not events:
             return ""
-        _label = {"glucose": "血糖", "diet": "饮食", "medication": "用药"}
         lines = [f"【患者过去 {days} 天健康记录】"]
         for e in events[:10]:
-            date  = e["timestamp"][:10]
-            val   = e["content"].get("value", "?")
-            label = _label.get(e["type"], e["type"])
-            lines.append(f"- {date} {label}：{val}")
+            ts      = e["timestamp"][:10]
+            content = e["content"]
+            if e["type"] == "glucose":
+                lines.append(f"- {ts} {content.get('time', '')} 血糖：{content.get('value', '?')} mmol/L")
+            elif e["type"] == "medication":
+                adherence = content.get("adherence", {})
+                taken  = [k for k, v in adherence.items() if v]
+                missed = [k for k, v in adherence.items() if not v]
+                parts  = []
+                if taken:  parts.append(f"已服 {', '.join(taken)}")
+                if missed: parts.append(f"未服 {', '.join(missed)}")
+                lines.append(f"- {ts} 用药：{'；'.join(parts)}")
+            elif e["type"] == "diet":
+                lines.append(f"- {ts} 饮食：{content.get('value', '?')}")
         return "\n".join(lines)
 
 
