@@ -40,13 +40,23 @@ def _per_turn(
 
 
 # ── 初始化新线程（首次对话 / reset 后）────────────────────────────
-def _init_thread(config: dict, user_id: str) -> None:
-    """通过 update_state 向 checkpointer 写入持久字段，无需跑一轮图。"""
-    app.update_state(config, {
-        "user_profile":    get_user_profile(user_id),
-        "history":         [],
-        "recent_emotions": [],
-    })
+def _init_thread(config: dict, user_id: str, force_reset: bool = False) -> None:
+    """
+    首次启动只写 user_profile，保留 checkpointer 中的历史记录。
+    force_reset=True（reset 命令）时才清空 history。
+    """
+    existing = app.get_state(config)
+    has_state = existing and existing.values
+
+    if force_reset or not has_state:
+        app.update_state(config, {
+            "user_profile":    get_user_profile(user_id),
+            "history":         [],
+            "recent_emotions": [],
+        })
+    else:
+        # 恢复旧 session：只刷新 user_profile
+        app.update_state(config, {"user_profile": get_user_profile(user_id)})
 
 
 def run_cli():
@@ -73,7 +83,7 @@ def run_cli():
             print("再见！")
             break
         if user_input.lower() == "reset":
-            _init_thread(config, user_id)
+            _init_thread(config, user_id, force_reset=True)
             print("[系统] 对话历史已清空\n")
             continue
 

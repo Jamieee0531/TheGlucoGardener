@@ -193,6 +193,7 @@ def _full_triage(state: ChatState) -> dict:
 - chitchat   （日常闲聊）
 
 规则：
+- 纯礼貌/确认词（谢谢、好的、嗯、明白、收到、thanks、ok 等）无论上下文如何，始终归为 ["chitchat"]
 - 结合上下文：若前几轮是情绪话题，简短回应也归为emotional
 - "打卡"指健康任务，"打视频"、"打电话"是通讯行为归emotional
 - 只返回JSON，不要任何解释"""

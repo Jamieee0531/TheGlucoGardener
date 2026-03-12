@@ -6,6 +6,8 @@ LangGraph 图构建
 input_node → device_sync_node → triage_node → policy_node
   → [条件路由] → 各Agent → history_update → END
 """
+import sqlite3
+from pathlib import Path
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.sqlite import SqliteSaver
 from chatbot.state.chat_state import ChatState
@@ -74,4 +76,7 @@ def build_graph(checkpointer=None):
     return graph.compile(checkpointer=checkpointer)
 
 
-app = build_graph(SqliteSaver.from_conn_string("data/langgraph.db"))
+_DB_PATH = Path(__file__).parent.parent.parent / "data" / "langgraph.db"
+_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+_conn = sqlite3.connect(str(_DB_PATH), check_same_thread=False)
+app   = build_graph(SqliteSaver(_conn))

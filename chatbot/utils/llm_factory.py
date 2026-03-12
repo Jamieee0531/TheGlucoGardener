@@ -84,18 +84,20 @@ def _call_cloudflare_fallback(system_prompt: str, messages: list) -> str:
         return "抱歉，服务暂时不可用，请稍后再试。"
 
 
-def call_sealion_with_history_stream(system_prompt: str, messages: list) -> str:
+def call_sealion_with_history_stream(
+    system_prompt: str, messages: list, reasoning: bool = False
+) -> str:
     """
-    流式调用（仅用于 instruct 对话模型）。
-    打印 token 到 stdout，返回完整内容。
+    流式调用。reasoning=True 时使用推理模型并自动跳过 <think> 块输出。
     限流时自动降级为 Cloudflare 非流式备用。
     """
     full_messages = [{"role": "system", "content": system_prompt}] + messages
+    model   = REASONING_MODEL if reasoning else INSTRUCT_MODEL
     headers = {
         "Content-Type":  "application/json",
         "Authorization": f"Bearer {SEALION_API_KEY}",
     }
-    payload = {"model": INSTRUCT_MODEL, "messages": full_messages, "stream": True}
+    payload = {"model": model, "messages": full_messages, "stream": True}
 
     try:
         resp = requests.post(
@@ -107,6 +109,9 @@ def call_sealion_with_history_stream(system_prompt: str, messages: list) -> str:
         resp.raise_for_status()
 
         full_content = ""
+        in_think     = reasoning   # 推理模型：进入时先抑制输出直到 </think>
+        think_buf    = ""
+
         for raw_line in resp.iter_lines():
             if not raw_line:
                 continue
@@ -118,7 +123,17 @@ def call_sealion_with_history_stream(system_prompt: str, messages: list) -> str:
                 break
             try:
                 delta = _json.loads(data)["choices"][0]["delta"].get("content", "")
-                if delta:
+                if not delta:
+                    continue
+                if in_think:
+                    think_buf += delta
+                    if "</think>" in think_buf:
+                        in_think = False
+                        after = think_buf.split("</think>", 1)[1]
+                        if after:
+                            print(after, end="", flush=True)
+                            full_content += after
+                else:
                     print(delta, end="", flush=True)
                     full_content += delta
             except Exception:

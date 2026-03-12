@@ -9,7 +9,7 @@
 """
 from datetime import datetime
 from chatbot.state.chat_state import ChatState
-from chatbot.utils.llm_factory import call_sealion_with_history, format_history_for_sealion
+from chatbot.utils.llm_factory import call_sealion_with_history_stream, format_history_for_sealion
 from chatbot.memory.long_term import get_health_store
 from chatbot.memory.rag.retriever import get_retriever
 
@@ -144,12 +144,9 @@ def expert_agent_node(state: ChatState) -> dict:
 
     history = format_history_for_sealion(state.get("history", []))
     history.append({"role": "user", "content": user_input})
-    response = call_sealion_with_history(system_prompt, history, reasoning=True)
+    print("\n助手：", end="", flush=True)
+    response = call_sealion_with_history_stream(system_prompt, history, reasoning=True)
 
-    if "</think>" in response:
-        response = response.split("</think>")[-1].strip()
-
-    print(f"\n助手：{response}")
     print(f"[Expert] 意图：{all_intents} | 情绪：{state.get('emotion_label', 'neutral')}")
     return {
         "response":      response,
