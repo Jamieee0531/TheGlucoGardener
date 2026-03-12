@@ -95,14 +95,22 @@ def companion_agent_node(state: ChatState) -> dict:
     print("\n助手：", end="", flush=True)
     response = call_sealion_with_history_stream(system_prompt, history)
 
-    # ── 写入情绪摘要（长期记忆，仅负面情绪）────────────────────
+    # ── 写入情绪摘要（长期记忆，仅负面情绪，每天一次）──────────
     if emotion_label in NEGATIVE_EMOTIONS:
-        summary = _generate_emotion_summary(user_input, response, emotion_label)
-        store.log_event(user_id, "emotion_summary", {
-            "text":    summary,
-            "emotion": emotion_label,
-        })
-        print(f"[陪伴Agent] 情绪摘要已存储：{summary[:40]}…")
+        today     = datetime.now().strftime("%Y-%m-%d")
+        has_today = any(
+            s["timestamp"].startswith(today)
+            for s in store.get_emotion_summaries(user_id, days=1)
+        )
+        if not has_today:
+            summary = _generate_emotion_summary(user_input, response, emotion_label)
+            store.log_event(user_id, "emotion_summary", {
+                "text":    summary,
+                "emotion": emotion_label,
+            })
+            print(f"[陪伴Agent] 今日情绪摘要已存储：{summary[:40]}…")
+        else:
+            print(f"[陪伴Agent] 今日摘要已存在，跳过生成")
 
     emotion_log = {
         "user_id": user_id, "timestamp": datetime.now().isoformat(),
