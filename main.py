@@ -1,0 +1,121 @@
+"""
+main.py — 项目统一入口
+运行方式：python main.py（从项目根目录）
+
+History 由 LangGraph Checkpointer 自动持久化，main.py 无需手动维护。
+"""
+from chatbot.graph.builder import app
+from chatbot.utils.memory import get_user_profile
+
+
+# ── 每轮重置的字段（不依赖 checkpointer）──────────────────────────
+def _per_turn(
+    user_input: str,
+    user_id: str,
+    input_mode: str = "text",
+    audio_path: str = None,
+    image_paths: list = None,
+    chat_mode: str = "personal",
+) -> dict:
+    return {
+        "user_id":            user_id,
+        "user_input":         user_input,
+        "input_mode":         input_mode,
+        "chat_mode":          chat_mode,
+        "audio_path":         audio_path,
+        "transcribed_text":   None,
+        "emotion_label":      "neutral",
+        "emotion_confidence": 0.0,
+        "intent":             None,
+        "all_intents":        None,
+        "policy_instruction": None,
+        "persistent_alert":   None,
+        "response":           None,
+        "emotion_log":        None,
+        "task_trigger":       None,
+        "alert_trigger":      None,
+        "image_paths":        image_paths,
+        "vision_result":      None,
+    }
+
+
+# ── 初始化新线程（首次对话 / reset 后）────────────────────────────
+def _init_thread(config: dict, user_id: str) -> None:
+    """通过 update_state 向 checkpointer 写入持久字段，无需跑一轮图。"""
+    app.update_state(config, {
+        "user_profile":    get_user_profile(user_id),
+        "history":         [],
+        "recent_emotions": [],
+    })
+
+
+def run_cli():
+    print("=" * 55)
+    print("  Health Companion — 对话测试")
+    print("  输入 'quit' 退出 | 'reset' 清空历史 | 'voice 路径' 语音 | 'image 路径 [文字]' 图片")
+    print("=" * 55)
+
+    user_id = "user_001"
+    config  = {"configurable": {"thread_id": user_id}}
+
+    # 初始化线程持久状态
+    _init_thread(config, user_id)
+
+    profile = get_user_profile(user_id)
+    print(f"\n  当前用户：{profile['name']} | 病症：{', '.join(profile['conditions'])}\n")
+
+    while True:
+        user_input = input("你：").strip()
+
+        if not user_input:
+            continue
+        if user_input.lower() == "quit":
+            print("再见！")
+            break
+        if user_input.lower() == "reset":
+            _init_thread(config, user_id)
+            print("[系统] 对话历史已清空\n")
+            continue
+
+        # 图片模式：输入 "image 图片路径" 或 "image 图片路径 附带文字"
+        if user_input.lower().startswith("image "):
+            parts    = user_input[6:].strip().split(" ", 1)
+            img_path = parts[0]
+            text     = parts[1] if len(parts) > 1 else ""
+            print(f"[图片模式] 正在识别：{img_path}")
+            state = _per_turn(text, user_id, image_paths=[img_path])
+
+        # 语音模式：输入 "voice 音频文件路径"
+        elif user_input.lower().startswith("voice "):
+            audio_path = user_input[6:].strip()
+            print(f"[语音模式] 处理音频：{audio_path}")
+            state = _per_turn("", user_id, input_mode="voice", audio_path=audio_path)
+
+        else:
+            state = _per_turn(user_input, user_id)
+
+        result = app.invoke(state, config=config)
+
+        if result.get("vision_result"):
+            for vr in result["vision_result"]:
+                scene = vr.get("scene_type", "?")
+                conf  = vr.get("confidence", 0.0)
+                print(f"  [Vision] 识别结果：{scene}（置信度 {conf:.0%}）")
+
+        intent  = result.get("intent", "?")
+        emotion = result.get("emotion_label", "neutral")
+        stage   = result.get("conversation_stage") or "idle"
+        policy  = result.get("policy_instruction", "")[:25]
+        print(f"  [{intent} | {emotion} | 阶段:{stage} | 策略:{policy}]\n")
+
+        if result.get("emotion_log"):
+            print("  📊 → 集成数据库：情绪记录已写入")
+        if result.get("task_trigger"):
+            print("  📋 → Chayi 任务模块：task_trigger 已发出")
+        if result.get("alert_trigger"):
+            print("  🚨 → Julia 预警模块：alert_trigger 已发出")
+        print()
+
+
+if __name__ == "__main__":
+    run_cli()
