@@ -33,7 +33,7 @@ class HealthEventStore:
             )
 
     def log_event(self, user_id: str, event_type: str, content: dict) -> None:
-        """记录一条健康事件。event_type: 'glucose' | 'diet' | 'medication'"""
+        """记录一条健康事件。event_type: 'glucose' | 'diet' | 'medication' | 'emotion_summary'"""
         with sqlite3.connect(str(DB_PATH)) as conn:
             conn.execute(
                 "INSERT INTO health_events "
@@ -42,6 +42,32 @@ class HealthEventStore:
                  json.dumps(content, ensure_ascii=False),
                  datetime.now().isoformat()),
             )
+
+    def get_emotion_summaries(self, user_id: str, days: int = 14) -> list:
+        """获取近 N 天情绪摘要，按时间倒序最多 5 条。"""
+        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+        with sqlite3.connect(str(DB_PATH)) as conn:
+            rows = conn.execute(
+                "SELECT content, timestamp FROM health_events "
+                "WHERE user_id=? AND event_type='emotion_summary' AND timestamp>? "
+                "ORDER BY timestamp DESC LIMIT 5",
+                (user_id, cutoff),
+            ).fetchall()
+        return [
+            {"text": json.loads(r[0]).get("text", ""), "timestamp": r[1]}
+            for r in rows
+        ]
+
+    def format_emotion_summary_for_llm(self, user_id: str, days: int = 14) -> str:
+        """将近期情绪摘要格式化为叙事段落注入 companion prompt。"""
+        summaries = self.get_emotion_summaries(user_id, days)
+        if not summaries:
+            return ""
+        lines = ["【患者近期情绪背景】"]
+        for s in summaries:
+            ts = s["timestamp"][:10]
+            lines.append(f"- {ts}：{s['text']}")
+        return "\n".join(lines)
 
     def get_recent(self, user_id: str, days: int = 7) -> list:
         """获取近 N 天健康事件，按时间倒序最多 20 条。"""
