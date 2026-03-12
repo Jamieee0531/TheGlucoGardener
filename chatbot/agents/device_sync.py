@@ -62,13 +62,7 @@ def device_sync_node(state: ChatState) -> dict:
     for r in data.get("glucose", []):
         store.log_event(user_id, "glucose", {**r, "date": today})
 
-    # 写入用药记录
-    med = data.get("medication", {})
-    if med:
-        store.log_event(user_id, "medication", {"adherence": med, "date": today})
-
     glucose_count = len(data.get("glucose", []))
-    med_status    = {k: ("✅" if v else "❌") for k, v in med.items()}
-    print(f"[DeviceSync] 血糖 {glucose_count} 条 | 用药 {med_status} | 已写入长期记忆")
+    print(f"[DeviceSync] 血糖 {glucose_count} 条 | 已写入长期记忆")
 
     return {"device_data": data}

@@ -122,8 +122,6 @@ def run_cli():
             print("  📊 → 集成数据库：情绪记录已写入")
         if result.get("task_trigger"):
             print("  📋 → Chayi 任务模块：task_trigger 已发出")
-        if result.get("alert_trigger"):
-            print("  🚨 → Julia 预警模块：alert_trigger 已发出")
         print()
 
 

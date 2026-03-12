@@ -52,24 +52,6 @@ def _fmt_diet(vision_result: list) -> str:
     return "；".join(foods)
 
 
-# ── 血糖预警检测 ──────────────────────────────────────────────
-
-def _check_alert(device_data: dict, user_id: str):
-    for r in device_data.get("glucose", []):
-        try:
-            v = float(r.get("value", 0))
-        except (TypeError, ValueError):
-            continue
-        if v > 10.0 or v < 3.9:
-            return {
-                "user_id":       user_id,
-                "timestamp":     datetime.now().isoformat(),
-                "glucose_value": v,
-                "severity":      "elevated" if v > 10.0 else "low",
-            }
-    return None
-
-
 # ── 主节点 ────────────────────────────────────────────────────
 
 def expert_agent_node(state: ChatState) -> dict:
@@ -99,9 +81,6 @@ def expert_agent_node(state: ChatState) -> dict:
     if any(kw in user_input for kw in _RAG_KEYWORDS):
         rag_query   = f"{user_input} 血糖 {glucose_str} 饮食 {diet_str}"
         rag_context = get_retriever().retrieve(rag_query, n=3)
-
-    # ── 血糖预警 ─────────────────────────────────────────────
-    alert_trigger = _check_alert(device_data, state["user_id"])
 
     # ── 情绪前缀 ─────────────────────────────────────────────
     emotional_prefix = ""
@@ -149,7 +128,6 @@ def expert_agent_node(state: ChatState) -> dict:
 
     print(f"[Expert] 意图：{all_intents} | 情绪：{state.get('emotion_label', 'neutral')}")
     return {
-        "response":      response,
-        "task_trigger":  task_trigger,
-        "alert_trigger": alert_trigger,
+        "response":     response,
+        "task_trigger": task_trigger,
     }

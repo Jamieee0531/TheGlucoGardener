@@ -31,6 +31,14 @@ class HealthEventStore:
                 "CREATE INDEX IF NOT EXISTS idx_user_ts "
                 "ON health_events(user_id, timestamp)"
             )
+            # 语音情绪日志：每用户一行，覆盖写入（仅语音模式，confidence >= 0.5）
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS emotion_log (
+                    user_id       TEXT PRIMARY KEY,
+                    emotion_label TEXT NOT NULL,
+                    recorded_at   TEXT NOT NULL
+                )
+            """)
 
     def log_event(self, user_id: str, event_type: str, content: dict) -> None:
         """记录一条健康事件。event_type: 'glucose' | 'diet' | 'medication' | 'emotion_summary'"""
@@ -41,6 +49,17 @@ class HealthEventStore:
                 (user_id, event_type,
                  json.dumps(content, ensure_ascii=False),
                  datetime.now().isoformat()),
+            )
+
+    def upsert_emotion_log(self, user_id: str, emotion_label: str) -> None:
+        """覆盖写入最新语音情绪（每用户一行）。调用前已过滤 confidence < 0.5。"""
+        with sqlite3.connect(str(DB_PATH)) as conn:
+            conn.execute(
+                "INSERT INTO emotion_log (user_id, emotion_label, recorded_at) "
+                "VALUES (?, ?, ?) "
+                "ON CONFLICT(user_id) DO UPDATE SET "
+                "emotion_label=excluded.emotion_label, recorded_at=excluded.recorded_at",
+                (user_id, emotion_label, datetime.now().isoformat()),
             )
 
     def get_emotion_summaries(self, user_id: str, days: int = 14) -> list:

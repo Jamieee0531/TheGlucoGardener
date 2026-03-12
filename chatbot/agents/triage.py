@@ -9,6 +9,7 @@ from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import call_sealion
 from chatbot.utils.meralion import process_voice_input
 from chatbot.config.settings import ALL_INTENTS, INTENT_CHITCHAT
+from chatbot.memory.long_term import get_health_store
 
 
 import concurrent.futures
@@ -49,6 +50,13 @@ def input_node(state: ChatState) -> dict:
     if state["input_mode"] == "voice":
         audio_path = state.get("audio_path", "")
         result = process_voice_input(audio_path)
+
+        # 写入语音情绪日志（confidence 门控）
+        if result["emotion_confidence"] >= 0.5:
+            get_health_store().upsert_emotion_log(
+                state["user_id"], result["emotion_label"]
+            )
+
         return {
             "user_input":         result["transcribed_text"],
             "transcribed_text":   result["transcribed_text"],
@@ -112,10 +120,6 @@ def triage_node(state: ChatState) -> dict:
 # ── Keyword pre-classification ────────────────────────────────────────────
 # Checked before LLM call. Order matters: alert > medical > emotional > task.
 KEYWORD_RULES = [
-    ("alert", [
-        "头晕", "晕倒", "胸痛", "发抖", "chest pain", "dizzy", "faint",
-        r"血糖.*1[5-9]", r"血糖.*[2-9][0-9]", r"血糖.*[0-2]\.\d", "低血糖",
-    ]),
     ("medical", [
         "血糖", "glucose", "sugar", "药", "medicine", "metformin",
         "二甲双胍", "饮食", "diet", "吃了什么", "GI", "升糖",
@@ -186,8 +190,7 @@ def _full_triage(state: ChatState) -> dict:
 {"intents": ["标签1","标签2"]}
 
 意图标签（按优先级，可多选）：
-- alert      （严重症状：头晕、胸痛、发抖；血糖>15或<3.5）
-- medical    （血糖偏高、药物、饮食建议、症状）
+- medical    （血糖偏高、药物、饮食建议、症状、身体不适）
 - emotional  （情绪倾诉、担心、沮丧、孤独、失望、需要陪伴）
 - task       （打卡、积分、提醒、上传照片）
 - chitchat   （日常闲聊）
@@ -196,6 +199,7 @@ def _full_triage(state: ChatState) -> dict:
 - 纯礼貌/确认词（谢谢、好的、嗯、明白、收到、thanks、ok 等）无论上下文如何，始终归为 ["chitchat"]
 - 结合上下文：若前几轮是情绪话题，简短回应也归为emotional
 - "打卡"指健康任务，"打视频"、"打电话"是通讯行为归emotional
+- 身体不适（头晕、胸痛等紧急症状）归为 ["medical", "emotional"]
 - 只返回JSON，不要任何解释"""
 
     history = state.get("history", [])
@@ -236,7 +240,6 @@ def route_by_intent(state: ChatState) -> str:
         "emotional": "companion_agent",
         "medical":   "expert_agent",
         "task":      "task_forward",
-        "alert":     "alert_forward",
         "chitchat":  "chitchat_agent",
     }
     return route_map.get(state.get("intent", "chitchat"), "chitchat_agent")

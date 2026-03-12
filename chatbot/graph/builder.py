@@ -17,7 +17,6 @@ from chatbot.agents.policy import policy_node
 from chatbot.agents.companion import companion_agent_node
 from chatbot.agents.expert import expert_agent_node
 from chatbot.agents.task_forward import task_forward_node
-from chatbot.agents.alert_forward import alert_forward_node
 from chatbot.agents.chitchat import chitchat_agent_node
 from chatbot.utils.memory import add_to_history
 
@@ -42,7 +41,6 @@ def build_graph(checkpointer=None):
     graph.add_node("companion_agent", companion_agent_node)
     graph.add_node("expert_agent",    expert_agent_node)
     graph.add_node("task_forward",    task_forward_node)
-    graph.add_node("alert_forward",   alert_forward_node)
     graph.add_node("chitchat_agent",  chitchat_agent_node)
     graph.add_node("history_update",  history_update_node)
 
@@ -62,14 +60,13 @@ def build_graph(checkpointer=None):
             "companion_agent": "companion_agent",
             "expert_agent":    "expert_agent",
             "task_forward":    "task_forward",
-            "alert_forward":   "alert_forward",
             "chitchat_agent":  "chitchat_agent",
         }
     )
 
     # ── 所有Agent → history_update → END ─────────────────
     for node in ["companion_agent", "expert_agent",
-                 "task_forward", "alert_forward", "chitchat_agent"]:
+                 "task_forward", "chitchat_agent"]:
         graph.add_edge(node, "history_update")
     graph.add_edge("history_update", END)
 
