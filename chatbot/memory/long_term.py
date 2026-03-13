@@ -1,7 +1,8 @@
 """
-长期记忆：用户健康事件日志（SQLite）
-存储每轮 expert agent 确认的血糖/饮食/用药数据
-expert agent 每次启动前读取近 N 天记录注入 prompt
+长期记忆：情绪相关数据（SQLite）
+- emotion_log: 最新语音情绪（每用户一行）
+- daily_emotion_log: 每日非 neutral 情绪记录
+- health_events: 保留用于读取旧 emotion_summary 数据
 """
 import sqlite3
 import json
@@ -54,19 +55,8 @@ class HealthEventStore:
                 "ON daily_emotion_log(user_id, timestamp)"
             )
 
-    def log_event(self, user_id: str, event_type: str, content: dict) -> None:
-        """记录一条健康事件。event_type: 'glucose' | 'diet' | 'medication' | 'emotion_summary'"""
-        with sqlite3.connect(str(DB_PATH)) as conn:
-            conn.execute(
-                "INSERT INTO health_events "
-                "(user_id, event_type, content, timestamp) VALUES (?, ?, ?, ?)",
-                (user_id, event_type,
-                 json.dumps(content, ensure_ascii=False),
-                 datetime.now().isoformat()),
-            )
-
     def upsert_emotion_log(self, user_id: str, emotion_label: str) -> None:
-        """覆盖写入最新语音情绪（每用户一行）。调用前已过滤 confidence < 0.5。"""
+        """覆盖写入最新语音情绪（每用户一行）。调用前已过滤 confidence < 0.6。"""
         with sqlite3.connect(str(DB_PATH)) as conn:
             conn.execute(
                 "INSERT INTO emotion_log (user_id, emotion_label, recorded_at) "
@@ -101,45 +91,6 @@ class HealthEventStore:
             ts = s["timestamp"][:10]
             lines.append(f"- {ts}：{s['text']}")
         return "\n".join(lines)
-
-    def get_recent(self, user_id: str, days: int = 7) -> list:
-        """获取近 N 天健康事件，按时间倒序最多 20 条。"""
-        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
-        with sqlite3.connect(str(DB_PATH)) as conn:
-            rows = conn.execute(
-                "SELECT event_type, content, timestamp FROM health_events "
-                "WHERE user_id=? AND event_type != 'emotion_summary' AND timestamp>? "
-                "ORDER BY timestamp DESC LIMIT 20",
-                (user_id, cutoff),
-            ).fetchall()
-        return [
-            {"type": r[0], "content": json.loads(r[1]), "timestamp": r[2]}
-            for r in rows
-        ]
-
-    def format_for_llm(self, user_id: str, days: int = 7) -> str:
-        """将近期健康记录格式化为 LLM 可读的上下文字符串。"""
-        events = self.get_recent(user_id, days)
-        if not events:
-            return ""
-        lines = [f"【患者过去 {days} 天健康记录】"]
-        for e in events[:10]:
-            ts      = e["timestamp"][:10]
-            content = e["content"]
-            if e["type"] == "glucose":
-                lines.append(f"- {ts} {content.get('time', '')} 血糖：{content.get('value', '?')} mmol/L")
-            elif e["type"] == "medication":
-                adherence = content.get("adherence", {})
-                taken  = [k for k, v in adherence.items() if v]
-                missed = [k for k, v in adherence.items() if not v]
-                parts  = []
-                if taken:  parts.append(f"已服 {', '.join(taken)}")
-                if missed: parts.append(f"未服 {', '.join(missed)}")
-                lines.append(f"- {ts} 用药：{'；'.join(parts)}")
-            elif e["type"] == "diet":
-                lines.append(f"- {ts} 饮食：{content.get('value', '?')}")
-        return "\n".join(lines)
-
 
     # ── daily_emotion_log methods ──────────────────────────────────
 

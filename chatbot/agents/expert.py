@@ -57,9 +57,6 @@ def expert_agent_node(state: ChatState) -> dict:
     # ── 饮食（Vision Agent）───────────────────────────────────
     diet_str = _fmt_diet(state.get("vision_result") or [])
 
-    # ── 长期记忆：近7天健康记录 ──────────────────────────────
-    health_history = get_health_store().format_for_llm(state["user_id"], days=7)
-
     # ── RAG：仅在医学相关查询时触发 ──────────────────────────
     _RAG_KEYWORDS = ["药", "血糖", "饮食", "建议", "副作用", "怎么", "为什么", "能不能",
                      "medicine", "glucose", "diet", "recommend", "why", "how"]
@@ -83,7 +80,6 @@ def expert_agent_node(state: ChatState) -> dict:
         f"【近1小时血糖数据】\n"
         f"- 血糖记录：{glucose_str}\n"
         f"{f'- 今餐饮食：{diet_str}' + chr(10) if diet_str else ''}"
-        f"\n{health_history + chr(10) if health_history else ''}"
         f"{f'【参考医学资料】{chr(10)}{rag_context}{chr(10)}' if rag_context else ''}"
         f"{f'【用户当前状态】{policy_instruction}' + chr(10) if policy_instruction else ''}"
         f"{emotional_prefix}"
