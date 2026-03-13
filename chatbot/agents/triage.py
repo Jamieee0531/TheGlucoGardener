@@ -211,6 +211,8 @@ def _full_triage(state: ChatState) -> dict:
     keyword_intent = keyword_preclassify(user_input)
     if keyword_intent:
         emotion = resolve_emotion(emotion_label, emotion_confidence, input_mode)
+        if emotion != "neutral":
+            get_health_store().log_daily_emotion(state["user_id"], emotion, user_input)
         print(f"[Triage] 关键词命中：{keyword_intent} | 情绪：{emotion}")
         return {
             "intent":        keyword_intent,
@@ -258,6 +260,8 @@ def _full_triage(state: ChatState) -> dict:
 
     # 情绪：voice >= 0.6 用模型结果，否则 neutral
     emotion = resolve_emotion(emotion_label, emotion_confidence, input_mode)
+    if emotion != "neutral":
+        get_health_store().log_daily_emotion(state["user_id"], emotion, user_input)
 
     print(f"[Triage] 意图：{intents} | 情绪：{emotion} | 输入：{input_mode}")
     return {
