@@ -36,19 +36,26 @@ test_images/*.jpeg
 *.pem
 credentials.json
 
-# Local notes / planning files (keep locally, not for repo)
+# Local notes / planning / PRD files (keep locally, not for repo)
 findings.md
 github-Multi-Agent-Medical-Assistant.md
 vision_agent_report.md
 task_plan.md
 progress.md
 PRD-chatbot.md
+PRD-visionAgent.md
 chatbot_agent_report.md
+CLAUDE.md
 docs/plans/
 
 # Database files
 data/*.db
+data/chroma_db/
 chatbot/*.db
+
+# Test images (subdirectories with actual photos)
+test_images/medicaiton/
+test_images/food/
 
 # Coverage
 .coverage
