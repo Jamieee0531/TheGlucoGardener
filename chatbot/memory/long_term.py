@@ -2,7 +2,7 @@
 长期记忆：情绪相关数据（SQLite）
 - emotion_log: 最新语音情绪（每用户一行）
 - daily_emotion_log: 每日非 neutral 情绪记录
-- health_events: 保留用于读取旧 emotion_summary 数据
+- emotion_summary: 每日情绪汇总（23:59 定时任务写入）
 """
 import sqlite3
 import json
@@ -19,19 +19,6 @@ class HealthEventStore:
 
     def _init_db(self):
         with sqlite3.connect(str(DB_PATH)) as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS health_events (
-                    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id    TEXT    NOT NULL,
-                    event_type TEXT    NOT NULL,
-                    content    TEXT    NOT NULL,
-                    timestamp  TEXT    NOT NULL
-                )
-            """)
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_user_ts "
-                "ON health_events(user_id, timestamp)"
-            )
             # 语音情绪日志：每用户一行，覆盖写入（仅语音模式，confidence >= 0.6）
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS emotion_log (
@@ -54,6 +41,20 @@ class HealthEventStore:
                 "CREATE INDEX IF NOT EXISTS idx_daily_emotion_user "
                 "ON daily_emotion_log(user_id, timestamp)"
             )
+            # 每日情绪汇总：23:59 定时任务写入，永久保留
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS emotion_summary (
+                    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id  TEXT NOT NULL,
+                    text     TEXT NOT NULL,
+                    emotion  TEXT NOT NULL,
+                    date     TEXT NOT NULL
+                )
+            """)
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_emotion_summary_user "
+                "ON emotion_summary(user_id, date)"
+            )
 
     def upsert_emotion_log(self, user_id: str, emotion_label: str) -> None:
         """覆盖写入最新语音情绪（每用户一行）。调用前已过滤 confidence < 0.6。"""
@@ -66,30 +67,39 @@ class HealthEventStore:
                 (user_id, emotion_label, datetime.now().isoformat()),
             )
 
+    # ── emotion_summary methods ────────────────────────────────────
+
+    def save_emotion_summary(self, user_id: str, text: str, emotion: str, date: str) -> None:
+        """写入每日情绪汇总（由 23:59 定时任务调用）。"""
+        with sqlite3.connect(str(DB_PATH)) as conn:
+            conn.execute(
+                "INSERT INTO emotion_summary (user_id, text, emotion, date) VALUES (?, ?, ?, ?)",
+                (user_id, text, emotion, date),
+            )
+
     def get_emotion_summaries(self, user_id: str, days: int = 14) -> list:
-        """获取近 N 天情绪摘要，按时间倒序最多 5 条。"""
-        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+        """获取近 N 天情绪摘要，按日期倒序最多 5 条。"""
+        cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
         with sqlite3.connect(str(DB_PATH)) as conn:
             rows = conn.execute(
-                "SELECT content, timestamp FROM health_events "
-                "WHERE user_id=? AND event_type='emotion_summary' AND timestamp>? "
-                "ORDER BY timestamp DESC LIMIT 5",
+                "SELECT text, emotion, date FROM emotion_summary "
+                "WHERE user_id=? AND date>=? "
+                "ORDER BY date DESC LIMIT 5",
                 (user_id, cutoff),
             ).fetchall()
         return [
-            {"text": json.loads(r[0]).get("text", ""), "timestamp": r[1]}
+            {"text": r[0], "emotion": r[1], "date": r[2]}
             for r in rows
         ]
 
     def format_emotion_summary_for_llm(self, user_id: str, days: int = 14) -> str:
-        """将近期情绪摘要格式化为叙事段落注入 companion prompt。"""
+        """将近期情绪摘要格式化为叙事段落注入 companion/expert prompt。"""
         summaries = self.get_emotion_summaries(user_id, days)
         if not summaries:
             return ""
         lines = ["【患者近期情绪背景】"]
         for s in summaries:
-            ts = s["timestamp"][:10]
-            lines.append(f"- {ts}：{s['text']}")
+            lines.append(f"- {s['date']}：{s['text']}")
         return "\n".join(lines)
 
     # ── daily_emotion_log methods ──────────────────────────────────
@@ -116,6 +126,16 @@ class HealthEventStore:
             {"emotion_label": r[0], "user_input": r[1], "timestamp": r[2]}
             for r in rows
         ]
+
+    def get_daily_emotion_user_ids(self) -> list:
+        """获取今日有情绪记录的所有 user_id。"""
+        today = datetime.now().strftime("%Y-%m-%d")
+        with sqlite3.connect(str(DB_PATH)) as conn:
+            rows = conn.execute(
+                "SELECT DISTINCT user_id FROM daily_emotion_log WHERE timestamp LIKE ?",
+                (f"{today}%",),
+            ).fetchall()
+        return [r[0] for r in rows]
 
     def clear_daily_emotions(self, user_id: str) -> None:
         """Clear today's emotion log (called after 23:59 summary)."""
