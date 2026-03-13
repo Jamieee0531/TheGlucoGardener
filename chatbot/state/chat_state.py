@@ -32,15 +32,14 @@ class ChatState(TypedDict):
     history:            list
     user_profile:       dict
 
-    # ── 设备数据（血糖仪/药盒，每轮对话由 device_sync_node 注入）──
-    device_data:        Optional[dict]   # {"glucose": [...], "medication": {...}}
+    # ── 血糖数据（每轮对话由 glucose_reader_node 注入）──
+    glucose_readings:   Optional[list]   # [{recorded_at, glucose}, ...] 最近1小时
 
     # ── Agent 输出 ────────────────────────────────────────
     response:           Optional[str]
 
     # ── 下游触发 ─────────────────────────────────────────
     emotion_log:        Optional[dict]
-    task_trigger:       Optional[dict]
     alert_trigger:      Optional[dict]
 
     # ── 图片 / Vision Agent ────────────────────────────────
