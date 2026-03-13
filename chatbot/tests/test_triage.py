@@ -7,17 +7,9 @@ def test_medical_keywords():
     assert keyword_preclassify("吃了药") == "medical"
 
 
-def test_alert_keywords():
-    assert keyword_preclassify("我头好晕快晕倒了") == "alert"
-
-
 def test_emotional_keywords():
     assert keyword_preclassify("我好难过") == "emotional"
     assert keyword_preclassify("最近压力好大") == "emotional"
-
-
-def test_task_keywords():
-    assert keyword_preclassify("帮我打卡") == "task"
 
 
 def test_ambiguous_returns_none():

@@ -7,7 +7,6 @@
   - 历史：SQLite 长期记忆 + checkpointer 短期 history
 无追问链：所有数据进 agent 前已就绪，单轮回答
 """
-from datetime import datetime
 from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import call_sealion_with_history_stream, format_history_for_sealion
 from chatbot.memory.long_term import get_health_store
@@ -87,18 +86,6 @@ def expert_agent_node(state: ChatState) -> dict:
     if "emotional" in all_intents or state.get("emotion_label") in ["anxious", "sad", "angry"]:
         emotional_prefix = "先用一句话回应用户情绪，再给健康建议。\n"
 
-    # ── 任务后缀 ─────────────────────────────────────────────
-    task_trigger = None
-    task_suffix  = ""
-    if "task" in all_intents:
-        task_suffix  = "\n最后提醒用户：打卡任务已转给任务系统处理。"
-        task_trigger = {
-            "user_id":   state["user_id"],
-            "timestamp": datetime.now().isoformat(),
-            "request":   user_input,
-            "type":      "task_request",
-        }
-
     policy_instruction = state.get("policy_instruction", "")
 
     system_prompt = (
@@ -118,7 +105,7 @@ def expert_agent_node(state: ChatState) -> dict:
         f"通用规则：\n"
         "- 「打卡」指健康任务打卡，不是自我伤害\n"
         f"- 结合新加坡本地饮食文化\n"
-        f"- 回复150字以内{task_suffix}"
+        f"- 回复150字以内"
     )
 
     history = format_history_for_sealion(state.get("history", []))
@@ -127,7 +114,4 @@ def expert_agent_node(state: ChatState) -> dict:
     response = call_sealion_with_history_stream(system_prompt, history, reasoning=True)
 
     print(f"[Expert] 意图：{all_intents} | 情绪：{state.get('emotion_label', 'neutral')}")
-    return {
-        "response":     response,
-        "task_trigger": task_trigger,
-    }
+    return {"response": response}

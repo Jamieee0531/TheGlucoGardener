@@ -128,7 +128,6 @@ KEYWORD_RULES = [
         "难过", "伤心", "压力", "焦虑", "害怕", "孤独", "stress",
         "担心", "不开心", "depressed", "anxious",
     ]),
-    ("task", ["打卡", "积分", "提醒我", "记录血糖", "remind"]),
 ]
 
 EMOTION_KEYWORDS = {
@@ -192,13 +191,11 @@ def _full_triage(state: ChatState) -> dict:
 意图标签（按优先级，可多选）：
 - medical    （血糖偏高、药物、饮食建议、症状、身体不适）
 - emotional  （情绪倾诉、担心、沮丧、孤独、失望、需要陪伴）
-- task       （打卡、积分、提醒、上传照片）
 - chitchat   （日常闲聊）
 
 规则：
 - 纯礼貌/确认词（谢谢、好的、嗯、明白、收到、thanks、ok 等）无论上下文如何，始终归为 ["chitchat"]
 - 结合上下文：若前几轮是情绪话题，简短回应也归为emotional
-- "打卡"指健康任务，"打视频"、"打电话"是通讯行为归emotional
 - 身体不适（头晕、胸痛等紧急症状）归为 ["medical", "emotional"]
 - 只返回JSON，不要任何解释"""
 
@@ -239,7 +236,6 @@ def route_by_intent(state: ChatState) -> str:
     route_map = {
         "emotional": "companion_agent",
         "medical":   "expert_agent",
-        "task":      "task_forward",
         "chitchat":  "chitchat_agent",
     }
     return route_map.get(state.get("intent", "chitchat"), "chitchat_agent")
