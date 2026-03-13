@@ -1,7 +1,7 @@
 """
 专家 Agent — 慢性病医疗顾问
 数据来源：
-  - 血糖 / 用药：device_sync_node 从设备直读（精确）
+  - 血糖：glucose_reader_node 从共享DB直读（精确）
   - 饮食：Vision Agent 拍照识别（有图时）
   - 情绪：triage + policy（对话/语音）
   - 历史：SQLite 长期记忆 + checkpointer 短期 history
@@ -17,22 +17,11 @@ from chatbot.memory.rag.retriever import get_retriever
 
 def _fmt_glucose(readings: list) -> str:
     if not readings:
-        return "暂无今日数据"
+        return "暂无近1小时数据"
     return "、".join(
-        f"{r.get('time', '?')} {r.get('value', '?')} mmol/L"
+        f"{r.get('recorded_at', '?')[-8:-3]} {r.get('glucose', '?')} mmol/L"
         for r in readings
     )
-
-
-def _fmt_medication(adherence: dict) -> str:
-    if not adherence:
-        return "暂无记录"
-    taken  = [k for k, v in adherence.items() if v]
-    missed = [k for k, v in adherence.items() if not v]
-    parts  = []
-    if taken:  parts.append(f"已服：{', '.join(taken)}")
-    if missed: parts.append(f"⚠️ 未服：{', '.join(missed)}")
-    return "；".join(parts)
 
 
 def _fmt_diet(vision_result: list) -> str:
@@ -41,9 +30,9 @@ def _fmt_diet(vision_result: list) -> str:
     foods = []
     for vr in vision_result:
         if vr.get("scene_type") == "FOOD" and not vr.get("error"):
-            names = [i.get("name", "") for i in vr.get("items", []) if i.get("name")]
-            cal   = vr.get("total_calories_kcal", "")
-            desc  = "、".join(names)
+            name = vr.get("food_name", "")
+            cal = vr.get("total_calories", "")
+            desc = name
             if cal:
                 desc += f"（约{cal}大卡）"
             if desc:
@@ -62,10 +51,8 @@ def expert_agent_node(state: ChatState) -> dict:
     all_intents = state.get("all_intents", ["medical"])
     user_input  = state.get("user_input", "")
 
-    # ── 设备数据 ─────────────────────────────────────────────
-    device_data  = state.get("device_data") or {}
-    glucose_str  = _fmt_glucose(device_data.get("glucose", []))
-    med_str      = _fmt_medication(device_data.get("medication", {}))
+    # ── 血糖数据 ─────────────────────────────────────────────
+    glucose_str = _fmt_glucose(state.get("glucose_readings") or [])
 
     # ── 饮食（Vision Agent）───────────────────────────────────
     diet_str = _fmt_diet(state.get("vision_result") or [])
@@ -93,9 +80,8 @@ def expert_agent_node(state: ChatState) -> dict:
         f"患者：{name} | 病症：{', '.join(conditions)} | "
         f"处方用药：{', '.join(medications) if medications else '未记录'}\n"
         f"请用{language}回复。\n\n"
-        f"【今日健康数据（设备直读）】\n"
+        f"【近1小时血糖数据】\n"
         f"- 血糖记录：{glucose_str}\n"
-        f"- 用药情况：{med_str}\n"
         f"{f'- 今餐饮食：{diet_str}' + chr(10) if diet_str else ''}"
         f"\n{health_history + chr(10) if health_history else ''}"
         f"{f'【参考医学资料】{chr(10)}{rag_context}{chr(10)}' if rag_context else ''}"
