@@ -52,7 +52,7 @@ def input_node(state: ChatState) -> dict:
         result = process_voice_input(audio_path)
 
         # 写入语音情绪日志（confidence 门控）
-        if result["emotion_confidence"] >= 0.5:
+        if result["emotion_confidence"] >= 0.6:
             get_health_store().upsert_emotion_log(
                 state["user_id"], result["emotion_label"]
             )
@@ -130,14 +130,6 @@ KEYWORD_RULES = [
     ]),
 ]
 
-EMOTION_KEYWORDS = {
-    "sad":     ["难过", "伤心", "不开心", "sad", "depressed"],
-    "anxious": ["焦虑", "担心", "害怕", "紧张", "anxious", "worried", "压力"],
-    "angry":   ["生气", "烦", "angry", "frustrated"],
-    "happy":   ["开心", "高兴", "happy", "great"],
-}
-
-
 def keyword_preclassify(user_input: str) -> Optional[str]:
     """Classify intent by keywords. Returns intent string or None (fall back to LLM)."""
     import re
@@ -149,19 +141,14 @@ def keyword_preclassify(user_input: str) -> Optional[str]:
     return None
 
 
-def _simple_emotion_detect(
-    user_input: str,
+def resolve_emotion(
     voice_emotion: str,
     voice_confidence: float,
     input_mode: str,
 ) -> str:
-    """Detect emotion by keywords. Voice emotion overrides if mode=voice and confidence > 0.6."""
-    if input_mode == "voice" and voice_confidence > 0.6:
+    """Unified emotion resolution: voice >= 0.6 → use result, otherwise neutral."""
+    if input_mode == "voice" and voice_confidence >= 0.6:
         return voice_emotion
-    text = user_input.lower()
-    for emotion, keywords in EMOTION_KEYWORDS.items():
-        if any(kw in text for kw in keywords):
-            return emotion
     return "neutral"
 
 
@@ -175,7 +162,7 @@ def _full_triage(state: ChatState) -> dict:
     # ── Step 1: Try keyword pre-classification ──────────
     keyword_intent = keyword_preclassify(user_input)
     if keyword_intent:
-        emotion = _simple_emotion_detect(user_input, emotion_label, emotion_confidence, input_mode)
+        emotion = resolve_emotion(emotion_label, emotion_confidence, input_mode)
         print(f"[Triage] 关键词命中：{keyword_intent} | 情绪：{emotion}")
         return {
             "intent":        keyword_intent,
@@ -221,8 +208,8 @@ def _full_triage(state: ChatState) -> dict:
     if not intents:
         intents = [INTENT_CHITCHAT]
 
-    # 情绪：语音用模型结果，文字用关键词
-    emotion = _simple_emotion_detect(user_input, emotion_label, emotion_confidence, input_mode)
+    # 情绪：voice >= 0.6 用模型结果，否则 neutral
+    emotion = resolve_emotion(emotion_label, emotion_confidence, input_mode)
 
     print(f"[Triage] 意图：{intents} | 情绪：{emotion} | 输入：{input_mode}")
     return {

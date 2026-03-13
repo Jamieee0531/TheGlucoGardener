@@ -1,5 +1,5 @@
-"""Test triage keyword pre-classification."""
-from agents.triage import keyword_preclassify, _simple_emotion_detect
+"""Test triage keyword pre-classification and emotion resolution."""
+from agents.triage import keyword_preclassify, resolve_emotion
 
 
 def test_medical_keywords():
@@ -18,18 +18,19 @@ def test_ambiguous_returns_none():
     assert keyword_preclassify("你好") is None
 
 
-def test_simple_emotion_detects_sad():
-    assert _simple_emotion_detect("我好难过", "neutral", 0.0, "text") == "sad"
+def test_emotion_voice_confident_uses_meralion():
+    """Voice + confidence >= 0.6 should use MERaLiON result."""
+    assert resolve_emotion("sad", 0.8, "voice") == "sad"
+    assert resolve_emotion("anxious", 0.6, "voice") == "anxious"
 
 
-def test_simple_emotion_detects_anxious():
-    assert _simple_emotion_detect("我很担心", "neutral", 0.0, "text") == "anxious"
+def test_emotion_voice_low_confidence_neutral():
+    """Voice + confidence < 0.6 should be neutral."""
+    assert resolve_emotion("sad", 0.5, "voice") == "neutral"
+    assert resolve_emotion("angry", 0.3, "voice") == "neutral"
 
 
-def test_simple_emotion_defaults_neutral():
-    assert _simple_emotion_detect("今天天气不错", "neutral", 0.0, "text") == "neutral"
-
-
-def test_simple_emotion_uses_voice_when_confident():
-    """When voice mode and confidence > 0.6, use voice emotion."""
-    assert _simple_emotion_detect("text doesn't matter", "sad", 0.8, "voice") == "sad"
+def test_emotion_text_always_neutral():
+    """Text input should always be neutral regardless of content."""
+    assert resolve_emotion("neutral", 0.0, "text") == "neutral"
+    assert resolve_emotion("sad", 0.9, "text") == "neutral"
