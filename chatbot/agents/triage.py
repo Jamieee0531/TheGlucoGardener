@@ -4,6 +4,8 @@ agents/triage.py
 追问链进行中：只检测退出意图，不判断情绪（省token）
 """
 import json
+import re
+from datetime import datetime
 from typing import Optional
 from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import call_sealion
@@ -112,7 +114,54 @@ def input_node(state: ChatState) -> dict:
     return updates
 
 
+# ── Crisis detection ──────────────────────────────────────────────────────────
+_CRISIS_PATTERNS = [
+    r"活着.*没.*意思", r"不想.*活", r"去死", r"伤害.*自己", r"结束.*生命",
+    r"no\s*point\s*living", r"want\s*to\s*die", r"hurt\s*myself", r"end\s*my\s*life",
+]
+
+
+def is_crisis(text: str) -> bool:
+    """Check for suicide/self-harm crisis keywords."""
+    return any(re.search(p, text) for p in _CRISIS_PATTERNS)
+
+
+def _crisis_response(state: ChatState) -> dict:
+    """Generate crisis response + alert_trigger. Called when triage detects crisis."""
+    profile = state.get("user_profile", {})
+    name = profile.get("name", "您")
+    language = profile.get("language", "Chinese")
+    user_id = state["user_id"]
+    user_input = state["user_input"]
+
+    response = (
+        f"{name}，您刚才说的话让我很担心。"
+        "您的生命很重要，您不需要一个人扛着这些。"
+        "请拨打新加坡心理援助热线：1-767（24小时）或 IMH：6389 2222。"
+        "我在这里陪您——能告诉我，是什么让您有这样的感受吗？"
+    ) if language != "English" else (
+        "I'm really concerned about what you said. You matter and you're not alone. "
+        "Please call Samaritans of Singapore: 1-767 (24hr) or IMH: 6389 2222."
+    )
+
+    return {
+        "response": response,
+        "intent": "crisis",
+        "alert_trigger": {
+            "user_id": user_id,
+            "timestamp": datetime.now().isoformat(),
+            "alert_input": user_input,
+            "severity": "心理危机",
+        },
+    }
+
+
 def triage_node(state: ChatState) -> dict:
+    user_input = state["user_input"]
+    # Crisis check first — short-circuits entire pipeline
+    if is_crisis(user_input):
+        print(f"[Triage] ⚠️ 心理危机检测触发")
+        return _crisis_response(state)
     return _full_triage(state)
 
 
@@ -132,7 +181,6 @@ KEYWORD_RULES = [
 
 def keyword_preclassify(user_input: str) -> Optional[str]:
     """Classify intent by keywords. Returns intent string or None (fall back to LLM)."""
-    import re
     text = user_input.lower()
     for intent, keywords in KEYWORD_RULES:
         for kw in keywords:

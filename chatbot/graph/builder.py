@@ -48,7 +48,20 @@ def build_graph(checkpointer=None):
     # ── 固定边 ───────────────────────────────────────────
     graph.add_edge("input_node",  "glucose_reader")
     graph.add_edge("glucose_reader", "triage_node")
-    graph.add_edge("triage_node", "policy_node")
+    # ── 条件路由：triage → crisis short-circuit or policy ──
+    def _route_after_triage(state: ChatState) -> str:
+        if state.get("intent") == "crisis":
+            return "history_update"
+        return "policy_node"
+
+    graph.add_conditional_edges(
+        "triage_node",
+        _route_after_triage,
+        {
+            "history_update": "history_update",
+            "policy_node": "policy_node",
+        }
+    )
 
     # ── 条件路由：policy → 各Agent ───────────────────────
     graph.add_conditional_edges(

@@ -1,10 +1,8 @@
 """
 陪伴Agent，用Qwen对话模型
 接收policy指令决定回复风格
-内置心理危机关键词检测
-长期记忆：读取近期情绪摘要注入 prompt，回复后生成本轮摘要并存储
+长期记忆：读取近期情绪摘要注入 prompt
 """
-import re
 from datetime import datetime
 from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import (
@@ -12,17 +10,7 @@ from chatbot.utils.llm_factory import (
 )
 from chatbot.memory.long_term import get_health_store
 
-# 用 regex 覆盖变体（"活着没什么意思"、"不想活了" 等）
-_CRISIS_PATTERNS = [
-    r"活着.*没.*意思", r"不想.*活", r"去死", r"伤害.*自己", r"结束.*生命",
-    r"no\s*point\s*living", r"want\s*to\s*die", r"hurt\s*myself", r"end\s*my\s*life",
-]
-
 NEGATIVE_EMOTIONS = {"sad", "anxious", "angry", "scared"}
-
-
-def _is_crisis(text: str) -> bool:
-    return any(re.search(p, text) for p in _CRISIS_PATTERNS)
 
 
 def _generate_emotion_summary(user_input: str, response: str, emotion_label: str) -> str:
@@ -48,31 +36,6 @@ def companion_agent_node(state: ChatState) -> dict:
     emotion_label      = state.get("emotion_label", "neutral")
     policy_instruction = state.get("policy_instruction", "")
     user_id            = state["user_id"]
-
-    # 心理危机检测
-    if _is_crisis(user_input):
-        response = (
-            f"{name}，您刚才说的话让我很担心。"
-            "您的生命很重要，您不需要一个人扛着这些。"
-            "请拨打新加坡心理援助热线：1-767（24小时）或 IMH：6389 2222。"
-            "我在这里陪您——能告诉我，是什么让您有这样的感受吗？"
-        ) if language != "English" else (
-            "I'm really concerned about what you said. You matter and you're not alone. "
-            "Please call Samaritans of Singapore: 1-767 (24hr) or IMH: 6389 2222."
-        )
-        print(f"\n助手：{response}")
-        print(f"[陪伴Agent] ⚠️ 心理危机检测触发")
-        return {
-            "response": response,
-            "emotion_log": {
-                "user_id": user_id, "timestamp": datetime.now().isoformat(),
-                "input": user_input, "emotion_label": "crisis", "is_crisis": True,
-            },
-            "alert_trigger": {
-                "user_id": user_id, "timestamp": datetime.now().isoformat(),
-                "alert_input": user_input, "severity": "心理危机",
-            },
-        }
 
     # ── 读取近期情绪摘要（长期记忆）────────────────────────────
     store           = get_health_store()
