@@ -32,7 +32,6 @@ def _per_turn(
         "all_intents":        None,
         "response":           None,
         "emotion_log":        None,
-        "task_trigger":       None,
         "image_paths":        image_paths,
         "vision_result":      None,
     }
@@ -122,8 +121,6 @@ def run_cli():
 
         if result.get("emotion_log"):
             print("  📊 → 集成数据库：情绪记录已写入")
-        if result.get("task_trigger"):
-            print("  📋 → Chayi 任务模块：task_trigger 已发出")
         print()
 
 
