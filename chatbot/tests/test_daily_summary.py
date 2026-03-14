@@ -31,28 +31,27 @@ def test_emotion_summary_table_created():
 
 
 def test_save_and_get_emotion_summary():
-    """save_emotion_summary should write, get_emotion_summaries should read from new table."""
+    """save_emotion_summary should write, get_emotion_summaries should read."""
     store, db_path = _make_store()
     try:
         with patch("chatbot.memory.long_term.DB_PATH", db_path):
-            store.save_emotion_summary("user_001", "患者今日情绪低落，因血糖控制不佳感到焦虑", "sad", "2026-03-13")
+            store.save_emotion_summary("user_001", "患者今日情绪低落，因血糖控制不佳感到焦虑", "2026-03-13")
             summaries = store.get_emotion_summaries("user_001", days=7)
             assert len(summaries) == 1
             assert summaries[0]["text"] == "患者今日情绪低落，因血糖控制不佳感到焦虑"
-            assert summaries[0]["emotion"] == "sad"
             assert "2026-03-13" in summaries[0]["date"]
     finally:
         os.unlink(db_path)
 
 
 def test_run_daily_summary_calls_llm_and_stores():
-    """run_daily_summary should read daily log, call LLM, write summary, clear log."""
+    """run_daily_summary should read today's log, call LLM, write summary."""
     store, db_path = _make_store()
     try:
         with patch("chatbot.memory.long_term.DB_PATH", db_path):
-            # Seed some daily emotion logs
-            store.log_daily_emotion("user_001", "sad", "我今天很难过")
-            store.log_daily_emotion("user_001", "anxious", "血糖又高了好焦虑")
+            # Seed some emotion logs
+            store.log_emotion("user_001", "sad", "我今天很难过")
+            store.log_emotion("user_001", "anxious", "血糖又高了好焦虑")
 
             from chatbot.jobs.daily_summary import run_daily_summary
 
@@ -65,11 +64,6 @@ def test_run_daily_summary_calls_llm_and_stores():
             summaries = store.get_emotion_summaries("user_001", days=1)
             assert len(summaries) == 1
             assert "情绪波动" in summaries[0]["text"]
-
-            # Daily log should be cleared
-            logs = store.get_daily_emotions("user_001")
-            assert len(logs) == 0
-
 
     finally:
         os.unlink(db_path)
