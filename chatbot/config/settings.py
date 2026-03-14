@@ -38,14 +38,12 @@ MAX_HISTORY_CHARS = 2000 # 历史字符上限
 
 
 # 意图类别
-INTENT_EMOTIONAL = "emotional"   # 情绪支持
 INTENT_MEDICAL   = "medical"     # 医疗咨询
-INTENT_CHITCHAT  = "chitchat"    # 日常闲聊
+INTENT_COMPANION = "companion"   # 陪伴/闲聊
 
 ALL_INTENTS = [
-    INTENT_EMOTIONAL,
     INTENT_MEDICAL,
-    INTENT_CHITCHAT,
+    INTENT_COMPANION,
 ]
 
 
