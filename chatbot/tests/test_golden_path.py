@@ -46,9 +46,6 @@ def _build_state(**overrides):
         emotion_confidence=0.0,
         intent=None,
         all_intents=None,
-        policy_instruction=None,
-        recent_emotions=[],
-        persistent_alert=None,
         history=[],
         user_profile={
             "name": "测试用户",
@@ -59,7 +56,6 @@ def _build_state(**overrides):
         glucose_readings=None,
         response=None,
         emotion_log=None,
-        alert_trigger=None,
         image_paths=None,
         vision_result=None,
     )
@@ -128,5 +124,3 @@ def test_crisis_short_circuits(mock_triage, mock_history, mock_stream):
     assert result.get("intent") == "crisis"
     assert result.get("response") is not None
     assert "1-767" in result["response"] or "6389" in result["response"]
-    assert result.get("alert_trigger") is not None
-    assert result["alert_trigger"]["severity"] == "心理危机"

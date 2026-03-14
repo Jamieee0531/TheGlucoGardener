@@ -5,11 +5,10 @@ agents/triage.py
 """
 import json
 import re
-from datetime import datetime
 from typing import Optional
 from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import call_sealion
-from chatbot.utils.meralion import process_voice_input
+from chatbot.utils.meralion import process_voice_input, process_text_input
 from chatbot.config.settings import ALL_INTENTS, INTENT_CHITCHAT
 from chatbot.memory.long_term import get_health_store
 
@@ -53,12 +52,6 @@ def input_node(state: ChatState) -> dict:
         audio_path = state.get("audio_path", "")
         result = process_voice_input(audio_path)
 
-        # 写入语音情绪日志（confidence 门控）
-        if result["emotion_confidence"] >= 0.6:
-            get_health_store().upsert_emotion_log(
-                state["user_id"], result["emotion_label"]
-            )
-
         return {
             "user_input":         result["transcribed_text"],
             "transcribed_text":   result["transcribed_text"],
@@ -101,10 +94,13 @@ def input_node(state: ChatState) -> dict:
         scene = vision_result[0].get("scene_type", "UNKNOWN") if vision_result else "UNKNOWN"
         user_input = SCENE_TEXT_MAP.get(scene, "我发了一张照片")
 
+    # ── 文字情绪识别（语义）────────────────────────────────
+    emotion_result = process_text_input(user_input)
+
     updates = {
         "transcribed_text":   user_input,
-        "emotion_label":      "neutral",
-        "emotion_confidence": 0.0,
+        "emotion_label":      emotion_result["emotion_label"],
+        "emotion_confidence": emotion_result["emotion_confidence"],
     }
 
     if image_paths:
@@ -127,12 +123,10 @@ def is_crisis(text: str) -> bool:
 
 
 def _crisis_response(state: ChatState) -> dict:
-    """Generate crisis response + alert_trigger. Called when triage detects crisis."""
+    """Generate crisis response. Called when triage detects crisis."""
     profile = state.get("user_profile", {})
     name = profile.get("name", "您")
     language = profile.get("language", "Chinese")
-    user_id = state["user_id"]
-    user_input = state["user_input"]
 
     response = (
         f"{name}，您刚才说的话让我很担心。"
@@ -147,12 +141,6 @@ def _crisis_response(state: ChatState) -> dict:
     return {
         "response": response,
         "intent": "crisis",
-        "alert_trigger": {
-            "user_id": user_id,
-            "timestamp": datetime.now().isoformat(),
-            "alert_input": user_input,
-            "severity": "心理危机",
-        },
     }
 
 
@@ -167,15 +155,11 @@ def triage_node(state: ChatState) -> dict:
 
 
 # ── Keyword pre-classification ────────────────────────────────────────────
-# Checked before LLM call. Order matters: alert > medical > emotional > task.
+# 只识别 medical（路由到 expert），其余由 companion 兜底
 KEYWORD_RULES = [
     ("medical", [
         "血糖", "glucose", "sugar", "药", "medicine", "metformin",
         "二甲双胍", "饮食", "diet", "吃了什么", "GI", "升糖",
-    ]),
-    ("emotional", [
-        "难过", "伤心", "压力", "焦虑", "害怕", "孤独", "stress",
-        "担心", "不开心", "depressed", "anxious",
     ]),
 ]
 
@@ -189,35 +173,20 @@ def keyword_preclassify(user_input: str) -> Optional[str]:
     return None
 
 
-def resolve_emotion(
-    voice_emotion: str,
-    voice_confidence: float,
-    input_mode: str,
-) -> str:
-    """Unified emotion resolution: voice >= 0.6 → use result, otherwise neutral."""
-    if input_mode == "voice" and voice_confidence >= 0.6:
-        return voice_emotion
-    return "neutral"
-
-
 def _full_triage(state: ChatState) -> dict:
-    """意图判断：关键词预分类 + LLM兜底。情绪只用关键词或语音模型，不走LLM。"""
-    emotion_label      = state.get("emotion_label", "neutral")
-    emotion_confidence = state.get("emotion_confidence", 0.0)
-    input_mode         = state.get("input_mode", "text")
-    user_input         = state["user_input"]
+    """意图判断：关键词预分类 + LLM兜底。情绪由 input_node 已通过 MERaLiON 设好。"""
+    emotion_label = state.get("emotion_label", "neutral")
+    user_input    = state["user_input"]
 
     # ── Step 1: Try keyword pre-classification ──────────
     keyword_intent = keyword_preclassify(user_input)
     if keyword_intent:
-        emotion = resolve_emotion(emotion_label, emotion_confidence, input_mode)
-        if emotion != "neutral":
-            get_health_store().log_daily_emotion(state["user_id"], emotion, user_input)
-        print(f"[Triage] 关键词命中：{keyword_intent} | 情绪：{emotion}")
+        get_health_store().log_emotion(state["user_id"], emotion_label, user_input)
+        print(f"[Triage] 关键词命中：{keyword_intent} | 情绪：{emotion_label}")
         return {
             "intent":        keyword_intent,
             "all_intents":   [keyword_intent],
-            "emotion_label": emotion,
+            "emotion_label": emotion_label,
         }
 
     # ── Step 2: LLM 只判意图，情绪用关键词 ──────────────
@@ -258,23 +227,15 @@ def _full_triage(state: ChatState) -> dict:
     if not intents:
         intents = [INTENT_CHITCHAT]
 
-    # 情绪：voice >= 0.6 用模型结果，否则 neutral
-    emotion = resolve_emotion(emotion_label, emotion_confidence, input_mode)
-    if emotion != "neutral":
-        get_health_store().log_daily_emotion(state["user_id"], emotion, user_input)
-
-    print(f"[Triage] 意图：{intents} | 情绪：{emotion} | 输入：{input_mode}")
+    get_health_store().log_emotion(state["user_id"], emotion_label, user_input)
+    print(f"[Triage] 意图：{intents} | 情绪：{emotion_label}")
     return {
         "intent":        intents[0],
         "all_intents":   intents,
-        "emotion_label": emotion,
+        "emotion_label": emotion_label,
     }
 
 
 def route_by_intent(state: ChatState) -> str:
-    route_map = {
-        "emotional": "companion_agent",
-        "medical":   "expert_agent",
-        "chitchat":  "chitchat_agent",
-    }
-    return route_map.get(state.get("intent", "chitchat"), "chitchat_agent")
+    intent = state.get("intent", "chitchat")
+    return "expert_agent" if intent == "medical" else "companion_agent"

@@ -23,11 +23,6 @@ class ChatState(TypedDict):
     intent:             Optional[str]
     all_intents:        Optional[list]
 
-    # ── Policy 层输出 ────────────────────────────────────
-    policy_instruction: Optional[str]   # 策略指令字符串
-    recent_emotions:    Optional[list]  # 最近5轮情绪记录
-    persistent_alert:   Optional[dict]  # 持续负面情绪预警
-
     # ── 对话记忆 ─────────────────────────────────────────
     history:            list
     user_profile:       dict
@@ -40,7 +35,6 @@ class ChatState(TypedDict):
 
     # ── 下游触发 ─────────────────────────────────────────
     emotion_log:        Optional[dict]
-    alert_trigger:      Optional[dict]
 
     # ── 图片 / Vision Agent ────────────────────────────────
     image_paths:        Optional[list]    # 用户发送的图片路径列表

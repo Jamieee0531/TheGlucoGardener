@@ -20,12 +20,11 @@ SEALION_INSTRUCT_MODEL = "aisingapore/Qwen-SEA-LION-v4-32B-IT" # 患者交互用
 SEALION_REASONING_MODEL = "aisingapore/Llama-SEA-LION-v3.5-70B-R" # 专家/预警 用 Reasoning 模型
 
 
-# MERaLiON 配置（语音处理）
-MERALION_API_KEY = os.getenv("MERALION_API_KEY", "")
-MERALION_BASE_URL = os.getenv("MERALION_BASE_URL", "https://api.meralion.ai/v1")
+# MERaLiON 配置（语音情绪识别）
+MERALION_API_KEY = os.getenv("MERALION_API_KEY", "Xiaobei-l5hI1RJwg1qrNL6YxeV5LTREBwhBNHHo")
+MERALION_BASE_URL = os.getenv("MERALION_BASE_URL", "http://meralion.org:8010")
 
-MERALION_ASR_MODEL = "MERaLiON-2-10B-ASR"   # 语音转文字
-MERALION_SER_MODEL = "MERaLiON-SER-v1"       # 情绪识别
+MERALION_MODEL = "MERaLiON/MERaLiON-2-10B"  # chat completions 情绪识别
 
 
 # 备用：OpenAI（SEA-LION API 未就绪时使用）
@@ -55,9 +54,8 @@ EMOTION_LABELS = [
     "neutral",
     "happy",
     "sad",
-    "anxious",
+    "fearful",
     "angry",
-    "confused",
 ]
 
 def get_active_api_key() -> str:

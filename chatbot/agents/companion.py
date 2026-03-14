@@ -1,6 +1,5 @@
 """
 陪伴Agent，用Qwen对话模型
-接收policy指令决定回复风格
 长期记忆：读取近期情绪摘要注入 prompt（写入由 23:59 daily job 负责）
 """
 from datetime import datetime
@@ -16,19 +15,20 @@ def companion_agent_node(state: ChatState) -> dict:
     name               = profile.get("name", "您")
     language           = profile.get("language", "Chinese")
     user_input         = state["user_input"]
-    emotion_label      = state.get("emotion_label", "neutral")
-    policy_instruction = state.get("policy_instruction", "")
-    user_id            = state["user_id"]
+    emotion_label = state.get("emotion_label", "neutral")
+    user_id       = state["user_id"]
 
     # ── 读取近期情绪摘要（长期记忆）────────────────────────────
     store           = get_health_store()
     emotion_context = store.format_emotion_summary_for_llm(user_id, days=14)
 
+    emotion_hint = f"【当前情绪】{emotion_label}\n" if emotion_label != "neutral" else ""
+
     system_prompt = (
         f"你是温暖、有耐心的健康陪伴助手，陪伴新加坡的慢性病患者。\n"
         f"患者姓名：{name}，请用{language}回复。\n"
         f"{emotion_context + chr(10) if emotion_context else ''}"
-        f"{f'【用户当前状态】{policy_instruction}' + chr(10) if policy_instruction else ''}"
+        f"{emotion_hint}"
         "通用原则：\n"
         "- 回复60字以内，越短越好\n"
         "- 不提供具体医疗建议\n"

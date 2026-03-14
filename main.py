@@ -4,7 +4,9 @@ main.py — 项目统一入口
 
 History 由 LangGraph Checkpointer 自动持久化，main.py 无需手动维护。
 """
+from apscheduler.schedulers.background import BackgroundScheduler
 from chatbot.graph.builder import app
+from chatbot.jobs.daily_summary import run_daily_summary
 from chatbot.utils.memory import get_user_profile
 
 
@@ -28,12 +30,9 @@ def _per_turn(
         "emotion_confidence": 0.0,
         "intent":             None,
         "all_intents":        None,
-        "policy_instruction": None,
-        "persistent_alert":   None,
         "response":           None,
         "emotion_log":        None,
         "task_trigger":       None,
-        "alert_trigger":      None,
         "image_paths":        image_paths,
         "vision_result":      None,
     }
@@ -67,6 +66,11 @@ def run_cli():
 
     user_id = "user_001"
     config  = {"configurable": {"thread_id": user_id}}
+
+    # 每日 23:59 情绪汇总定时任务
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(run_daily_summary, 'cron', hour=23, minute=59)
+    scheduler.start()
 
     # 初始化线程持久状态
     _init_thread(config, user_id)
@@ -114,9 +118,7 @@ def run_cli():
 
         intent  = result.get("intent", "?")
         emotion = result.get("emotion_label", "neutral")
-        stage   = result.get("conversation_stage") or "idle"
-        policy  = result.get("policy_instruction", "")[:25]
-        print(f"  [{intent} | {emotion} | 阶段:{stage} | 策略:{policy}]\n")
+        print(f"  [{intent} | {emotion}]\n")
 
         if result.get("emotion_log"):
             print("  📊 → 集成数据库：情绪记录已写入")

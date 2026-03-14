@@ -1,163 +1,161 @@
 """
 utils/meralion.py
 MERaLiON API 集成
-流程：上传音频 → /transcribe → /analyze → 解析情绪标签
+- 语音输入：base64编码音频 → 转录 + 情绪识别（官方模板）
+- 文字输入：纯文本 → 语义情绪识别
+logprob 解析：扫 top_logprobs 取第一个合法情绪标签
 """
+import base64
+import math
 import os
-import re
-import time
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-MERALION_BASE_URL = os.getenv("MERALION_BASE_URL", "https://api.cr8lab.com")
-MERALION_API_KEY  = os.getenv("MERALION_API_KEY", "")
+MERALION_BASE_URL = os.getenv("MERALION_BASE_URL", "http://meralion.org:8010")
+MERALION_API_KEY  = os.getenv("MERALION_API_KEY", "Xiaobei-l5hI1RJwg1qrNL6YxeV5LTREBwhBNHHo")
+MERALION_MODEL    = os.getenv("MERALION_MODEL", "MERaLiON/MERaLiON-2-10B")
 
-# /analyze返回的emotion词 → 我们的标签体系
-EMOTION_KEYWORD_MAP = {
-    # sad
-    "sad": "sad", "unhappy": "sad", "depressed": "sad",
-    "disappointed": "sad", "grief": "sad", "melancholy": "sad",
-    "lonely": "sad", "sorrowful": "sad",
-    # anxious
-    "anxious": "anxious", "worried": "anxious", "nervous": "anxious",
-    "fearful": "anxious", "scared": "anxious", "stressed": "anxious",
-    "tense": "anxious", "apprehensive": "anxious",
-    # angry
-    "angry": "angry", "frustrated": "angry", "irritated": "angry",
-    "annoyed": "angry", "furious": "angry", "agitated": "angry",
-    "hostile": "angry",
-    # happy
-    "happy": "happy", "joyful": "happy", "excited": "happy",
-    "pleased": "happy", "content": "happy", "cheerful": "happy",
-    "positive": "happy", "enthusiastic": "happy",
-    # confused
-    "confused": "confused", "uncertain": "confused", "puzzled": "confused",
-    "hesitant": "confused",
-    # neutral
-    "neutral": "neutral", "calm": "neutral", "flat": "neutral",
-}
+CONFIDENCE_THRESHOLD = 0.4
+VALID_EMOTIONS = {"angry", "sad", "fearful", "happy", "neutral"}
+
+# 官方语音 prompt 模板
+_AUDIO_PROMPT = "Instruction: {query} \nFollow the text instruction based on the following audio: <SpeechHere>"
+_EMOTION_QUERY = "Analyze the speaker's emotion from both tone and content. Reply with a single word only, one of: angry sad fearful happy neutral"
 
 
-def _upload_audio(audio_path: str) -> str:
-    """上传音频到S3，返回fileKey"""
-    filename    = os.path.basename(audio_path)
-    file_size   = os.path.getsize(audio_path)
-    content_type = "audio/wav" if filename.endswith(".wav") else "audio/mpeg"
+def _parse_emotion_from_logprobs(data: dict) -> tuple[str, float]:
+    """
+    从 top_logprobs 扫描，取第一个在 VALID_EMOTIONS 里的候选及其概率。
+    模型有时输出截断词（'an'、'frust'），直接取 content 字段不可靠。
+    """
+    try:
+        top = data["choices"][0]["logprobs"]["content"][0]["top_logprobs"]
+        for candidate in top:
+            token = candidate["token"].strip().lower()
+            prob  = math.exp(candidate["logprob"])
+            if token in VALID_EMOTIONS:
+                return token, prob
+    except (KeyError, IndexError, TypeError):
+        pass
+    # fallback：取 content 字段
+    raw = data["choices"][0]["message"]["content"].strip().lower()
+    return ("neutral", 0.0) if raw not in VALID_EMOTIONS else (raw, 0.5)
 
-    # Step1: 获取presigned URL
+
+# ── 语音相关 ──────────────────────────────────────────────────────
+
+def _call_audio_api(audio_b64: str, content_type: str, query: str,
+                    max_tokens: int, logprobs: bool = False) -> dict:
     resp = requests.post(
-        f"{MERALION_BASE_URL}/upload-url",
-        headers={"x-api-key": MERALION_API_KEY, "Content-Type": "application/json"},
-        json={"filename": filename, "contentType": content_type, "fileSize": file_size},
-        timeout=15,
-    )
-    resp.raise_for_status()
-    data       = resp.json()["response"]
-    upload_url = data["url"]
-    file_key   = data["key"]
-
-    # Step2: PUT上传音频
-    with open(audio_path, "rb") as f:
-        put_resp = requests.put(
-            upload_url,
-            headers={"Content-Type": content_type},
-            data=f,
-            timeout=60,
-        )
-    put_resp.raise_for_status()
-    print(f"[MERaLiON] 音频上传成功：{filename}")
-    return file_key
-
-
-def _transcribe(file_key: str) -> str:
-    """调用/transcribe，返回转录文字"""
-    resp = requests.post(
-        f"{MERALION_BASE_URL}/transcribe",
-        headers={"x-api-key": MERALION_API_KEY, "Content-Type": "application/json"},
-        json={"key": file_key},
+        f"{MERALION_BASE_URL}/v1/chat/completions",
+        headers={"Authorization": f"Bearer {MERALION_API_KEY}"},
+        json={
+            "model": MERALION_MODEL,
+            "messages": [{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": _AUDIO_PROMPT.format(query=query)},
+                    {"type": "audio_url", "audio_url": {"url": f"data:{content_type};base64,{audio_b64}"}},
+                ],
+            }],
+            "temperature": 0.0,
+            "max_tokens": max_tokens,
+            "logprobs": logprobs,
+            "top_logprobs": 5 if logprobs else 0,
+        },
         timeout=60,
     )
     resp.raise_for_status()
-    text = resp.json()["response"]["text"]
-    print(f"[MERaLiON] 转录完成：{text[:50]}...")
+    return resp.json()
+
+
+def _transcribe(audio_b64: str, content_type: str) -> str:
+    data = _call_audio_api(audio_b64, content_type,
+                           query="Please transcribe this speech.",
+                           max_tokens=256, logprobs=False)
+    text = data["choices"][0]["message"]["content"].strip()
+    print(f"[MERaLiON] 转录完成：{text[:60]}{'...' if len(text) > 60 else ''}")
     return text
 
 
-def _analyze(file_key: str) -> tuple[str, float]:
-    """
-    调用/analyze，解析情绪标签
-    返回 (emotion_label, confidence)
-    """
-    resp = requests.post(
-        f"{MERALION_BASE_URL}/analyze",
-        headers={"x-api-key": MERALION_API_KEY, "Content-Type": "application/json"},
-        json={"key": file_key, "segment_length": 4},
-        timeout=60,
-    )
-    resp.raise_for_status()
-    raw_text = resp.json()["response"]["text"].lower()
-
-    # 从文字描述里提取emotion关键词
-    # 格式例：Emotion: Frustrated Tone: Critical ...
-    emotion_label = "neutral"
-    matched_word  = None
-
-    # 优先匹配"Emotion:"后面的词
-    emotion_match = re.search(r"emotion[:\s]+(\w+)", raw_text)
-    if emotion_match:
-        word = emotion_match.group(1).strip()
-        emotion_label = EMOTION_KEYWORD_MAP.get(word, "neutral")
-        matched_word  = word
-
-    # 如果没匹配到，扫描全文
-    if emotion_label == "neutral" and not matched_word:
-        for keyword, label in EMOTION_KEYWORD_MAP.items():
-            if keyword in raw_text:
-                emotion_label = label
-                matched_word  = keyword
-                break
-
-    # MERaLiON没有置信度，根据是否明确匹配给固定值
-    confidence = 0.8 if matched_word and matched_word != "neutral" else 0.5
-
-    print(f"[MERaLiON] 情绪分析：原始='{raw_text.strip()}' → 标签={emotion_label}（置信度{confidence}）")
+def _analyze_audio_emotion(audio_b64: str, content_type: str) -> tuple[str, float]:
+    data = _call_audio_api(audio_b64, content_type,
+                           query=_EMOTION_QUERY, max_tokens=5, logprobs=True)
+    emotion_label, confidence = _parse_emotion_from_logprobs(data)
+    if confidence < CONFIDENCE_THRESHOLD:
+        emotion_label = "neutral"
+    print(f"[MERaLiON] 语音情绪：{emotion_label}（置信度{confidence:.3f}）")
     return emotion_label, confidence
 
 
 def process_voice_input(audio_path: str) -> dict:
-    """
-    主入口：音频文件路径 → 转录文字 + 情绪标签
-    返回格式与ChatState兼容
-    """
+    """音频文件路径 → 转录文字 + 情绪标签"""
     try:
-        file_key          = _upload_audio(audio_path)
-        time.sleep(1)  # 等待S3处理完成
-        transcribed_text  = _transcribe(file_key)
-        emotion_label, confidence = _analyze(file_key)
-
+        with open(audio_path, "rb") as f:
+            audio_b64 = base64.b64encode(f.read()).decode()
+        content_type = "audio/wav" if audio_path.lower().endswith(".wav") else "audio/mpeg"
+        transcribed_text          = _transcribe(audio_b64, content_type)
+        emotion_label, confidence = _analyze_audio_emotion(audio_b64, content_type)
         return {
             "transcribed_text":   transcribed_text,
             "emotion_label":      emotion_label,
             "emotion_confidence": confidence,
         }
-
     except Exception as e:
-        print(f"[MERaLiON] 调用失败：{e}，返回默认值")
-        return {
-            "transcribed_text":   "",
-            "emotion_label":      "neutral",
-            "emotion_confidence": 0.0,
-        }
+        print(f"[MERaLiON] 语音调用失败：{e}")
+        return {"transcribed_text": "", "emotion_label": "neutral", "emotion_confidence": 0.0}
 
 
-# ── Mock模式（无API Key时使用）────────────────────────────
+# ── 文字情绪识别 ──────────────────────────────────────────────────
+
+def _analyze_text_emotion(text: str) -> tuple[str, float]:
+    resp = requests.post(
+        f"{MERALION_BASE_URL}/v1/chat/completions",
+        headers={"Authorization": f"Bearer {MERALION_API_KEY}"},
+        json={
+            "model": MERALION_MODEL,
+            "messages": [{
+                "role": "user",
+                "content": (
+                    "Analyze the emotion in the following text. "
+                    "Reply with a single word only, one of: angry sad fearful happy neutral\n"
+                    f"Text: {text}"
+                ),
+            }],
+            "temperature": 0.0,
+            "max_tokens": 5,
+            "logprobs": True,
+            "top_logprobs": 5,
+        },
+        timeout=30,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    emotion_label, confidence = _parse_emotion_from_logprobs(data)
+    if confidence < CONFIDENCE_THRESHOLD:
+        emotion_label = "neutral"
+    print(f"[MERaLiON] 文字情绪：{emotion_label}（置信度{confidence:.3f}）")
+    return emotion_label, confidence
+
+
+def process_text_input(text: str) -> dict:
+    """文字内容 → 情绪标签（语义识别）"""
+    try:
+        emotion_label, confidence = _analyze_text_emotion(text)
+        return {"emotion_label": emotion_label, "emotion_confidence": confidence}
+    except Exception as e:
+        print(f"[MERaLiON] 文字情绪调用失败：{e}")
+        return {"emotion_label": "neutral", "emotion_confidence": 0.0}
+
+
+# ── Mock模式 ──────────────────────────────────────────────────────
 def process_voice_input_mock(audio_path: str) -> dict:
-    """测试用mock，不调用真实API"""
     print(f"[MERaLiON Mock] 处理：{audio_path}")
-    return {
-        "transcribed_text":   "我今天血糖有点高，很担心",
-        "emotion_label":      "anxious",
-        "emotion_confidence": 0.82,
-    }
+    return {"transcribed_text": "我今天血糖有点高，很担心", "emotion_label": "fearful", "emotion_confidence": 0.82}
+
+
+def process_text_input_mock(text: str) -> dict:
+    print(f"[MERaLiON Mock] 文字情绪：{text[:30]}")
+    return {"emotion_label": "neutral", "emotion_confidence": 0.85}

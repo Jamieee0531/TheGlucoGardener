@@ -65,12 +65,8 @@ def expert_agent_node(state: ChatState) -> dict:
         rag_query   = f"{user_input} 血糖 {glucose_str} 饮食 {diet_str}"
         rag_context = get_retriever().retrieve(rag_query, n=3)
 
-    # ── 情绪前缀 ─────────────────────────────────────────────
-    emotional_prefix = ""
-    if "emotional" in all_intents or state.get("emotion_label") in ["anxious", "sad", "angry"]:
-        emotional_prefix = "先用一句话回应用户情绪，再给健康建议。\n"
-
-    policy_instruction = state.get("policy_instruction", "")
+    emotion_label = state.get("emotion_label", "neutral")
+    emotion_hint  = f"【当前情绪】{emotion_label}\n" if emotion_label != "neutral" else ""
 
     system_prompt = (
         f"你是专业的慢性病管理医疗顾问，专注于新加坡患者。\n"
@@ -81,8 +77,7 @@ def expert_agent_node(state: ChatState) -> dict:
         f"- 血糖记录：{glucose_str}\n"
         f"{f'- 今餐饮食：{diet_str}' + chr(10) if diet_str else ''}"
         f"{f'【参考医学资料】{chr(10)}{rag_context}{chr(10)}' if rag_context else ''}"
-        f"{f'【用户当前状态】{policy_instruction}' + chr(10) if policy_instruction else ''}"
-        f"{emotional_prefix}"
+        f"{emotion_hint}"
         f"请根据以上数据回答患者问题，给出具体可行的建议。\n\n"
         f"通用规则：\n"
         "- 「打卡」指健康任务打卡，不是自我伤害\n"
@@ -95,5 +90,5 @@ def expert_agent_node(state: ChatState) -> dict:
     print("\n助手：", end="", flush=True)
     response = call_sealion_with_history_stream(system_prompt, history, reasoning=True)
 
-    print(f"[Expert] 意图：{all_intents} | 情绪：{state.get('emotion_label', 'neutral')}")
+    print(f"[Expert] 意图：{all_intents} | 情绪：{emotion_label}")
     return {"response": response}
