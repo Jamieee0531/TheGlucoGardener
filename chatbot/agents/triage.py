@@ -9,7 +9,7 @@ from typing import Optional
 from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import call_sealion
 from chatbot.utils.meralion import process_voice_input, process_text_input
-from chatbot.config.settings import ALL_INTENTS, INTENT_CHITCHAT
+from chatbot.config.settings import ALL_INTENTS, INTENT_COMPANION
 from chatbot.memory.long_term import get_health_store
 
 
@@ -168,6 +168,7 @@ def triage_node(state: ChatState) -> dict:
     # Crisis check first — short-circuits entire pipeline
     if is_crisis(user_input):
         print(f"[Triage] ⚠️ 心理危机检测触发")
+        get_health_store().log_emotion(state["user_id"], state.get("emotion_label", "neutral"), user_input)
         return _crisis_response(state)
     return _full_triage(state)
 
@@ -178,7 +179,8 @@ def triage_node(state: ChatState) -> dict:
 KEYWORD_RULES = [
     ("medical", [
         "血糖", "glucose", "sugar", "药", "medicine", "metformin",
-        "二甲双胍", "饮食", "diet", "吃了什么", "GI", "升糖",
+        "二甲双胍", "饮食", "diet", "吃了什么", "GI", "升糖", "HbA1c", "hba1c",
+        "糖化", "胰岛素", "insulin", "blood pressure", "血压", "症状", "symptom",
     ]),
 ]
 
@@ -211,17 +213,15 @@ def _full_triage(state: ChatState) -> dict:
     # ── Step 2: LLM 只判意图，情绪用关键词 ──────────────
     system_prompt = """你是医疗健康助手的分诊系统，服务于新加坡的慢性病患者。
 结合【最近对话】和【当前消息】，判断用户意图，返回JSON：
-{"intents": ["标签1","标签2"]}
+{"intents": ["标签"]}
 
-意图标签（按优先级，可多选）：
-- medical    （血糖偏高、药物、饮食建议、症状、身体不适）
-- emotional  （情绪倾诉、担心、沮丧、孤独、失望、需要陪伴）
-- chitchat   （日常闲聊）
+意图标签（二选一）：
+- medical    （血糖、血压、药物、饮食建议、症状、身体不适等任何健康医疗话题）
+- companion  （情绪倾诉、日常闲聊、问候、确认词、其他非医疗话题）
 
 规则：
-- 纯礼貌/确认词（谢谢、好的、嗯、明白、收到、thanks、ok 等）无论上下文如何，始终归为 ["chitchat"]
-- 结合上下文：若前几轮是情绪话题，简短回应也归为emotional
-- 身体不适（头晕、胸痛等紧急症状）归为 ["medical", "emotional"]
+- 只返回一个标签
+- 有任何医疗/健康相关内容，优先归为 medical
 - 只返回JSON，不要任何解释"""
 
     history = state.get("history", [])
@@ -244,7 +244,7 @@ def _full_triage(state: ChatState) -> dict:
         intents = []
 
     if not intents:
-        intents = [INTENT_CHITCHAT]
+        intents = [INTENT_COMPANION]
 
     get_health_store().log_emotion(state["user_id"], emotion_label, user_input)
     print(f"[Triage] 意图：{intents} | 情绪：{emotion_label}")
@@ -256,5 +256,5 @@ def _full_triage(state: ChatState) -> dict:
 
 
 def route_by_intent(state: ChatState) -> str:
-    intent = state.get("intent", "chitchat")
+    intent = state.get("intent", "companion")
     return "expert_agent" if intent == "medical" else "companion_agent"
