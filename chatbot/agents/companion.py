@@ -2,6 +2,7 @@
 陪伴Agent，用Qwen对话模型
 长期记忆：读取近期情绪摘要注入 prompt（写入由 23:59 daily job 负责）
 """
+import re
 from datetime import datetime
 from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import (
@@ -10,11 +11,18 @@ from chatbot.utils.llm_factory import (
 from chatbot.memory.long_term import get_health_store
 
 
+def _detect_language(text: str) -> str:
+    """Detect if input is primarily English or Chinese."""
+    chinese_chars = len(re.findall(r'[\u4e00-\u9fff]', text))
+    ascii_letters  = len(re.findall(r'[a-zA-Z]', text))
+    return "English" if ascii_letters > chinese_chars else "Chinese"
+
+
 def companion_agent_node(state: ChatState) -> dict:
     profile            = state.get("user_profile", {})
     name               = profile.get("name", "您")
-    language           = profile.get("language", "Chinese")
     user_input         = state["user_input"]
+    language           = _detect_language(user_input) if user_input.strip() else profile.get("language", "Chinese")
     emotion_label = state.get("emotion_label", "neutral")
     user_id       = state["user_id"]
 
