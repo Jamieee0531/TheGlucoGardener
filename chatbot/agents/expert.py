@@ -11,6 +11,15 @@ from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import call_sealion_with_history_stream, format_history_for_sealion
 from chatbot.memory.long_term import get_health_store
 from chatbot.memory.rag.retriever import get_retriever
+import re
+from chatbot.agents.glucose_reader import get_weekly_glucose_summary, get_weekly_diet_history
+
+
+def _detect_language(text: str) -> str:
+    """Detect if input is primarily English or Chinese."""
+    chinese_chars = len(re.findall(r'[\u4e00-\u9fff]', text))
+    ascii_letters  = len(re.findall(r'[a-zA-Z]', text))
+    return "English" if ascii_letters > chinese_chars else "Chinese"
 
 
 # ── 格式化辅助 ────────────────────────────────────────────────
@@ -40,19 +49,37 @@ def _fmt_diet(vision_result: list) -> str:
     return "；".join(foods)
 
 
+def _fmt_weekly_glucose(records: list) -> str:
+    if not records:
+        return ""
+    return "、".join(
+        f"{r['date'][-5:]} 均{r['avg']} [{r['min']}-{r['max']}] mmol/L"
+        for r in records
+    )
+
+
+def _fmt_weekly_diet(records: list) -> str:
+    if not records:
+        return ""
+    return "\n".join(f"  {r['date'][-5:]}：{r['meals']}" for r in records)
+
+
 # ── 主节点 ────────────────────────────────────────────────────
 
 def expert_agent_node(state: ChatState) -> dict:
     profile     = state.get("user_profile", {})
     name        = profile.get("name", "患者")
-    language    = profile.get("language", "Chinese")
     conditions  = profile.get("conditions", ["Type 2 Diabetes"])
     medications = profile.get("medications", [])
     all_intents = state.get("all_intents", ["medical"])
     user_input  = state.get("user_input", "")
+    language    = _detect_language(user_input) if user_input.strip() else profile.get("language", "Chinese")
 
     # ── 血糖数据 ─────────────────────────────────────────────
     glucose_str = _fmt_glucose(state.get("glucose_readings") or [])
+    user_id = state["user_id"]
+    weekly_glucose_str = _fmt_weekly_glucose(get_weekly_glucose_summary(user_id))
+    weekly_diet_str = _fmt_weekly_diet(get_weekly_diet_history(user_id))
 
     # ── 饮食（Vision Agent）───────────────────────────────────
     diet_str = _fmt_diet(state.get("vision_result") or [])
@@ -73,9 +100,11 @@ def expert_agent_node(state: ChatState) -> dict:
         f"患者：{name} | 病症：{', '.join(conditions)} | "
         f"处方用药：{', '.join(medications) if medications else '未记录'}\n"
         f"请用{language}回复。\n\n"
-        f"【近1小时血糖数据】\n"
-        f"- 血糖记录：{glucose_str}\n"
-        f"{f'- 今餐饮食：{diet_str}' + chr(10) if diet_str else ''}"
+        f"【近1小时血糖】\n"
+        f"- 记录：{glucose_str}\n"
+        f"{f'- 当餐饮食：{diet_str}{chr(10)}' if diet_str else ''}"
+        f"{f'【近7天血糖趋势】{chr(10)}- {weekly_glucose_str}{chr(10)}' if weekly_glucose_str else ''}"
+        f"{f'【近7天饮食历史】{chr(10)}{weekly_diet_str}{chr(10)}' if weekly_diet_str else ''}"
         f"{f'【参考医学资料】{chr(10)}{rag_context}{chr(10)}' if rag_context else ''}"
         f"{emotion_hint}"
         f"请根据以上数据回答患者问题，给出具体可行的建议。\n\n"
