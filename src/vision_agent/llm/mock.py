@@ -17,137 +17,33 @@ _FOOD_SCENARIOS = [
     # Scenario 0: Hainanese Chicken Rice (default)
     {
         "scene_type": "FOOD",
-        "items": [
-            {
-                "name": "Hainanese Chicken Rice",
-                "quantity": "1 plate",
-                "nutrition": {
-                    "calories_kcal": 480.0,
-                    "carbs_g": 65.0,
-                    "protein_g": 28.0,
-                    "fat_g": 12.0,
-                    "fiber_g": 1.2,
-                    "sodium_mg": 820.0,
-                },
-            },
-            {
-                "name": "Clear Soup",
-                "quantity": "1 bowl",
-                "nutrition": {
-                    "calories_kcal": 20.0,
-                    "carbs_g": 2.0,
-                    "protein_g": 1.0,
-                    "fat_g": 0.5,
-                    "fiber_g": None,
-                    "sodium_mg": 380.0,
-                },
-            },
-        ],
-        "total_calories_kcal": 500.0,
-        "meal_type": "lunch",
-        "notes": "Estimated portion sizes. Common Singapore hawker meal.",
+        "food_name": "Hainanese Chicken Rice, Clear Soup",
+        "gi_level": "medium",
+        "total_calories": 500.0,
         "confidence": 0.91,
     },
     # Scenario 1: Nasi Lemak (breakfast)
     {
         "scene_type": "FOOD",
-        "items": [
-            {
-                "name": "Nasi Lemak",
-                "quantity": "1 set",
-                "nutrition": {
-                    "calories_kcal": 389.0,
-                    "carbs_g": 48.0,
-                    "protein_g": 12.0,
-                    "fat_g": 17.0,
-                    "fiber_g": 2.5,
-                    "sodium_mg": 650.0,
-                },
-            },
-            {
-                "name": "Teh Tarik",
-                "quantity": "1 cup (250ml)",
-                "nutrition": {
-                    "calories_kcal": 120.0,
-                    "carbs_g": 18.0,
-                    "protein_g": 3.5,
-                    "fat_g": 4.0,
-                    "fiber_g": None,
-                    "sodium_mg": 55.0,
-                },
-            },
-        ],
-        "total_calories_kcal": 509.0,
-        "meal_type": "breakfast",
-        "notes": "Includes sambal, ikan bilis, and half-boiled egg.",
+        "food_name": "Nasi Lemak, Teh Tarik",
+        "gi_level": "high",
+        "total_calories": 509.0,
         "confidence": 0.88,
     },
     # Scenario 2: Char Kway Teow (supper)
     {
         "scene_type": "FOOD",
-        "items": [
-            {
-                "name": "Char Kway Teow",
-                "quantity": "1 plate",
-                "nutrition": {
-                    "calories_kcal": 742.0,
-                    "carbs_g": 95.0,
-                    "protein_g": 22.0,
-                    "fat_g": 30.0,
-                    "fiber_g": 2.0,
-                    "sodium_mg": 1580.0,
-                },
-            },
-        ],
-        "total_calories_kcal": 742.0,
-        "meal_type": "supper",
-        "notes": "High in sodium. Wok hei characteristic of good CKT.",
+        "food_name": "Char Kway Teow",
+        "gi_level": "high",
+        "total_calories": 742.0,
         "confidence": 0.85,
     },
     # Scenario 3: Kaya Toast breakfast set
     {
         "scene_type": "FOOD",
-        "items": [
-            {
-                "name": "Kaya Toast",
-                "quantity": "2 slices",
-                "nutrition": {
-                    "calories_kcal": 190.0,
-                    "carbs_g": 26.0,
-                    "protein_g": 4.0,
-                    "fat_g": 8.0,
-                    "fiber_g": 1.0,
-                    "sodium_mg": 210.0,
-                },
-            },
-            {
-                "name": "Half-Boiled Eggs",
-                "quantity": "2 eggs",
-                "nutrition": {
-                    "calories_kcal": 140.0,
-                    "carbs_g": 1.0,
-                    "protein_g": 12.0,
-                    "fat_g": 10.0,
-                    "fiber_g": None,
-                    "sodium_mg": 140.0,
-                },
-            },
-            {
-                "name": "Kopi-O",
-                "quantity": "1 cup (250ml)",
-                "nutrition": {
-                    "calories_kcal": 45.0,
-                    "carbs_g": 10.0,
-                    "protein_g": 0.5,
-                    "fat_g": 0.0,
-                    "fiber_g": None,
-                    "sodium_mg": 10.0,
-                },
-            },
-        ],
-        "total_calories_kcal": 375.0,
-        "meal_type": "breakfast",
-        "notes": "Classic kopitiam breakfast set.",
+        "food_name": "Kaya Toast, Half-Boiled Eggs, Kopi-O",
+        "gi_level": "medium",
+        "total_calories": 375.0,
         "confidence": 0.93,
     },
 ]
@@ -370,7 +266,7 @@ class MockVLM(BaseVLM):
     @classmethod
     def food_scenarios(cls) -> list[str]:
         """Return all food scenario names for parametrized testing."""
-        return [s["items"][0]["name"] for s in _FOOD_SCENARIOS]
+        return [s["food_name"] for s in _FOOD_SCENARIOS]
 
     @classmethod
     def medication_scenarios(cls) -> list[str]:

@@ -25,22 +25,19 @@ def test_food_scenario_valid_schema(mock_image_path, scenario_index, expected_di
     assert result.is_food
     food = result.as_food
     assert food is not None
-    names = [item.name for item in food.items]
-    assert expected_dish in names, f"Expected '{expected_dish}' in {names}"
+    assert expected_dish in food.food_name, f"Expected '{expected_dish}' in '{food.food_name}'"
 
 
 @pytest.mark.parametrize("scenario_index", range(len(_FOOD_SCENARIOS)))
-def test_food_calories_consistency(mock_image_path, scenario_index):
-    """total_calories_kcal must equal sum of all item calories."""
+def test_food_has_required_fields(mock_image_path, scenario_index):
+    """All food scenarios must have food_name, gi_level, and total_calories."""
     agent = VisionAgent(vlm=MockVLM(forced_scene="FOOD", scenario_index=scenario_index))
     result = agent.analyze(mock_image_path)
     food = result.as_food
     assert food is not None
-    computed_total = sum(item.nutrition.calories_kcal for item in food.items)
-    assert abs(food.total_calories_kcal - computed_total) < 1.0, (
-        f"Scenario {scenario_index}: total {food.total_calories_kcal} "
-        f"≠ sum {computed_total}"
-    )
+    assert len(food.food_name) > 0
+    assert food.gi_level in ("high", "medium", "low")
+    assert food.total_calories > 0
 
 
 # ─── Parametrized medication scenarios ───────────────────────────────────────
@@ -145,8 +142,8 @@ def test_mock_vlm_scenario_counts():
 
 def test_mock_vlm_food_scenarios_list():
     names = MockVLM.food_scenarios()
-    assert "Hainanese Chicken Rice" in names
-    assert "Nasi Lemak" in names
+    assert any("Hainanese Chicken Rice" in n for n in names)
+    assert any("Nasi Lemak" in n for n in names)
     assert len(names) == len(_FOOD_SCENARIOS)
 
 

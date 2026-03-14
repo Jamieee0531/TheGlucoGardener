@@ -27,8 +27,8 @@ class TestGraphFoodPath:
         assert result["scene_type"] == "FOOD"
         output = result["structured_output"]
         assert output["scene_type"] == "FOOD"
-        assert "items" in output
-        assert output["total_calories_kcal"] > 0
+        assert "food_name" in output
+        assert output["total_calories"] > 0
 
     def test_food_output_has_confidence(self, food_graph, base_state):
         result = food_graph.invoke(base_state)

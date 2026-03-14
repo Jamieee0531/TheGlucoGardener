@@ -4,11 +4,9 @@ import pytest
 from pydantic import ValidationError
 
 from src.vision_agent.schemas.outputs import (
-    FoodItem,
     FoodOutput,
     Ingredient,
     MedicationOutput,
-    NutritionInfo,
     ReportIndicator,
     ReportOutput,
     SceneType,
@@ -28,50 +26,30 @@ class TestFoodOutput:
     def test_valid_food_output(self):
         data = {
             "scene_type": "FOOD",
-            "items": [
-                {
-                    "name": "Chicken Rice",
-                    "quantity": "1 plate",
-                    "nutrition": {
-                        "calories_kcal": 450.0,
-                        "carbs_g": 60.0,
-                        "protein_g": 25.0,
-                        "fat_g": 12.0,
-                    },
-                }
-            ],
-            "total_calories_kcal": 450.0,
-            "meal_type": "lunch",
+            "food_name": "Chicken Rice, Clear Soup",
+            "gi_level": "medium",
+            "total_calories": 500.0,
             "confidence": 0.92,
         }
         output = FoodOutput(**data)
         assert output.scene_type == SceneType.FOOD
-        assert len(output.items) == 1
-        assert output.items[0].name == "Chicken Rice"
-        assert output.total_calories_kcal == 450.0
+        assert output.food_name == "Chicken Rice, Clear Soup"
+        assert output.gi_level == "medium"
+        assert output.total_calories == 500.0
 
     def test_missing_required_field_raises(self):
         with pytest.raises(ValidationError):
-            FoodOutput(scene_type="FOOD", total_calories_kcal=400.0, confidence=0.9)
+            FoodOutput(scene_type="FOOD", total_calories=400.0, confidence=0.9)
 
     def test_confidence_bounds(self):
         with pytest.raises(ValidationError):
             FoodOutput(
                 scene_type="FOOD",
-                items=[],
-                total_calories_kcal=0,
-                meal_type="lunch",
+                food_name="Test",
+                gi_level="low",
+                total_calories=0,
                 confidence=1.5,  # > 1.0
             )
-
-    def test_nutrition_optional_fields(self):
-        item = FoodItem(
-            name="Kaya Toast",
-            quantity="2 slices",
-            nutrition=NutritionInfo(calories_kcal=180.0),
-        )
-        assert item.nutrition.carbs_g is None
-        assert item.nutrition.protein_g is None
 
 
 class TestMedicationOutput:

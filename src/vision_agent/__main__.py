@@ -66,17 +66,9 @@ def _print_result(result: dict, as_json: bool) -> None:
     print(f"{'='*50}")
 
     if scene == "FOOD":
-        items = output.get("items", [])
-        for item in items:
-            n = item.get("nutrition", {})
-            print(f"  {item['name']} ({item.get('quantity', '?')})")
-            print(f"    Calories: {n.get('calories_kcal', '?')} kcal"
-                  f"  |  Carbs: {n.get('carbs_g', '?')}g"
-                  f"  |  Protein: {n.get('protein_g', '?')}g"
-                  f"  |  Fat: {n.get('fat_g', '?')}g")
-        print(f"\n  Total calories: {output.get('total_calories_kcal', '?')} kcal")
-        if output.get("notes"):
-            print(f"  Note: {output['notes']}")
+        print(f"  Food    : {output.get('food_name', '?')}")
+        print(f"  GI Level: {output.get('gi_level', '?')}")
+        print(f"  Calories: {output.get('total_calories', '?')} kcal")
 
     elif scene == "MEDICATION":
         print(f"  Drug    : {output.get('drug_name', '?')}")

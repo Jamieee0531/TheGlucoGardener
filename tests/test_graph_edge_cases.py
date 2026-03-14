@@ -84,12 +84,9 @@ class TestGraphAllScenesPipeline:
         result = self._run("FOOD")
         out = result["structured_output"]
         assert out["scene_type"] == "FOOD"
-        assert isinstance(out["items"], list)
-        for item in out["items"]:
-            assert "name" in item
-            assert "nutrition" in item
-            assert "calories_kcal" in item["nutrition"]
-        assert isinstance(out["total_calories_kcal"], float)
+        assert isinstance(out["food_name"], str)
+        assert isinstance(out["gi_level"], str)
+        assert isinstance(out["total_calories"], float)
 
     def test_medication_pipeline_output_shape(self):
         result = self._run("MEDICATION")

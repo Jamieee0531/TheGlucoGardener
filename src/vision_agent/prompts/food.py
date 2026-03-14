@@ -36,30 +36,19 @@ Analyze this food image and identify ALL visible food items. For each item:
 Respond with ONLY a JSON object in this exact format:
 {{
   "scene_type": "FOOD",
-  "items": [
-    {{
-      "name": "<food name, prefer local Singapore name>",
-      "quantity": "<e.g. '1 plate', '2 pieces', '250ml', '1 bowl'>",
-      "nutrition": {{
-        "calories_kcal": <float>,
-        "carbs_g": <float or null>,
-        "protein_g": <float or null>,
-        "fat_g": <float or null>,
-        "fiber_g": <float or null>,
-        "sodium_mg": <float or null>
-      }}
-    }}
-  ],
-  "total_calories_kcal": <sum of all items' calories>,
-  "meal_type": "<breakfast|lunch|dinner|supper|snack|drinks|null>",
-  "notes": "<caveats about estimation accuracy, e.g. 'Sauce not included in estimate' or null>",
+  "food_name": "<comma-separated list of ALL visible food items, prefer local Singapore names>",
+  "gi_level": "<high|medium|low — overall GI level of the meal>",
+  "total_calories": <float, total estimated calories in kcal for all items combined>,
   "confidence": <float 0.0-1.0, how confident you are in the identification>
 }}
 
 Rules:
-- total_calories_kcal MUST equal the sum of all items' calories_kcal
-- Use null for nutritional values you genuinely cannot estimate
+- food_name: list ALL visible items separated by commas (e.g. "Hainanese Chicken Rice, Chili Sauce, Clear Soup")
+- gi_level: estimate the overall Glycemic Index level of the meal as "high", "medium", or "low"
+  - high: white rice dishes, sugary drinks, refined carbs (e.g. Char Kway Teow, Nasi Lemak, Milo Dinosaur)
+  - medium: mixed dishes with protein and moderate carbs (e.g. Chicken Rice, Wanton Mee)
+  - low: mostly vegetables, protein, whole grains (e.g. Yong Tau Foo, Thunder Tea Rice)
+- total_calories: rough estimate in kcal for the entire meal
 - If you cannot identify a dish, describe it literally (e.g. "Unidentified fried rice dish")
-- Include all sides, condiments, and drinks visible
 - Do not include any text outside the JSON
 - You may receive one or more images. Treat all provided images as a single combined context for analysis"""

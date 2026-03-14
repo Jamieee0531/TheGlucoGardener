@@ -33,8 +33,8 @@ class TestFoodAnalyzer:
         assert result["error"] is None
         output = result["structured_output"]
         assert output["scene_type"] == "FOOD"
-        assert isinstance(output["items"], list)
-        assert output["total_calories_kcal"] > 0
+        assert isinstance(output["food_name"], str)
+        assert output["total_calories"] > 0
 
     def test_skips_on_existing_error(self):
         node = make_food_analyzer(MockVLM(forced_scene="FOOD"))
@@ -61,7 +61,7 @@ class TestFoodAnalyzer:
         bad_vlm = MagicMock()
         bad_vlm.call_multi.return_value = json.dumps({
             "scene_type": "FOOD",
-            # missing required 'items' and 'total_calories_kcal'
+            # missing required 'food_name', 'gi_level', 'total_calories'
             "confidence": 0.9,
         })
         node = make_food_analyzer(bad_vlm)

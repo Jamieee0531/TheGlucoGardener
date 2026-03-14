@@ -15,27 +15,11 @@ class SceneType(str, Enum):
 
 # ─── Food ────────────────────────────────────────────────────────────────────
 
-class NutritionInfo(BaseModel):
-    calories_kcal: float
-    carbs_g: Optional[float] = None
-    protein_g: Optional[float] = None
-    fat_g: Optional[float] = None
-    fiber_g: Optional[float] = None
-    sodium_mg: Optional[float] = None
-
-
-class FoodItem(BaseModel):
-    name: str
-    quantity: str
-    nutrition: NutritionInfo
-
-
 class FoodOutput(BaseModel):
     scene_type: SceneType = SceneType.FOOD
-    items: List[FoodItem]
-    total_calories_kcal: float
-    meal_type: Optional[str] = None   # breakfast / lunch / dinner / snack
-    notes: Optional[str] = None       # e.g. "Estimated portions"
+    food_name: str                                  # comma-separated if multiple items
+    gi_level: str                                   # high / medium / low
+    total_calories: float                           # kcal
     confidence: float = Field(ge=0.0, le=1.0)
 
 

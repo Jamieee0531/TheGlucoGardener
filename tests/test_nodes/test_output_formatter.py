@@ -23,8 +23,9 @@ class TestOutputFormatter:
         state = _state(structured_output={
             "scene_type": "FOOD",
             "confidence": 0.9,
-            "items": [],
-            "total_calories_kcal": 0.0,
+            "food_name": "Test",
+            "gi_level": "low",
+            "total_calories": 0.0,
         })
         result = output_formatter(state)
         assert result["structured_output"]["scene_type"] == "FOOD"

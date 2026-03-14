@@ -48,7 +48,7 @@ class TestMockVLM:
         response = vlm.call("describe image", "base64data")
         data = json.loads(response)
         assert data["scene_type"] == "FOOD"
-        assert len(data["items"]) > 0
+        assert len(data["food_name"]) > 0
 
     def test_forced_medication_scene(self):
         vlm = MockVLM(forced_scene="MEDICATION")
