@@ -16,15 +16,30 @@ from chatbot.memory.long_term import get_health_store
 import concurrent.futures
 
 from src.vision_agent.agent import VisionAgent as _VisionAgent
+from src.vision_agent.config import get_settings, VLMProvider
+from src.vision_agent.llm.gemini import GeminiVLM
+from src.vision_agent.llm.mock import MockVLM
+from src.vision_agent.llm.sealion import SeaLionVLM
+
 _vision_agent: "_VisionAgent | None" = None
 _executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+
+
+def _build_vlm():
+    """Build VLM based on .env config (VLM_PROVIDER)."""
+    provider = get_settings().vlm_provider
+    if provider == VLMProvider.GEMINI:
+        return GeminiVLM()
+    if provider == VLMProvider.SEALION:
+        return SeaLionVLM()
+    return MockVLM()
 
 
 def analyze_image(image_path: str):
     """Call Vision Agent to analyze an image. Returns AnalysisResult or None on timeout."""
     global _vision_agent
     if _vision_agent is None:
-        _vision_agent = _VisionAgent()
+        _vision_agent = _VisionAgent(vlm=_build_vlm())
     future = _executor.submit(_vision_agent.analyze, image_path)
     try:
         return future.result(timeout=15)
@@ -62,11 +77,14 @@ def input_node(state: ChatState) -> dict:
     # ── Image handling ──────────────────────────────────
     image_paths = state.get("image_paths") or []
     vision_result = []
+    print(f"[input_node] image_paths={image_paths}")
 
     if image_paths:
         for path in image_paths:
             try:
+                print(f"[input_node] calling analyze_image({path})")
                 result = analyze_image(path)
+                print(f"[input_node] analyze_image returned: {result}")
                 if result is None:
                     vision_result.append({
                         "scene_type": "UNKNOWN",
@@ -82,6 +100,7 @@ def input_node(state: ChatState) -> dict:
                         "confidence": 0.0,
                     })
             except Exception as e:
+                print(f"[input_node] ❌ Vision 异常：{type(e).__name__}: {e}")
                 vision_result.append({
                     "scene_type": "UNKNOWN",
                     "error": str(e),

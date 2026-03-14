@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
+        extra="ignore",
     )
 
     @field_validator("sealion_api_key", "sealion_api_url", "gemini_api_key", mode="before")

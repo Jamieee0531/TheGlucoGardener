@@ -60,6 +60,11 @@ async def chat_message(
     image: Optional[UploadFile] = File(None),
     audio: Optional[UploadFile] = File(None),
 ):
+    # ── Debug: log received inputs ───────────────────────────
+    print(f"[API] text={text!r}, image={image}, audio={audio}")
+    if image:
+        print(f"[API] image.filename={image.filename!r}, size={image.size}, content_type={image.content_type}")
+
     # ── Normalise empty uploads (Swagger sends "string" placeholder) ─
     if image and not image.filename:
         image = None
