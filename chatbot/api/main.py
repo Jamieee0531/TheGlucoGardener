@@ -110,7 +110,7 @@ async def chat_message(
 
     # ── Extract response ─────────────────────────────────────
     reply = result.get("response", "")
-    intent = result.get("intent", "chitchat")
+    intent = result.get("intent", "companion")
     agent_type = _intent_to_agent_type(intent)
 
     transcribed = result.get("transcribed_text") if input_mode == "voice" else None

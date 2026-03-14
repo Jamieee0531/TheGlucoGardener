@@ -12,7 +12,7 @@ def _mock_llm_response(system_prompt: str, messages: list, reasoning: bool = Fal
     # Triage: return JSON
     if '"intents"' in combined or "分诊" in combined or "意图" in combined and "返回JSON" in combined:
         if "我好难过" in combined or "压力" in combined:
-            return '{"intents": ["emotional"], "emotion": "sad"}'
+            return '{"intents": ["companion"], "emotion": "sad"}'
         if "药" in combined or "medication" in combined.lower():
             return '{"intents": ["medical"], "emotion": "neutral"}'
         return '{"intents": ["medical"], "emotion": "neutral"}'
@@ -107,7 +107,7 @@ def test_step5_emotional_routes_to_companion(mock_triage, mock_history, mock_str
     app = build_graph()
     state = _build_state(user_input="唉，我最近压力好大，管不住嘴")
     result = app.invoke(state)
-    assert result.get("intent") in ["emotional", "medical"]
+    assert result.get("intent") in ["companion", "medical"]
     assert result.get("response") is not None
     assert len(result["response"]) > 0
 
