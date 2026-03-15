@@ -15,6 +15,8 @@ const NAV_ITEMS = [
   { label: "Task", href: "/task" },
   { label: "Garden", href: "/garden" },
   { label: "Setting", href: "/setting" },
+  { label: "Soft alert-Beta", href: "/soft-alert" },
+  { label: "Hard alert-Beta", href: "/hard-alert" },
 ];
 
 export default function TopBar({ title = "Chat", agentType, transparent = false }) {
