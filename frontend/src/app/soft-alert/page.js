@@ -50,10 +50,10 @@ export default function SoftAlertPage() {
             Good Morning, User!
           </h2>
 
-          <h3 className="text-lg font-bold italic text-[#d4a44a] mt-3">
+          <h3 className="text-lg font-bold italic text-[#F4B95D] mt-3">
             Heads up!
           </h3>
-          <p className="text-base italic text-[#d4a44a] mt-1 leading-snug max-w-[260px]">
+          <p className="text-base italic text-[#F4B95D] mt-1 leading-snug max-w-[260px]">
             Your glucose is 4.9. If you start HIIT now, it could drop to 3.85, which is too low. Grab 15g fast carbs like 1/2 cup juice first. You&apos;ve got this!
           </p>
 
@@ -67,7 +67,7 @@ export default function SoftAlertPage() {
 
         {/* ====== SECTION 2: Middle-right — Snapshot + Stats + Tasks + Flower ====== */}
         <div className="self-end -mt-20 mr-0 text-right w-[55%]">
-          <h3 className="text-xl font-bold italic text-[#6b7ec2] leading-tight">
+          <h3 className="text-xl font-bold italic text-[#88B3F9] leading-tight">
             Today&apos;s<br />Snapshot
           </h3>
           <div className="mt-3 space-y-0.5 text-sm text-gray-800 text-right pr-1">
@@ -95,7 +95,7 @@ export default function SoftAlertPage() {
 
         {/* ====== SECTION 3: Bottom-left — Check your sugar + Chart ====== */}
         <div className="w-[70%]">
-          <h3 className="text-2xl font-bold italic text-[#d4a44a] leading-tight">
+          <h3 className="text-2xl font-bold italic text-[#454545] leading-tight">
             Check your<br />sugar
           </h3>
           <SugarChart />
