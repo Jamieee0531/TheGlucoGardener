@@ -37,7 +37,7 @@ export default function HomePage() {
       />
 
       {/* ── TopBar ── */}
-      <div className="relative z-10">
+      <div className="relative z-30">
         <TopBar title="Home" transparent />
       </div>
 
