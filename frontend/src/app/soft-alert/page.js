@@ -13,7 +13,7 @@ export default function SoftAlertPage() {
         className="absolute z-0"
         style={{
           width: 500, height: 500, borderRadius: "50%",
-          backgroundColor: "#e8ddd4",
+          backgroundColor: "#EBE9E9",
           top: 250, left: 100,
         }}
       />
@@ -22,7 +22,7 @@ export default function SoftAlertPage() {
         className="absolute z-[1]"
         style={{
           width: 580, height: 580, borderRadius: "50%",
-          backgroundColor: "#f5cdc6",
+          backgroundColor: "#FBE6E1",
           top: -210, left: -250,
         }}
       />
@@ -31,7 +31,7 @@ export default function SoftAlertPage() {
         className="absolute z-[1]"
         style={{
           width: 650, height: 650, borderRadius: "50%",
-          backgroundColor: "#b8e6da",
+          backgroundColor: "#CEF7EA",
           bottom: -300, left: -300,
         }}
       />
@@ -51,10 +51,10 @@ export default function SoftAlertPage() {
           </h2>
 
           <h3 className="text-lg font-bold italic text-[#d4a44a] mt-3">
-            Glucose Changing Quickly
+            Heads up!
           </h3>
           <p className="text-base italic text-[#d4a44a] mt-1 leading-snug max-w-[260px]">
-            Your glucose trend is increasing faster than usual. You may want to keep an eye on it.
+            Your glucose is 4.9. If you start HIIT now, it could drop to 3.85, which is too low. Grab 15g fast carbs like 1/2 cup juice first. You&apos;ve got this!
           </p>
 
           <Link

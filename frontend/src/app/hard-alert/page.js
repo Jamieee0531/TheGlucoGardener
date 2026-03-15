@@ -16,7 +16,7 @@ export default function HardAlertPage() {
         className="absolute z-0"
         style={{
           width: 500, height: 500, borderRadius: "50%",
-          backgroundColor: "#e8ddd4",
+          backgroundColor: "#EBE9E9",
           top: 250, left: 100,
         }}
       />
@@ -25,7 +25,7 @@ export default function HardAlertPage() {
         className="absolute z-[1]"
         style={{
           width: 580, height: 580, borderRadius: "50%",
-          backgroundColor: "#f5cdc6",
+          backgroundColor: "#FBE6E1",
           top: -210, left: -250,
         }}
       />
@@ -34,7 +34,7 @@ export default function HardAlertPage() {
         className="absolute z-[1]"
         style={{
           width: 650, height: 650, borderRadius: "50%",
-          backgroundColor: "#b8e6da",
+          backgroundColor: "#CEF7EA",
           bottom: -300, left: -300,
         }}
       />

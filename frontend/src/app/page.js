@@ -13,7 +13,7 @@ export default function HomePage() {
         className="absolute z-0"
         style={{
           width: 500, height: 500, borderRadius: "50%",
-          backgroundColor: "#e8ddd4",
+          backgroundColor: "#EBE9E9",
           top: 250, left: 100,
         }}
       />
@@ -22,7 +22,7 @@ export default function HomePage() {
         className="absolute z-[1]"
         style={{
           width: 580, height: 580, borderRadius: "50%",
-          backgroundColor: "#f5cdc6",
+          backgroundColor: "#FBE6E1",
           top: -210, left: -250,
         }}
       />
@@ -31,7 +31,7 @@ export default function HomePage() {
         className="absolute z-[1]"
         style={{
           width: 650, height: 650, borderRadius: "50%",
-          backgroundColor: "#b8e6da",
+          backgroundColor: "#CEF7EA",
           bottom: -300, left: -300,
         }}
       />
@@ -49,7 +49,7 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold italic text-[#e8927c] mt-1">
             Good Morning, User!
           </h2>
-          <p className="text-base italic text-[#d4a44a] mt-0.5">
+          <p className="text-base italic text-[#F4B95D] mt-0.5">
             How are you feeling today?
           </p>
 
@@ -69,7 +69,7 @@ export default function HomePage() {
 
         {/* ====== SECTION 2: Middle-right — Snapshot + Stats + Tasks + Flower ====== */}
         <div className="self-end -mt-20 mr-0 text-right w-[55%]">
-          <h3 className="text-xl font-bold italic text-[#6b7ec2] leading-tight">
+          <h3 className="text-xl font-bold italic text-[#88B3F9] leading-tight">
             Today&apos;s<br />Snapshot
           </h3>
           <div className="mt-3 space-y-0.5 text-sm text-gray-800 text-right pr-1">
@@ -97,7 +97,7 @@ export default function HomePage() {
 
         {/* ====== SECTION 3: Bottom-left — Check your sugar + Chart ====== */}
         <div className="w-[70%]">
-          <h3 className="text-2xl font-bold italic text-[#d4a44a] leading-tight">
+          <h3 className="text-2xl font-bold italic text-[#454545] leading-tight">
             Check your<br />sugar
           </h3>
           <SugarChart />
