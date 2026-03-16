@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Health Companion",
+  title: "The GlucoGardener",
   description: "AI Health Companion Chatbot",
 };
 
