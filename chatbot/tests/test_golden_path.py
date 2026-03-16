@@ -112,15 +112,3 @@ def test_step5_emotional_routes_to_companion(mock_triage, mock_history, mock_str
     assert len(result["response"]) > 0
 
 
-@patch("utils.llm_factory.call_sealion_with_history_stream", side_effect=_mock_llm_response)
-@patch("utils.llm_factory.call_sealion_with_history", side_effect=_mock_llm_response)
-@patch("agents.triage.call_sealion", side_effect=_mock_llm_single)
-def test_crisis_short_circuits(mock_triage, mock_history, mock_stream):
-    """Crisis input -> triage detects crisis, skips to history_update."""
-    from graph.builder import build_graph
-    app = build_graph()
-    state = _build_state(user_input="我不想活了")
-    result = app.invoke(state)
-    assert result.get("intent") == "crisis"
-    assert result.get("response") is not None
-    assert "1-767" in result["response"] or "6389" in result["response"]

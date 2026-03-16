@@ -2,7 +2,8 @@
 state/chat_state.py
 LangGraph 共享状态定义
 """
-from typing import TypedDict, Literal, Optional
+import operator
+from typing import Annotated, TypedDict, Literal, Optional
 
 
 class ChatState(TypedDict):
@@ -24,7 +25,7 @@ class ChatState(TypedDict):
     all_intents:        Optional[list]
 
     # ── 对话记忆 ─────────────────────────────────────────
-    history:            list
+    history:            Annotated[list, operator.add]
     user_profile:       dict
 
     # ── 血糖数据（每轮对话由 glucose_reader_node 注入）──

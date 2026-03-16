@@ -6,7 +6,6 @@ import Link from "next/link";
 const AGENT_ICONS = {
   companion: "💞",
   expert: "🩺",
-  crisis: "🩺",
 };
 
 const NAV_ITEMS = [

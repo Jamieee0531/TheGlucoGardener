@@ -7,8 +7,22 @@ SEA-LION 试用版 API 调用封装
 """
 import json as _json
 import os
+import threading
 import requests
+from typing import Callable, Optional
 from dotenv import load_dotenv
+
+# ── Token streaming callback — thread-local so each request has its own ──
+_tls = threading.local()
+
+def set_token_callback(cb: Optional[Callable[[str], None]]) -> None:
+    _tls.callback = cb
+
+def clear_token_callback(_=None) -> None:
+    _tls.callback = None
+
+def _get_token_callback() -> Optional[Callable[[str], None]]:
+    return getattr(_tls, 'callback', None)
 
 load_dotenv()
 
@@ -25,6 +39,10 @@ INSTRUCT_MODEL  = "aisingapore/Qwen-SEA-LION-v4-32B-IT"
 REASONING_MODEL = "aisingapore/Llama-SEA-LION-v3.5-70B-R"
 
 
+MAX_TOKENS_INSTRUCT  = 200   # companion / triage：60字上限，留余量
+MAX_TOKENS_REASONING = 900   # expert：reasoning 模型需要 think block (~600) + 2句回答 (~100)
+
+
 def call_sealion(system_prompt: str, user_message: str, reasoning: bool = False) -> str:
     """单轮调用"""
     return call_sealion_with_history(system_prompt, [
@@ -39,13 +57,14 @@ def call_sealion_with_history(system_prompt: str, messages: list, reasoning: boo
     """
     full_messages = [{"role": "system", "content": system_prompt}] + messages
     model         = REASONING_MODEL if reasoning else INSTRUCT_MODEL
+    max_tokens    = MAX_TOKENS_REASONING if reasoning else MAX_TOKENS_INSTRUCT
 
     # ── 主线：SEA-LION 试用版 ────────────────────────
     headers = {
         "Content-Type":  "application/json",
         "Authorization": f"Bearer {SEALION_API_KEY}",
     }
-    payload = {"model": model, "messages": full_messages}
+    payload = {"model": model, "messages": full_messages, "max_tokens": max_tokens}
 
     try:
         resp = requests.post(
@@ -92,12 +111,13 @@ def call_sealion_with_history_stream(
     限流时自动降级为 Cloudflare 非流式备用。
     """
     full_messages = [{"role": "system", "content": system_prompt}] + messages
-    model   = REASONING_MODEL if reasoning else INSTRUCT_MODEL
+    model      = REASONING_MODEL if reasoning else INSTRUCT_MODEL
+    max_tokens = MAX_TOKENS_REASONING if reasoning else MAX_TOKENS_INSTRUCT
     headers = {
         "Content-Type":  "application/json",
         "Authorization": f"Bearer {SEALION_API_KEY}",
     }
-    payload = {"model": model, "messages": full_messages, "stream": True}
+    payload = {"model": model, "messages": full_messages, "stream": True, "max_tokens": max_tokens}
 
     try:
         resp = requests.post(
@@ -133,9 +153,15 @@ def call_sealion_with_history_stream(
                         if after:
                             print(after, end="", flush=True)
                             full_content += after
+                            cb = _get_token_callback()
+                            if cb:
+                                cb(after)
                 else:
                     print(delta, end="", flush=True)
                     full_content += delta
+                    cb = _get_token_callback()
+                    if cb:
+                        cb(delta)
             except Exception:
                 continue
 
@@ -146,6 +172,9 @@ def call_sealion_with_history_stream(
         print(f"\n[SEA-LION] {e}，切换到 Cloudflare Gemma 备用")
         content = _call_cloudflare_fallback(system_prompt, messages)
         print(content)
+        cb = _get_token_callback()
+        if cb:
+            cb(content)
         return content
 
 

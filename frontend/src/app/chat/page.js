@@ -6,7 +6,7 @@ import MessageList from "../../components/MessageList";
 import InputBar from "../../components/InputBar";
 import ActionSheet from "../../components/ActionSheet";
 import ImagePreview from "../../components/ImagePreview";
-import { sendMessage } from "../../lib/api";
+import { sendMessageStream } from "../../lib/api";
 
 const USER_ID = "demo_user";
 
@@ -28,13 +28,7 @@ export default function ChatPage() {
     return msgIdRef.current;
   };
 
-  const addMessage = (role, content, image = null) => {
-    const msg = { id: nextId(), role, content, image };
-    setMessages((prev) => [...prev, msg]);
-    return msg;
-  };
-
-  const handleSend = async ({ text, audio, image, imagePreview }) => {
+  const handleSend = ({ text, audio, image, imagePreview }) => {
     const userMsgId = nextId();
     const userMsg = {
       id: userMsgId,
@@ -47,36 +41,52 @@ export default function ChatPage() {
     setPendingImage(null);
     setPendingImageFile(null);
 
-    setIsLoading(true);
-    try {
-      const data = await sendMessage({
-        userId: USER_ID,
-        sessionId,
-        text: text || undefined,
-        image: image || undefined,
-        audio: audio || undefined,
-      });
+    // Add an empty assistant bubble immediately and track its ID
+    const assistantMsgId = nextId();
+    const assistantMsg = { id: assistantMsgId, role: "assistant", content: "" };
+    setMessages((prev) => [...prev, assistantMsg]);
 
-      // Update voice message bubble with transcribed text
-      if (audio && data.transcribed_text) {
+    setIsLoading(true);
+
+    sendMessageStream({
+      userId: USER_ID,
+      sessionId,
+      text: text || undefined,
+      image: image || undefined,
+      audio: audio || undefined,
+      onToken: (token) => {
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === userMsgId
-              ? { ...m, content: `🎙 ${data.transcribed_text}` }
+            m.id === assistantMsgId
+              ? { ...m, content: m.content + token }
               : m
           )
         );
-      }
-
-      if (!sessionId) setSessionId(data.session_id);
-      setAgentType(data.agent_type);
-      addMessage("assistant", data.reply);
-    } catch (err) {
-      console.error("Send failed:", err);
-      addMessage("assistant", "Sorry, something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+      },
+      onDone: (data) => {
+        if (!sessionId) setSessionId(data.session_id);
+        setAgentType(data.agent_type);
+        if (data.reply) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMsgId ? { ...m, content: data.reply } : m
+            )
+          );
+        }
+        setIsLoading(false);
+      },
+      onError: (message) => {
+        console.error("Stream error:", message);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsgId
+              ? { ...m, content: "Sorry, something went wrong. Please try again." }
+              : m
+          )
+        );
+        setIsLoading(false);
+      },
+    });
   };
 
   const handleSendText = (text) => {

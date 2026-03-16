@@ -1,10 +1,13 @@
 """
 chatbot/api/main.py
-FastAPI entry point — single POST /chat/message endpoint.
+FastAPI entry point — POST /chat/message and POST /chat/stream endpoints.
 
 Usage:
     uvicorn chatbot.api.main:app --reload
 """
+import asyncio
+import json
+import threading
 import uuid
 import tempfile
 from pathlib import Path
@@ -12,12 +15,23 @@ from typing import Optional
 
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from chatbot.graph.builder import app as graph_app
+from chatbot.utils.llm_factory import set_token_callback, clear_token_callback
+from chatbot.memory.rag.retriever import get_retriever
 
 # ── FastAPI app ──────────────────────────────────────────────────
 api = FastAPI(title="Health Companion Chatbot", version="0.1.0")
+
+
+@api.on_event("startup")
+async def _warmup():
+    """预热 RAG：启动时加载 embedding 模型 + 建索引，避免首次请求延迟。"""
+    import asyncio
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, lambda: get_retriever()._init())
 
 api.add_middleware(
     CORSMiddleware,
@@ -60,11 +74,6 @@ async def chat_message(
     image: Optional[UploadFile] = File(None),
     audio: Optional[UploadFile] = File(None),
 ):
-    # ── Debug: log received inputs ───────────────────────────
-    print(f"[API] text={text!r}, image={image}, audio={audio}")
-    if image:
-        print(f"[API] image.filename={image.filename!r}, size={image.size}, content_type={image.content_type}")
-
     # ── Normalise empty uploads (Swagger sends "string" placeholder) ─
     if image and not image.filename:
         image = None
@@ -120,4 +129,112 @@ async def chat_message(
         reply=reply,
         agent_type=agent_type,
         transcribed_text=transcribed,
+    )
+
+
+@api.post("/chat/stream")
+async def chat_stream(
+    user_id: str = Form(...),
+    session_id: Optional[str] = Form(None),
+    text: Optional[str] = Form(None),
+    image: Optional[UploadFile] = File(None),
+    audio: Optional[UploadFile] = File(None),
+):
+    # ── Normalise empty uploads ───────────────────────────────
+    if image and not image.filename:
+        image = None
+    if audio and not audio.filename:
+        audio = None
+
+    # ── Session: auto-create if first message ────────────────
+    if not session_id:
+        session_id = uuid.uuid4().hex
+
+    # ── Determine input mode ─────────────────────────────────
+    input_mode = "voice" if audio else "text"
+
+    # ── Build initial state ──────────────────────────────────
+    state = {
+        "user_input": text or "",
+        "input_mode": input_mode,
+        "chat_mode": "personal",
+        "user_id": user_id,
+        "history": [],
+        "user_profile": {},
+    }
+
+    # ── Handle audio upload ──────────────────────────────────
+    if audio:
+        ext = Path(audio.filename).suffix if audio.filename else ".webm"
+        audio_path = await _save_upload(audio, suffix=ext)
+        state["audio_path"] = audio_path
+
+    # ── Handle image upload ──────────────────────────────────
+    if image:
+        image_path = await _save_upload(image, suffix=".jpg")
+        state["image_paths"] = [image_path]
+
+    # ── Set up streaming queue and callback ──────────────────
+    queue: asyncio.Queue = asyncio.Queue()
+    loop = asyncio.get_event_loop()
+
+    def token_cb(token: str) -> None:
+        loop.call_soon_threadsafe(queue.put_nowait, token)
+
+    # ── Run the graph in a background thread ─────────────────
+    config = {"configurable": {"thread_id": session_id}}
+
+    def run_graph():
+        # Set callback on THIS thread (threading.local is per-thread)
+        set_token_callback(token_cb)
+        try:
+            result = graph_app.invoke(state, config=config)
+            loop.call_soon_threadsafe(
+                queue.put_nowait, {"__done__": True, "result": result}
+            )
+        except Exception as e:
+            loop.call_soon_threadsafe(
+                queue.put_nowait, {"__error__": str(e)}
+            )
+        finally:
+            clear_token_callback()
+
+    t = threading.Thread(target=run_graph, daemon=True)
+    t.start()
+
+    # ── Async generator that yields SSE events ───────────────
+    async def event_generator():
+        while True:
+            item = await queue.get()
+            if isinstance(item, str):
+                payload = json.dumps({"type": "token", "token": item})
+                yield f"data: {payload}\n\n"
+            elif isinstance(item, dict):
+                if "__done__" in item:
+                    result = item["result"]
+                    intent = result.get("intent", "companion")
+                    agent_type = _intent_to_agent_type(intent)
+                    payload = json.dumps({
+                        "type": "done",
+                        "session_id": session_id,
+                        "agent_type": agent_type,
+                        "reply": result.get("response", ""),
+                    })
+                    yield f"data: {payload}\n\n"
+                    break
+                elif "__error__" in item:
+                    payload = json.dumps({
+                        "type": "error",
+                        "message": item["__error__"],
+                    })
+                    yield f"data: {payload}\n\n"
+                    break
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
     )

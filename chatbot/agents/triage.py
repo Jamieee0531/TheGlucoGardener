@@ -5,6 +5,7 @@ agents/triage.py
 """
 import json
 import re
+import concurrent.futures
 from typing import Optional
 from chatbot.state.chat_state import ChatState
 from chatbot.utils.llm_factory import call_sealion
@@ -12,8 +13,9 @@ from chatbot.utils.meralion import process_voice_input, process_text_input
 from chatbot.config.settings import ALL_INTENTS, INTENT_COMPANION
 from chatbot.memory.long_term import get_health_store
 
-
-import concurrent.futures
+# ── RAG 预取：medical 命中后立即后台拉取，存 future 供 expert_agent 消费 ──
+_rag_executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+_rag_futures: dict = {}   # session_id → Future[str]
 
 from src.vision_agent.agent import VisionAgent as _VisionAgent
 from src.vision_agent.config import get_settings, VLMProvider
@@ -42,9 +44,9 @@ def analyze_image(image_path: str):
         _vision_agent = _VisionAgent(vlm=_build_vlm())
     future = _executor.submit(_vision_agent.analyze, image_path)
     try:
-        return future.result(timeout=15)
+        return future.result(timeout=30)
     except concurrent.futures.TimeoutError:
-        print(f"[Triage] Vision 超时（>15s），跳过图片分析：{image_path}")
+        print(f"[Triage] Vision 超时（>30s），跳过图片分析：{image_path}")
         return None
     except Exception as e:
         print(f"[Triage] Vision 调用失败：{e}")
@@ -129,47 +131,7 @@ def input_node(state: ChatState) -> dict:
     return updates
 
 
-# ── Crisis detection ──────────────────────────────────────────────────────────
-_CRISIS_PATTERNS = [
-    r"活着.*没.*意思", r"不想.*活", r"去死", r"伤害.*自己", r"结束.*生命",
-    r"no\s*point\s*living", r"want\s*to\s*die", r"hurt\s*myself", r"end\s*my\s*life",
-]
-
-
-def is_crisis(text: str) -> bool:
-    """Check for suicide/self-harm crisis keywords."""
-    return any(re.search(p, text) for p in _CRISIS_PATTERNS)
-
-
-def _crisis_response(state: ChatState) -> dict:
-    """Generate crisis response. Called when triage detects crisis."""
-    profile = state.get("user_profile", {})
-    name = profile.get("name", "您")
-    language = profile.get("language", "Chinese")
-
-    response = (
-        f"{name}，您刚才说的话让我很担心。"
-        "您的生命很重要，您不需要一个人扛着这些。"
-        "请拨打新加坡心理援助热线：1-767（24小时）或 IMH：6389 2222。"
-        "我在这里陪您——能告诉我，是什么让您有这样的感受吗？"
-    ) if language != "English" else (
-        "I'm really concerned about what you said. You matter and you're not alone. "
-        "Please call Samaritans of Singapore: 1-767 (24hr) or IMH: 6389 2222."
-    )
-
-    return {
-        "response": response,
-        "intent": "crisis",
-    }
-
-
 def triage_node(state: ChatState) -> dict:
-    user_input = state["user_input"]
-    # Crisis check first — short-circuits entire pipeline
-    if is_crisis(user_input):
-        print(f"[Triage] ⚠️ 心理危机检测触发")
-        get_health_store().log_emotion(state["user_id"], state.get("emotion_label", "neutral"), user_input)
-        return _crisis_response(state)
     return _full_triage(state)
 
 
@@ -204,6 +166,8 @@ def _full_triage(state: ChatState) -> dict:
     if keyword_intent:
         get_health_store().log_emotion(state["user_id"], emotion_label, user_input)
         print(f"[Triage] 关键词命中：{keyword_intent} | 情绪：{emotion_label}")
+        if keyword_intent == "medical":
+            _prefetch_rag(state["user_id"], user_input)
         return {
             "intent":        keyword_intent,
             "all_intents":   [keyword_intent],
@@ -248,6 +212,8 @@ def _full_triage(state: ChatState) -> dict:
 
     get_health_store().log_emotion(state["user_id"], emotion_label, user_input)
     print(f"[Triage] 意图：{intents} | 情绪：{emotion_label}")
+    if intents[0] == "medical":
+        _prefetch_rag(state["user_id"], user_input)
     return {
         "intent":        intents[0],
         "all_intents":   intents,
@@ -258,3 +224,22 @@ def _full_triage(state: ChatState) -> dict:
 def route_by_intent(state: ChatState) -> str:
     intent = state.get("intent", "companion")
     return "expert_agent" if intent == "medical" else "companion_agent"
+
+
+def _prefetch_rag(user_id: str, query: str) -> None:
+    """在后台线程开始 RAG 检索，结果缓存供 expert_agent 消费。"""
+    from chatbot.memory.rag.retriever import get_retriever
+    future = _rag_executor.submit(get_retriever().retrieve, query, 3)
+    _rag_futures[user_id] = future
+
+
+def consume_rag_prefetch(user_id: str, fallback_query: str) -> str:
+    """Expert agent 调用：拿预取结果（已完成则零延迟），否则同步检索。"""
+    future = _rag_futures.pop(user_id, None)
+    if future:
+        try:
+            return future.result(timeout=5)
+        except Exception:
+            pass
+    from chatbot.memory.rag.retriever import get_retriever
+    return get_retriever().retrieve(fallback_query, 3)

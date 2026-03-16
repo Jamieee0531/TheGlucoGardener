@@ -22,9 +22,13 @@ def history_update_node(state: ChatState) -> dict:
     """图内最后一步：把本轮对话追加到 history，由 checkpointer 持久化。"""
     user_text = state.get("user_input", "")
     response  = state.get("response", "")
-    history   = add_to_history(state.get("history") or [], "user",      user_text)
-    history   = add_to_history(history,                    "assistant",  response)
-    return {"history": history}
+    # Annotated[list, operator.add]：只返回新增的条目，LangGraph 自动追加
+    new_entries = []
+    if user_text:
+        new_entries.append({"role": "user", "content": user_text})
+    if response:
+        new_entries.append({"role": "assistant", "content": response})
+    return {"history": new_entries}
 
 
 def build_graph(checkpointer=None):
@@ -45,17 +49,11 @@ def build_graph(checkpointer=None):
     graph.add_edge("input_node",     "glucose_reader")
     graph.add_edge("glucose_reader", "triage_node")
 
-    # ── 条件路由：triage → crisis short-circuit or agent ──
-    def _route_after_triage(state: ChatState) -> str:
-        if state.get("intent") == "crisis":
-            return "history_update"
-        return route_by_intent(state)
-
+    # ── 条件路由：triage → medical / companion ──
     graph.add_conditional_edges(
         "triage_node",
-        _route_after_triage,
+        route_by_intent,
         {
-            "history_update": "history_update",
             "companion_agent": "companion_agent",
             "expert_agent":    "expert_agent",
         }
