@@ -182,7 +182,7 @@ SG_INNOVATION/
 
 | Member | Role |
 |--------|------|
-| Jamie | Vision Agent, Frontend Development |
+| Jamie | Vision Agent, Chatbot, Frontend Development |
 | Bailey | Health Companion Chatbot |
 | Chayi | Task Agent |
 | Julia | Alert Agent |
