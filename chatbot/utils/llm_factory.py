@@ -39,8 +39,8 @@ INSTRUCT_MODEL  = "aisingapore/Qwen-SEA-LION-v4-32B-IT"
 REASONING_MODEL = "aisingapore/Llama-SEA-LION-v3.5-70B-R"
 
 
-MAX_TOKENS_INSTRUCT  = 200   # companion / triage：60字上限，留余量
-MAX_TOKENS_REASONING = 900   # expert：reasoning 模型需要 think block (~600) + 2句回答 (~100)
+MAX_TOKENS_INSTRUCT  = 4096  # companion / triage
+MAX_TOKENS_REASONING = 4096  # expert：reasoning 模型需要 think block + 回答
 
 
 def call_sealion(system_prompt: str, user_message: str, reasoning: bool = False) -> str:

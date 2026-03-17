@@ -214,12 +214,15 @@ async def chat_stream(
                     result = item["result"]
                     intent = result.get("intent", "companion")
                     agent_type = _intent_to_agent_type(intent)
-                    payload = json.dumps({
+                    done_data = {
                         "type": "done",
                         "session_id": session_id,
                         "agent_type": agent_type,
                         "reply": result.get("response", ""),
-                    })
+                    }
+                    if input_mode == "voice" and result.get("transcribed_text"):
+                        done_data["transcribed_text"] = result["transcribed_text"]
+                    payload = json.dumps(done_data)
                     yield f"data: {payload}\n\n"
                     break
                 elif "__error__" in item:

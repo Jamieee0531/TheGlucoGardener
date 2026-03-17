@@ -69,7 +69,7 @@ def _clean_response(text: str) -> str:
     清理模型输出：
     - 去掉生硬措辞
     - 数字列表转 Markdown 无序列表
-    - 超过3句时截断，保留前3句
+    （字数由 prompt 软限制，不再硬截断）
     """
     text = text.strip()
     # 替换生硬措辞
@@ -78,15 +78,6 @@ def _clean_response(text: str) -> str:
 
     # 把 "1. xxx\n2. xxx" 风格转成 markdown "- xxx\n- xxx"
     text = re.sub(r'(?m)^\s*\d+\.\s+', '- ', text)
-
-    # 超过3句截断
-    parts = re.split(r'(?<=[。！？!?])', text)
-    parts = [p for p in parts if p.strip()]
-    if len(parts) > 3:
-        # 如果有列表项，保留列表完整
-        has_list = any(p.strip().startswith('-') for p in parts)
-        if not has_list:
-            text = "".join(parts[:3]).strip()
 
     return text.strip()
 

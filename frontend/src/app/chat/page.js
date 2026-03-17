@@ -66,13 +66,17 @@ export default function ChatPage() {
       onDone: (data) => {
         if (!sessionId) setSessionId(data.session_id);
         setAgentType(data.agent_type);
-        if (data.reply) {
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantMsgId ? { ...m, content: data.reply } : m
-            )
-          );
-        }
+        setMessages((prev) =>
+          prev.map((m) => {
+            if (m.id === assistantMsgId && data.reply) {
+              return { ...m, content: data.reply };
+            }
+            if (m.id === userMsgId && data.transcribed_text) {
+              return { ...m, content: data.transcribed_text };
+            }
+            return m;
+          })
+        );
         setIsLoading(false);
       },
       onError: (message) => {
