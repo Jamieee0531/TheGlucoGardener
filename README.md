@@ -185,7 +185,7 @@ SG_INNOVATION/
 | Jamie | Vision Agent, Chatbot, Frontend Development |
 | Bailey | Health Companion Chatbot |
 | Chayi | Task Agent |
-| Julia | Alert Agent |
+| Julia | Alert Agent, Program Leader |
 | Ruiyu | UI/UX Design, Game & Interaction Design |
 | Congrong | Business Model, Data Analysis, Demo & Presentation |
 
