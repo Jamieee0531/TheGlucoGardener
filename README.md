@@ -1,4 +1,4 @@
-# The GlucoGardener 🌱
+# The GlucoGardener
 
 AI-powered chronic disease management platform for diabetic patients in Singapore. Built for the **SG INNOVATION** competition.
 
