@@ -1,310 +1,191 @@
-# SG INNOVATION - AI Health Platform
+# The GlucoGardener 🌱
 
-**English | [中文](README_CN.md)**
+AI-powered chronic disease management platform for diabetic patients in Singapore. Built for the **SG INNOVATION** competition.
 
-AI-powered health management platform for diabetic patients in Singapore. Built for the **SG INNOVATION** competition.
+## Platform Overview
 
-This repo contains two integrated modules:
+| Module | Directory | Status | Description |
+|--------|-----------|--------|-------------|
+| **Health Companion Chatbot** | `chatbot/` | ✅ Backend ready | Multi-turn conversational agent with intent routing, emotion awareness, streaming responses |
+| **Vision Agent** | `src/vision_agent/` | ✅ Backend ready | Analyzes food photos, medication images, and medical reports → structured JSON |
+| **Task System** | `frontend/src/app/task/` | 🟡 Frontend only | Daily health task management (meal logging, exercise, check-ins) |
+| **Alert System** | `frontend/src/app/soft-alert/`, `hard-alert/` | 🟡 Frontend only | Soft & hard alerts for glucose/heart rate anomalies |
+| **Garden** | `frontend/src/app/garden/` | 🟡 Frontend only | Gamification — grow your garden by completing health tasks |
+| **Settings** | `frontend/src/app/setting/` | 🟡 Frontend only | User profile and preferences |
 
-| Module | Description |
-|--------|-------------|
-| **Vision Agent** (`src/vision_agent/`) | Analyzes food photos, medication images, and medical reports — converting images into structured JSON |
-| **Health Companion Chatbot** (`chatbot/`) | Multi-turn conversational agent with intent routing, emotion awareness, and Vision Agent integration |
-
----
-
-## Chatbot Quick Start
-
-```bash
-cd chatbot
-pip install -r requirements.txt
-cp ../.env .env   # uses same API keys as Vision Agent
-python main.py
-
-# CLI commands:
-# 你好                          → text input
-# image /path/to/food.jpg       → image input (triggers Vision Agent)
-# image /path/photo.jpg 这是午饭  → image + text
-# voice /path/to/audio.mp3      → voice input
-# reset                         → clear conversation history
-# quit                          → exit
-```
-
-### Chatbot Architecture
-
-```
-User Input (text / image / voice)
-    |
-input_node     ← detects images, calls Vision Agent, generates synthetic text
-    |
-triage_node    ← keyword pre-classification + LLM fallback (intent + emotion)
-    |
-policy_node    ← rule table: (intent, emotion) → strategy instruction
-    |
-    +-- Expert Agent    ← confidence-driven multi-turn: glucose/diet/medication
-    +-- Companion Agent ← emotional support + crisis detection
-    +-- Chitchat Agent  ← casual conversation
-    +-- Task Forward    ← triggers Task Agent (Chayi)
-    +-- Alert Forward   ← triggers Alert Agent (Julia)
-```
+> Task Agent (Chayi) and Alert Agent (Julia) are developed in separate repos. Frontend pages are ready; backend integration is in progress.
 
 ---
-
-## Vision Agent Architecture
-
-### LangGraph Pipeline
-
-```
-[Image Input(s)]      One or more images (e.g. front+back of medicine box)
-     |
-[image_intake]        Receive image(s), validate each, convert to base64
-     |
-[scene_classifier]    Classify scene: FOOD / MEDICATION / REPORT / UNKNOWN
-     |
-     +-- FOOD       → [food_analyzer]       Identify dishes, estimate nutrition
-     +-- MEDICATION → [medication_reader]    Extract drug name, dosage, frequency
-     +-- REPORT     → [report_digitizer]     Extract lab indicators (HbA1c, glucose, etc.)
-     +-- UNKNOWN    → [rejection_handler]    Reject non-target images
-     |
-[output_formatter]    Validate with Pydantic, format unified JSON output
-     |
-[Structured JSON Output]
-```
-
-### VLM Strategy (Model Layer)
-
-```
-Current (Development):
-  Gemini 2.5 Flash  →  Vision + text analysis (temporary VLM)
-
-Planned (Production):
-  FoodAI (A*STAR/SMU) →  "Eyes" - SG food recognition (756 classes, 100+ local dishes)
-  SEA-LION VL          →  "Brain" - Multilingual analysis & dietary advice
-  SEA-LION 27B Text    →  Localized suggestions (Singlish, SG diabetes diet culture)
-```
-
-All VLM implementations share a common `BaseVLM` interface — swap models by changing one config line, no graph logic changes needed.
-
-| Provider | Model | Status | Use Case |
-|----------|-------|--------|----------|
-| `mock` | MockVLM | Ready | Dev/testing, no API calls |
-| `gemini` | Gemini 2.5 Flash | Ready | Temporary VLM for all 3 scenarios |
-| `sealion` | Gemma-SEA-LION-v4-27B-IT | Ready | Text-only analysis & advice |
-| `foodai` | FoodAI v5.0 | Pending | SG food recognition (applied, awaiting approval) |
 
 ## Quick Start
 
-### 1. Install
+### 1. Backend Setup
 
 ```bash
 git clone <repo-url>
 cd SG_INNOVATION
+
+# Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Configure
-
-```bash
+# Configure API keys
 cp .env.example .env
-# Edit .env with your API keys:
-#   GEMINI_API_KEY=your_key
-#   SEALION_API_KEY=your_key
+# Edit .env with your API keys
 ```
 
-### 3. Run
+### 2. Start Backend
 
 ```bash
-# Analyze with Gemini (real VLM)
-make run-gemini IMG=test_images/chicken_rice.jpg
-
-# Analyze with mock (no API, for dev/testing)
-make run IMG=test_images/sample.jpg
-
-# Multi-image analysis (e.g. front + back of medicine box)
-python -m src.vision_agent front.jpg back.jpg --provider gemini
-
-# JSON output
-make run-json IMG=test_images/sample.jpg PROVIDER=gemini
-
-# Direct CLI
-python -m src.vision_agent photo.jpg --provider gemini --json
+uvicorn chatbot.api.main:api --reload --port 8080
 ```
 
-### 4. Test
+### 3. Start Frontend
 
 ```bash
-make test              # Run all tests (171 tests)
-make coverage          # Tests + coverage report (99%+)
+cd frontend
+npm install
+npm run dev
+# Open http://localhost:3000
 ```
+
+---
+
+## Architecture
+
+### System Overview
+
+```
+User → Frontend (Next.js)
+         ├── /chat        → Chatbot API (FastAPI :8080)
+         ├── /task         → Task Agent (Chayi) [TBD]
+         ├── /soft-alert   → Alert Agent (Julia) [TBD]
+         ├── /hard-alert   → Alert Agent (Julia) [TBD]
+         ├── /garden       → Gamification [TBD]
+         └── /setting      → User Settings [TBD]
+```
+
+### Chatbot Flow (LangGraph)
+
+```
+User Input (text / image / voice)
+    |
+input_node       ← detects images → calls Vision Agent; voice → MeraLion STT
+    |
+glucose_reader   ← fetches weekly glucose & diet history
+    |
+triage_node      ← keyword pre-classification + LLM fallback (intent + emotion)
+    |                + background RAG prefetch for medical queries
+    |
+    +── Expert Agent     ← medical Q&A, diet advice, glucose analysis
+    +── Companion Agent  ← emotional support, daily conversation
+    |
+history_update   ← persist conversation to SQLite via LangGraph checkpointer
+```
+
+### Vision Agent Pipeline (LangGraph)
+
+```
+[Image Input(s)]
+     |
+[image_intake]        Receive image(s), validate, convert to base64
+     |
+[scene_classifier]    Classify: FOOD / MEDICATION / REPORT / UNKNOWN
+     |
+     +── FOOD       → [food_analyzer]       Identify dishes, estimate nutrition
+     +── MEDICATION → [medication_reader]    Extract drug name, dosage, frequency
+     +── REPORT     → [report_digitizer]     Extract lab indicators (HbA1c, glucose)
+     +── UNKNOWN    → [rejection_handler]    Reject non-target images
+     |
+[output_formatter]    Validate with Pydantic → unified JSON output
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/chat/message` | Send message, get full response |
+| POST | `/chat/stream` | Send message, get streaming SSE response |
+
+Both endpoints accept `FormData` with fields: `user_id`, `session_id`, `text`, `image`, `audio`.
+
+---
 
 ## Project Structure
 
 ```
 SG_INNOVATION/
 ├── README.md
-├── CLAUDE.md                        # AI dev guidelines
-├── PRD-visionAgent.md               # Vision Agent product spec
-├── PRD-chatbot.md                   # Chatbot product spec
-├── Makefile
 ├── requirements.txt
 ├── .env.example
+├── Makefile
 │
-├── chatbot/                         # Health Companion Chatbot
-│   ├── main.py                      # CLI entry point
-│   ├── agents/                      # triage, policy, expert, companion, chitchat, forward
-│   ├── graph/                       # LangGraph graph definition
-│   ├── state/                       # ChatState (TypedDict)
-│   ├── utils/                       # llm_factory, memory, meralion
-│   ├── config/                      # settings
-│   └── tests/                       # 29 tests
+├── chatbot/                          # Health Companion Chatbot
+│   ├── api/main.py                   # FastAPI endpoints
+│   ├── agents/                       # triage, expert, companion
+│   ├── graph/builder.py              # LangGraph graph definition
+│   ├── state/chat_state.py           # ChatState (TypedDict)
+│   ├── utils/                        # llm_factory, memory, meralion
+│   ├── config/settings.py            # Environment config
+│   ├── memory/                       # Long-term storage + RAG
+│   └── tests/
 │
-├── src/vision_agent/
-│   ├── agent.py                     # Public API: VisionAgent.analyze()
-│   ├── graph.py                     # LangGraph state graph definition
-│   ├── state.py                     # Shared state (TypedDict)
-│   ├── config.py                    # Settings from .env (Pydantic)
-│   ├── logging_config.py
-│   ├── __main__.py                  # CLI entry point
-│   │
-│   ├── llm/                         # VLM interface layer
-│   │   ├── base.py                  # Abstract BaseVLM interface
-│   │   ├── gemini.py                # Google Gemini 2.5 Flash (current)
-│   │   ├── sealion.py               # SEA-LION text model
-│   │   ├── mock.py                  # Mock for dev/testing
-│   │   └── retry.py                 # Exponential backoff wrapper
-│   │
-│   ├── nodes/                       # Graph nodes (processing steps)
-│   │   ├── image_intake.py          # Image loading & base64 conversion
-│   │   ├── scene_classifier.py      # Scene classification (4 types)
-│   │   ├── food_analyzer.py         # Food identification & nutrition
-│   │   ├── medication_reader.py     # Drug info extraction
-│   │   ├── report_digitizer.py      # Lab report digitization
-│   │   ├── rejection_handler.py     # Non-target image handling
-│   │   └── output_formatter.py      # Pydantic validation & formatting
-│   │
-│   ├── prompts/                     # SG-optimized prompt templates
-│   │   ├── classifier.py            # Scene classification prompt
-│   │   ├── food.py                  # 50+ SG dishes, HPB nutrition context
-│   │   ├── medication.py            # SG drugs, HSA labels, BD/OD/TDS parsing
-│   │   └── report.py               # MOH/HPB reference ranges, SG hospital formats
-│   │
-│   └── schemas/                     # Pydantic v2 output models
-│       └── outputs.py               # FoodOutput, MedicationOutput, ReportOutput
+├── src/vision_agent/                 # Vision Agent
+│   ├── agent.py                      # Public API: VisionAgent.analyze()
+│   ├── graph.py                      # LangGraph state graph
+│   ├── nodes/                        # Pipeline nodes (7 nodes)
+│   ├── prompts/                      # SG-optimized prompt templates
+│   ├── schemas/outputs.py            # Pydantic v2 output models
+│   └── llm/                          # VLM interface (Gemini, SEA-LION, Mock)
 │
-├── tests/                           # 171 tests, 99%+ coverage
-│   ├── conftest.py                  # Shared fixtures
-│   ├── test_config.py
-│   ├── test_graph.py
-│   ├── test_nodes/
-│   └── test_schemas/
+├── frontend/                         # Next.js Frontend
+│   └── src/app/
+│       ├── page.js                   # Home — health snapshot
+│       ├── chat/                     # Chat — streaming AI conversation
+│       ├── task/                     # Task — daily health tasks
+│       ├── garden/                   # Garden — gamification
+│       ├── setting/                  # Settings — user profile
+│       ├── soft-alert/               # Soft alerts
+│       └── hard-alert/               # Hard alerts
 │
-└── test_images/                     # Test images (gitignored)
-```
-
-## Output Examples
-
-### Food Analysis
-
-```json
-{
-  "scene_type": "FOOD",
-  "items": [
-    {
-      "name": "Hainanese Chicken Rice",
-      "quantity": "1 plate",
-      "nutrition": {
-        "calories_kcal": 480.0,
-        "carbs_g": 65.0,
-        "protein_g": 28.0,
-        "fat_g": 12.0,
-        "sodium_mg": 820.0
-      }
-    }
-  ],
-  "total_calories_kcal": 480.0,
-  "meal_type": "lunch",
-  "confidence": 0.91
-}
-```
-
-### Medication Verification
-
-```json
-{
-  "scene_type": "MEDICATION",
-  "drug_name": "Metformin Hydrochloride",
-  "dosage": "500mg",
-  "frequency": "twice daily with meals (BD)",
-  "route": "oral",
-  "warnings": ["Do not crush or chew", "Take with food to reduce GI side effects"],
-  "confidence": 0.87
-}
-```
-
-### Medical Report Digitization
-
-```json
-{
-  "scene_type": "REPORT",
-  "report_type": "blood_test",
-  "indicators": [
-    {"name": "HbA1c", "value": "7.2", "unit": "%", "reference_range": "4.0-5.6", "is_abnormal": true},
-    {"name": "Fasting Glucose", "value": "6.8", "unit": "mmol/L", "reference_range": "3.9-6.1", "is_abnormal": true}
-  ],
-  "report_date": "2024-01-15",
-  "lab_name": "Singapore General Hospital",
-  "confidence": 0.95
-}
-```
-
-## API Usage
-
-```python
-from src.vision_agent.agent import VisionAgent
-from src.vision_agent.llm.gemini import GeminiVLM
-
-# With Gemini (real vision)
-agent = VisionAgent(vlm=GeminiVLM())
-result = agent.analyze("meal_photo.jpg")
-
-print(result.scene_type)        # "FOOD"
-print(result.confidence)        # 0.91
-print(result.as_food.items)     # [FoodItem(...), ...]
-
-# Multi-image analysis (e.g. front + back of medicine box)
-result = agent.analyze(["front.jpg", "back.jpg"])
-print(result.is_multi_image)    # True
-print(result.image_path)        # "front.jpg" (backward compatible)
-print(result.image_paths)       # ["front.jpg", "back.jpg"]
-
-# With Mock (dev/testing, no API calls)
-agent = VisionAgent()
-result = agent.analyze("any_image.jpg")
+└── tests/                            # Vision Agent tests (171 tests, 99%+ coverage)
 ```
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `VLM_PROVIDER` | No | `mock` | VLM provider: `mock`, `gemini`, `sealion` |
-| `GEMINI_API_KEY` | When provider=gemini | - | Google Gemini API key |
-| `SEALION_API_KEY` | When provider=sealion | - | SEA-LION API key |
-| `LOG_LEVEL` | No | `INFO` | DEBUG, INFO, WARNING, ERROR |
-| `VLM_MAX_RETRIES` | No | `3` | Max retry attempts for VLM calls |
-| `VLM_RETRY_DELAY_S` | No | `1.0` | Initial retry delay (seconds) |
-| `MAX_IMAGE_SIZE_MB` | No | `10.0` | Max image file size |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VLM_PROVIDER` | No | VLM provider: `mock`, `gemini`, `sealion` |
+| `GEMINI_API_KEY` | When provider=gemini | Google Gemini API key |
+| `SEALION_API_KEY` | Yes (chatbot) | SEA-LION API key |
+| `SEALION_BASE_URL` | No | Default: `https://api.sea-lion.ai/v1` |
+| `MERALION_API_KEY` | For voice input | MeraLion STT API key |
+| `MERALION_BASE_URL` | No | Default: `http://meralion.org:8010` |
+| `LOG_LEVEL` | No | `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 
 ## Tech Stack
 
-- **Framework**: LangGraph (state graph orchestration)
-- **Language**: Python 3.10+
-- **VLM**: Gemini 2.5 Flash (temp) / SEA-LION (planned)
+- **Backend**: Python 3.10+, FastAPI, LangGraph
+- **Frontend**: Next.js 16, React 19, Tailwind CSS 4
+- **AI Models**: SEA-LION (text), Gemini 2.5 Flash (vision), MeraLion (voice)
+- **Database**: SQLite (conversation history via LangGraph checkpointer)
 - **Validation**: Pydantic v2
-- **HTTP**: httpx
-- **Testing**: pytest (171 tests, 99%+ coverage)
+- **Testing**: pytest (171 tests, 99%+ coverage for Vision Agent)
+
+## Team
+
+| Member | Module |
+|--------|--------|
+| Jamie | Vision Agent, Frontend |
+| Bailey | Health Companion Chatbot |
+| Chayi | Task Agent |
+| Julia | Alert Agent |
 
 ## License
 
-SG INNOVATION Competition Project - AI Singapore
+SG INNOVATION Competition Project — AI Singapore
