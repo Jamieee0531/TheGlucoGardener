@@ -173,18 +173,21 @@ SG_INNOVATION/
 - **Backend**: Python 3.10+, FastAPI, LangGraph
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4
 - **AI Models**: SEA-LION (text), Gemini 2.5 Flash (vision), MeraLion (voice)
-- **Database**: SQLite (conversation history via LangGraph checkpointer)
+- **Database**: PostgreSQL (production), SQLite (dev conversation history)
+- **RAG**: ChromaDB (vector store) + sentence-transformers (embeddings)
 - **Validation**: Pydantic v2
 - **Testing**: pytest (171 tests, 99%+ coverage for Vision Agent)
 
 ## Team
 
-| Member | Module |
-|--------|--------|
-| Jamie | Vision Agent, Frontend |
+| Member | Role |
+|--------|------|
+| Jamie | Vision Agent, Frontend Development |
 | Bailey | Health Companion Chatbot |
 | Chayi | Task Agent |
 | Julia | Alert Agent |
+| Ruiyu | UI/UX Design, Game & Interaction Design |
+| Congrong | Business Model, Data Analysis, Demo & Presentation |
 
 ## License
 
