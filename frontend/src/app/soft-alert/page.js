@@ -46,20 +46,20 @@ export default function SoftAlertPage() {
 
         {/* ====== SECTION 1: Top-left — Greeting + Soft Alert ====== */}
         <div style={{ minHeight: 255 }}>
-          <h2 className="text-2xl font-bold italic text-[#e8927c] mt-1">
+          <h2 className="text-2xl font-bold italic text-[#e8927c] -mt-1">
             Good Morning, User!
           </h2>
 
-          <h3 className="text-lg font-bold italic text-[#F4B95D] mt-3">
+          <h3 className="text-lg font-bold italic text-[#F4B95D] mt-1.5">
             Heads up!
           </h3>
           <p className="text-base italic text-[#F4B95D] mt-1 leading-snug max-w-[260px]">
-            Your glucose is 4.9. If you start HIIT now, it could drop to 3.85, which is too low. Grab 15g fast carbs like 1/2 cup juice first. You&apos;ve got this!
+            Your glucose is 4.9 mmol/L. If you start resistance training, it could drop to 4.04 mmol/L. Consider a small apple or handful of nuts (15-30g slow-release carbs) beforehand. Stay safe and strong!
           </p>
 
           <Link
             href="/chat"
-            className="inline-block mt-4 px-6 py-2 text-sm font-medium text-gray-700 border border-[#e8c8a0] rounded-full bg-[#fce8d0]/40 hover:bg-[#fce8d0] w-fit"
+            className="inline-block mt-2 px-6 py-2 text-sm font-medium text-gray-700 border border-[#e8c8a0] rounded-full bg-[#fce8d0]/40 hover:bg-[#fce8d0] w-fit"
           >
             &gt;&gt;Chat with AI
           </Link>
