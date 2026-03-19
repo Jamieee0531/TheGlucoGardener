@@ -9,7 +9,7 @@ AI-powered chronic disease management platform for diabetic patients in Singapor
 ## Presentation
 
 - [Presentation Slides (PDF)](docs/presentation-slides.pdf)
-- Demo Video (coming soon)
+- [Demo Video (Google Drive)](https://drive.google.com/drive/folders/1p6h_YFwAAUWyiWDxKaYO_nvAUaOvfyBL?usp=sharing)
 
 ---
 
