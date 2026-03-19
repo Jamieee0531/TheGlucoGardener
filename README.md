@@ -195,12 +195,12 @@ SG_INNOVATION/
 
 | Member | Role |
 |--------|------|
-| Jamie | Vision Agent, Chatbot, Frontend Development |
-| Bailey | Health Companion Chatbot |
-| Chayi | Task Agent |
-| Julia | Alert Agent, Program Leader |
+| Jamie ([@Jamieee0531](https://github.com/Jamieee0531)) | Vision Agent, Chatbot, Frontend Development |
+| Bailey ([@baileybei](https://github.com/baileybei)) | Health Companion Chatbot |
+| Chayi ([@Verse-Founder](https://github.com/Verse-Founder)) | Task Agent |
+| Julia ([@juliawangjiayu](https://github.com/juliawangjiayu)) | Alert Agent, Program Leader |
 | Ruiyu | UI/UX Design, Game & Interaction Design |
-| Congrong | Business Model, Data Analysis, Demo & Presentation |
+| Congrong ([@Douliciouss](https://github.com/Douliciouss)) | Business Model, Data Analysis, Demo & Presentation |
 
 ## License
 
