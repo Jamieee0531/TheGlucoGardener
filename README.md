@@ -25,7 +25,8 @@ AI-powered chronic disease management platform for diabetic patients in Singapor
 | **Settings** | `frontend/src/app/setting/` | 🟡 Frontend only | User profile and preferences |
 
 > Task Agent and Alert Agent are developed in separate repos. Frontend pages are ready; backend integration is in progress.
-> - Task & Alert Agents: [SG-Innovation-Agents](https://github.com/Verse-Founder/SG-Innovation-Agents)
+> - Task Agent: [SG-Innovation-Agents](https://github.com/Verse-Founder/SG-Innovation-Agents)
+> - Alert Agent: [Diabetes_Guardian](https://github.com/juliawangjiayu/Diabetes_Guardian)
 
 ---
 
