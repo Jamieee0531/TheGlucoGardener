@@ -24,7 +24,8 @@ AI-powered chronic disease management platform for diabetic patients in Singapor
 | **Garden** | `frontend/src/app/garden/` | 🟡 Frontend only | Gamification — grow your garden by completing health tasks |
 | **Settings** | `frontend/src/app/setting/` | 🟡 Frontend only | User profile and preferences |
 
-> Task Agent (Chayi) and Alert Agent (Julia) are developed in separate repos. Frontend pages are ready; backend integration is in progress.
+> Task Agent and Alert Agent are developed in separate repos. Frontend pages are ready; backend integration is in progress.
+> - Task & Alert Agents: [SG-Innovation-Agents](https://github.com/Verse-Founder/SG-Innovation-Agents)
 
 ---
 
