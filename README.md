@@ -2,6 +2,17 @@
 
 AI-powered chronic disease management platform for diabetic patients in Singapore. Built for the **SG INNOVATION** competition.
 
+## Poster
+
+![The GlucoGardener Poster](docs/poster.png)
+
+## Presentation
+
+- [Presentation Slides (PDF)](docs/presentation-slides.pdf)
+- Demo Video (coming soon)
+
+---
+
 ## Platform Overview
 
 | Module | Directory | Status | Description |
