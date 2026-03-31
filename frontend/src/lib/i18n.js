@@ -62,8 +62,8 @@ const dict = {
   open_camera: { English: "Open Camera", Chinese: "打开相机", Malay: "Buka Kamera", Tamil: "கேமரா திற" },
   open_gallery: { English: "Open Gallery", Chinese: "打开相册", Malay: "Buka Galeri", Tamil: "கேலரி திற" },
   body_checkin_title: { English: "Body Check-in", Chinese: "身体记录", Malay: "Pemeriksaan Badan", Tamil: "உடல் பதிவு" },
-  waist_cm: { English: "Waist (cm)", Chinese: "腰围（厘米）", Malay: "Pinggang (cm)", Tamil: "இடுப்பு (செமீ)" },
-  weight_kg: { English: "Weight (kg)", Chinese: "体重（公斤）", Malay: "Berat (kg)", Tamil: "எடை (கிகி)" },
+  waist_cm: { English: "Current Waist (cm)", Chinese: "当前腰围（厘米）", Malay: "Pinggang Semasa (cm)", Tamil: "தற்போதைய இடுப்பு (செமீ)" },
+  weight_kg: { English: "Current Weight (kg)", Chinese: "当前体重（公斤）", Malay: "Berat Semasa (kg)", Tamil: "தற்போதைய எடை (கிகி)" },
 
   // ── Garden ──
   garden_title: { English: "Garden", Chinese: "花园", Malay: "Taman", Tamil: "தோட்டம்" },
@@ -112,7 +112,7 @@ const dict = {
   select_placeholder: { English: "Select...", Chinese: "请选择...", Malay: "Pilih...", Tamil: "தேர்ந்தெடு..." },
   health_profile: { English: "Your health profile", Chinese: "你的健康档案", Malay: "Profil kesihatan anda", Tamil: "உங்கள் சுகாதார சுயவிவரம்" },
   better_insights: { English: "We use this to give you better insights", Chinese: "我们用这些数据为您提供更好的健康建议", Malay: "Kami gunakan ini untuk memberi pandangan lebih baik", Tamil: "சிறந்த நுண்ணறிவை வழங்க இதைப் பயன்படுத்துகிறோம்" },
-  waist_circumference: { English: "Waist circumference (cm)", Chinese: "腰围（厘米）", Malay: "Lilitan pinggang (cm)", Tamil: "இடுப்பு சுற்றளவு (செமீ)" },
+  waist_circumference: { English: "Current Waist circumference (cm)", Chinese: "当前腰围（厘米）", Malay: "Lilitan pinggang semasa (cm)", Tamil: "தற்போதைய இடுப்பு சுற்றளவு (செமீ)" },
   choose_your_language: { English: "Choose your language", Chinese: "选择你的语言", Malay: "Pilih bahasa anda", Tamil: "உங்கள் மொழியைத் தேர்ந்தெடுங்கள்" },
   change_later_settings: { English: "You can change this later in Settings", Chinese: "你可以稍后在设置中更改", Malay: "Anda boleh tukar kemudian di Tetapan", Tamil: "பின்னர் அமைப்புகளில் மாற்றலாம்" },
   all_set: { English: "All set!", Chinese: "准备就绪！", Malay: "Sedia!", Tamil: "தயார்!" },

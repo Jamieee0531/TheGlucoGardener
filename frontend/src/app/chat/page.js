@@ -128,7 +128,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-full bg-cream">
-      <TopBar agentType={agentType} />
+      <TopBar title={t("nav_chat")} agentType={agentType} />
 
       <MessageList messages={messages} isLoading={isLoading} />
 
