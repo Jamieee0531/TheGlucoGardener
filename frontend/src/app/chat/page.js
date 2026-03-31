@@ -8,9 +8,11 @@ import ActionSheet from "../../components/ActionSheet";
 import ImagePreview from "../../components/ImagePreview";
 import { sendMessageStream } from "../../lib/api";
 import { useAuth } from "../../lib/useAuth";
+import { useTranslation } from "../../lib/i18n";
 
 export default function ChatPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
 
   const [messages, setMessages] = useState([]);
   const [sessionId, setSessionId] = useState(null);
@@ -36,7 +38,7 @@ export default function ChatPage() {
     const userMsg = {
       id: userMsgId,
       role: "user",
-      content: text || (audio ? "🎙 Recording..." : ""),
+      content: text || (audio ? `🎙 ${t("recording")}` : ""),
       image: imagePreview || null,
     };
     setMessages((prev) => [...prev, userMsg]);
@@ -87,7 +89,7 @@ export default function ChatPage() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsgId
-              ? { ...m, content: "Sorry, something went wrong. Please try again." }
+              ? { ...m, content: t("chat_error") }
               : m
           )
         );
