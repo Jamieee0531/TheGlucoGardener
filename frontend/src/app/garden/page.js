@@ -1,14 +1,15 @@
 "use client";
 
 import TopBar from "../../components/TopBar";
-
-const FRIENDS = [
-  { name: "Friend 1", avatar: "/avatar1.jpg" },
-  { name: "Friend 2", avatar: "/avatar2.jpg" },
-  { name: "Friend 3", avatar: "/avatar3.jpg" },
-];
+import { useAuth } from "../../lib/useAuth";
+import { TEST_USERS } from "../../lib/users";
 
 export default function GardenPage() {
+  const { user, loading } = useAuth();
+  if (loading || !user) return null;
+
+  const friends = TEST_USERS.filter((u) => u.user_id !== user.user_id);
+
   return (
     <div className="flex flex-col h-full bg-cream">
       <TopBar title="Garden" transparent />
@@ -27,18 +28,19 @@ export default function GardenPage() {
         <h3 className="text-xl font-bold italic text-[#7cb342] mb-3">Friends</h3>
 
         <div>
-          {FRIENDS.map((friend, i) => (
-            <div key={friend.name}>
+          {friends.map((friend, i) => (
+            <div key={friend.user_id}>
               <div className="flex items-center py-3 px-4 bg-[#f0e6d6] rounded-lg">
                 <img
                   src={friend.avatar}
                   alt={friend.name}
                   className="w-[55px] h-[55px] rounded-full object-cover"
                 />
+                <span className="ml-3 text-sm font-semibold text-gray-700">{friend.name}</span>
                 <span className="flex-1" />
                 <span className="text-sm font-semibold text-gray-800">Visit&gt;&gt;</span>
               </div>
-              {i < FRIENDS.length - 1 && <div className="h-3" />}
+              {i < friends.length - 1 && <div className="h-3" />}
             </div>
           ))}
         </div>
