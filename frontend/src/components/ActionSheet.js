@@ -1,3 +1,5 @@
+"use client";
+
 import { useTranslation } from "../lib/i18n";
 
 export default function ActionSheet({ visible, onCamera, onGallery, onClose }) {
