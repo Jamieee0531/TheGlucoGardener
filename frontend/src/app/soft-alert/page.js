@@ -4,9 +4,11 @@ import Link from "next/link";
 import TopBar from "../../components/TopBar";
 import SugarChart from "../../components/SugarChart";
 import { useAuth } from "../../lib/useAuth";
+import { useTranslation } from "../../lib/i18n";
 
 export default function SoftAlertPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   if (loading || !user) return null;
 
   return (
@@ -42,7 +44,7 @@ export default function SoftAlertPage() {
 
       {/* ── TopBar ── */}
       <div className="relative z-30">
-        <TopBar title="Home" transparent />
+        <TopBar title={t("nav_home")} transparent />
       </div>
 
       {/* ── Content ── */}
@@ -51,40 +53,40 @@ export default function SoftAlertPage() {
         {/* ====== SECTION 1: Top-left — Greeting + Soft Alert ====== */}
         <div style={{ minHeight: 255 }}>
           <h2 className="text-2xl font-bold italic text-[#e8927c] -mt-1">
-            Good Morning, {user.name.split(" ")[0]}!
+            {t("good_morning")} {user.name.split(" ")[0]}!
           </h2>
 
           <h3 className="text-lg font-bold italic text-[#F4B95D] mt-1.5">
-            Heads up!
+            {t("heads_up")}
           </h3>
           <p className="text-base italic text-[#F4B95D] mt-1 leading-snug max-w-[260px]">
-            Your glucose is 4.9 mmol/L. If you start resistance training, it could drop to 4.04 mmol/L. Consider a small apple or handful of nuts (15-30g slow-release carbs) beforehand. Stay safe and strong!
+            {t("soft_alert_msg")}
           </p>
 
           <Link
             href="/chat"
             className="inline-block mt-2 px-6 py-2 text-sm font-medium text-gray-700 border border-[#e8c8a0] rounded-full bg-[#fce8d0]/40 hover:bg-[#fce8d0] w-fit"
           >
-            &gt;&gt;Chat with AI
+            {t("chat_with_ai")}
           </Link>
         </div>
 
         {/* ====== SECTION 2: Middle-right — Snapshot + Stats + Tasks + Flower ====== */}
         <div className="self-end -mt-20 mr-0 text-right w-[55%]">
           <h3 className="text-xl font-bold italic text-[#88B3F9] leading-tight">
-            Today&apos;s<br />Snapshot
+            {t("todays_snapshot")}
           </h3>
           <div className="mt-3 space-y-0.5 text-sm text-gray-800 text-right pr-1">
             <p><span className="font-semibold">Step Count:</span> 1234</p>
-            <p><span className="font-semibold">BMI:</span> 23.0</p>
-            <p><span className="font-semibold">Meals logged:</span> 1/3</p>
+            <p><span className="font-semibold">{t("bmi")}</span> 23.0</p>
+            <p><span className="font-semibold">{t("meals_logged")}</span> 1/3</p>
           </div>
 
           <Link
             href="/task"
             className="inline-block mt-3 px-5 py-1.5 text-sm font-medium text-gray-700 border border-gray-400 rounded-full hover:bg-gray-100"
           >
-            &gt;&gt;View your tasks
+            {t("view_tasks")}
           </Link>
 
           <img
@@ -100,7 +102,7 @@ export default function SoftAlertPage() {
         {/* ====== SECTION 3: Bottom-left — Check your sugar + Chart ====== */}
         <div className="w-[70%]">
           <h3 className="text-2xl font-bold italic text-[#454545] leading-tight">
-            Check your<br />sugar
+            {t("check_sugar")}
           </h3>
           <SugarChart />
         </div>

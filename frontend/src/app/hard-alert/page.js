@@ -5,9 +5,11 @@ import Link from "next/link";
 import TopBar from "../../components/TopBar";
 import SugarChart from "../../components/SugarChart";
 import { useAuth } from "../../lib/useAuth";
+import { useTranslation } from "../../lib/i18n";
 
 export default function HardAlertPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const [showAlert, setShowAlert] = useState(true);
 
   if (loading || !user) return null;
@@ -45,7 +47,7 @@ export default function HardAlertPage() {
 
       {/* ── TopBar ── */}
       <div className="relative z-30">
-        <TopBar title="Home" transparent />
+        <TopBar title={t("nav_home")} transparent />
       </div>
 
       {/* ── Content (same as Home) ── */}
@@ -54,17 +56,17 @@ export default function HardAlertPage() {
         {/* ====== SECTION 1: Top-left — Greeting + Chat + Illustration ====== */}
         <div>
           <h2 className="text-2xl font-bold italic text-[#e8927c] mt-1">
-            Good Morning, {user.name.split(" ")[0]}!
+            {t("good_morning")} {user.name.split(" ")[0]}!
           </h2>
           <p className="text-base italic text-[#F4B95D] mt-0.5">
-            How are you feeling today?
+            {t("how_feeling")}
           </p>
 
           <Link
             href="/chat"
             className="inline-block mt-3 px-6 py-2 text-sm font-medium text-gray-700 border border-[#e8c8a0] rounded-full bg-[#fce8d0]/40 hover:bg-[#fce8d0] w-fit"
           >
-            &gt;&gt;Chat with AI
+            {t("chat_with_ai")}
           </Link>
 
           <img
@@ -77,19 +79,19 @@ export default function HardAlertPage() {
         {/* ====== SECTION 2: Middle-right — Snapshot + Stats + Tasks + Flower ====== */}
         <div className="self-end -mt-20 mr-0 text-right w-[55%]">
           <h3 className="text-xl font-bold italic text-[#88B3F9] leading-tight">
-            Today&apos;s<br />Snapshot
+            {t("todays_snapshot")}
           </h3>
           <div className="mt-3 space-y-0.5 text-sm text-gray-800 text-right pr-1">
             <p><span className="font-semibold">Step Count:</span> 1234</p>
-            <p><span className="font-semibold">BMI:</span> 23.0</p>
-            <p><span className="font-semibold">Meals logged:</span> 1/3</p>
+            <p><span className="font-semibold">{t("bmi")}</span> 23.0</p>
+            <p><span className="font-semibold">{t("meals_logged")}</span> 1/3</p>
           </div>
 
           <Link
             href="/task"
             className="inline-block mt-3 px-5 py-1.5 text-sm font-medium text-gray-700 border border-gray-400 rounded-full hover:bg-gray-100"
           >
-            &gt;&gt;View your tasks
+            {t("view_tasks")}
           </Link>
 
           <img
@@ -105,7 +107,7 @@ export default function HardAlertPage() {
         {/* ====== SECTION 3: Bottom-left — Check your sugar + Chart ====== */}
         <div className="w-[70%]">
           <h3 className="text-2xl font-bold italic text-[#454545] leading-tight">
-            Check your<br />sugar
+            {t("check_sugar")}
           </h3>
           <SugarChart />
         </div>
@@ -134,12 +136,12 @@ export default function HardAlertPage() {
 
               {/* Title */}
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Alert! Potential Hypoglycemia
+                {t("alert_hypo")}
               </h3>
 
               {/* Description */}
               <p className="text-base text-gray-400 leading-relaxed">
-                Your blood sugar level appears to be low. Please consider having a quick source of sugar and check your level again.
+                {t("alert_hypo_msg")}
               </p>
             </div>
           </div>
