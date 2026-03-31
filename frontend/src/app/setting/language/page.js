@@ -8,7 +8,9 @@ import { getLanguage, setLanguage } from "../../../lib/users";
 
 const LANGUAGES = [
   { code: "English", label: "English", flag: "\uD83C\uDDEC\uD83C\uDDE7" },
-  { code: "Chinese", label: "\u4E2D\u6587", flag: "\uD83C\uDDE8\uD83C\uDDF3" },
+  { code: "Chinese", label: "\u534E\u8BED", flag: "\uD83C\uDDE8\uD83C\uDDF3" },
+  { code: "Malay", label: "Bahasa Melayu", flag: "\uD83C\uDDF2\uD83C\uDDFE" },
+  { code: "Tamil", label: "\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD", flag: "\uD83C\uDDEE\uD83C\uDDF3" },
 ];
 
 export default function LanguagePage() {

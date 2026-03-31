@@ -1,10 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import TopBar from "../../components/TopBar";
 import { useAuth } from "../../lib/useAuth";
 import { TEST_USERS } from "../../lib/users";
 
 export default function GardenPage() {
+  const router = useRouter();
   const { user, loading } = useAuth();
   if (loading || !user) return null;
 
@@ -38,7 +40,12 @@ export default function GardenPage() {
                 />
                 <span className="ml-3 text-sm font-semibold text-gray-700">{friend.name}</span>
                 <span className="flex-1" />
-                <span className="text-sm font-semibold text-gray-800">Visit&gt;&gt;</span>
+                <button
+                  onClick={() => router.push(`/garden/visit?id=${friend.user_id}`)}
+                  className="text-sm font-semibold text-gray-800 hover:text-[#7cb342] transition-colors"
+                >
+                  Visit&gt;&gt;
+                </button>
               </div>
               {i < friends.length - 1 && <div className="h-3" />}
             </div>

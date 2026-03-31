@@ -6,17 +6,6 @@ import { useAuth } from "../../lib/useAuth";
 
 const TASKS = [
   {
-    id: "move",
-    title: "Move a little today",
-    emoji: "🏃",
-    color: "#A7CBED",
-    description: "Moving your body helps support stable glucose.",
-    logType: "none",
-    completable: false,
-    extraInfo: "Step count: 1234/8000",
-    completedLabel: null,
-  },
-  {
     id: "meals",
     title: "Log your meals",
     emoji: "🍽",
@@ -44,7 +33,7 @@ const TASKS = [
     emoji: "🌅",
     color: "#F4BAC1",
     description:
-      "Personalized quest: Take a brisk walk at West Coast Park and capture the sunset.",
+      "Personalised quest: Take a brisk walk at West Coast Park and capture the sunset.",
     logType: "photo",
     completable: true,
     completedLabel: "Logged!",

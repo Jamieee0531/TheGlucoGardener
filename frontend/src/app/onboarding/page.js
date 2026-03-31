@@ -136,7 +136,7 @@ export default function OnboardingPage() {
               Tell us about you
             </h2>
             <p className="text-sm text-gray-500 mb-6">
-              This helps us personalize your experience
+              This helps us personalise your experience
             </p>
 
             <div className="space-y-4">
@@ -235,7 +235,9 @@ export default function OnboardingPage() {
             <div className="space-y-3">
               {[
                 { code: "English", label: "English", flag: "\uD83C\uDDEC\uD83C\uDDE7" },
-                { code: "Chinese", label: "\u4E2D\u6587", flag: "\uD83C\uDDE8\uD83C\uDDF3" },
+                { code: "Chinese", label: "\u534E\u8BED", flag: "\uD83C\uDDE8\uD83C\uDDF3" },
+                { code: "Malay", label: "Bahasa Melayu", flag: "\uD83C\uDDF2\uD83C\uDDFE" },
+                { code: "Tamil", label: "\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD", flag: "\uD83C\uDDEE\uD83C\uDDF3" },
               ].map((lang) => (
                 <button
                   key={lang.code}

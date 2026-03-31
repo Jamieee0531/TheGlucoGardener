@@ -77,7 +77,6 @@ export default function HomePage() {
             Today&apos;s<br />Snapshot
           </h3>
           <div className="mt-3 space-y-0.5 text-sm text-gray-800 text-right pr-1">
-            <p><span className="font-semibold">Step Count:</span> 1234</p>
             <p><span className="font-semibold">BMI:</span> 23.0</p>
             <p><span className="font-semibold">Meals logged:</span> 1/3</p>
           </div>

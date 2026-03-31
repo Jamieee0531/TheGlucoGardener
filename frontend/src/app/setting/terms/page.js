@@ -21,7 +21,7 @@ export default function TermsPage() {
             <span className="font-semibold">1. Purpose.</span> This application is designed as a health companion tool for diabetes management. It is not a substitute for professional medical advice, diagnosis, or treatment.
           </p>
           <p>
-            <span className="font-semibold">2. Data Collection.</span> We collect health-related data including glucose readings, dietary information, and activity data to provide personalized recommendations.
+            <span className="font-semibold">2. Data Collection.</span> We collect health-related data including glucose readings, dietary information, and activity data to provide personalised recommendations.
           </p>
           <p>
             <span className="font-semibold">3. User Responsibility.</span> Users are responsible for the accuracy of self-reported data. Always consult your healthcare provider for medical decisions.

@@ -21,7 +21,7 @@ export default function PrivacyPage() {
             <span className="font-semibold">Data We Collect.</span> Health metrics (glucose levels, heart rate), dietary logs, exercise data, and conversation history with the AI companion.
           </p>
           <p>
-            <span className="font-semibold">How We Use It.</span> Your data is used solely to provide personalized health insights, task recommendations, and alert notifications. We do not sell or share your data with third parties.
+            <span className="font-semibold">How We Use It.</span> Your data is used solely to provide personalised health insights, task recommendations, and alert notifications. We do not sell or share your data with third parties.
           </p>
           <p>
             <span className="font-semibold">Data Storage.</span> All data is securely stored in encrypted databases. You may request deletion of your data at any time.
