@@ -22,6 +22,7 @@ export const TEST_USERS = [
     weight_kg: 78.0,
     waist_cm: 94.5,
     language: "Chinese",
+    onboarding_completed: true,
   },
   {
     user_id: "user_003",
@@ -33,6 +34,7 @@ export const TEST_USERS = [
     weight_kg: 70.0,
     waist_cm: 88.0,
     language: "English",
+    onboarding_completed: true,
   },
 ];
 
@@ -85,4 +87,24 @@ export function getLanguage() {
 
 export function setLanguage(lang) {
   localStorage.setItem("app_language", lang);
+}
+
+export function isOnboardingCompleted(userId) {
+  if (typeof window === "undefined") return true;
+  const profile = localStorage.getItem(`profile_${userId}`);
+  if (!profile) return false;
+  try {
+    return JSON.parse(profile).onboarding_completed === true;
+  } catch {
+    return false;
+  }
+}
+
+export function completeOnboarding(userId, formData) {
+  const profile = {
+    ...formData,
+    user_id: userId,
+    onboarding_completed: true,
+  };
+  localStorage.setItem(`profile_${userId}`, JSON.stringify(profile));
 }
