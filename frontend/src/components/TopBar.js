@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "../lib/i18n";
 
 const AGENT_ICONS = {
   companion: "💞",
@@ -9,17 +10,18 @@ const AGENT_ICONS = {
 };
 
 const NAV_ITEMS = [
-  { label: "Home", href: "/" },
-  { label: "Chat", href: "/chat" },
-  { label: "Task", href: "/task" },
-  { label: "Garden", href: "/garden" },
-  { label: "Setting", href: "/setting" },
-  { label: "Soft alert-Beta", href: "/soft-alert" },
-  { label: "Hard alert-Beta", href: "/hard-alert" },
+  { key: "nav_home", href: "/" },
+  { key: "nav_chat", href: "/chat" },
+  { key: "nav_task", href: "/task" },
+  { key: "nav_garden", href: "/garden" },
+  { key: "nav_setting", href: "/setting" },
+  { key: "nav_soft_alert", suffix: "-Beta", href: "/soft-alert" },
+  { key: "nav_hard_alert", suffix: "-Beta", href: "/hard-alert" },
 ];
 
 export default function TopBar({ title = "Chat", agentType, transparent = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useTranslation();
   const icon = agentType ? (AGENT_ICONS[agentType] || "💞") : null;
 
   return (
@@ -39,12 +41,12 @@ export default function TopBar({ title = "Chat", agentType, transparent = false 
           <div className="absolute right-4 top-24 bg-white rounded-xl shadow-lg z-50 py-2 min-w-[140px]">
             {NAV_ITEMS.map((item) => (
               <Link
-                key={item.label}
+                key={item.key}
                 href={item.href}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
                 onClick={() => setMenuOpen(false)}
               >
-                {item.label}
+                {t(item.key)}{item.suffix || ""}
               </Link>
             ))}
           </div>

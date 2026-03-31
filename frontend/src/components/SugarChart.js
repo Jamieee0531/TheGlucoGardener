@@ -1,4 +1,7 @@
+import { useTranslation } from "../lib/i18n";
+
 export default function SugarChart() {
+  const { t } = useTranslation();
   // Simple blood sugar line on L-shaped axis
   const points = [
     [40, 75],
@@ -18,8 +21,8 @@ export default function SugarChart() {
     <div className="mt-2">
       {/* Labels */}
       <div className="text-xs font-semibold text-gray-800 leading-tight mb-1">
-        <div>Blood</div>
-        <div>sugar</div>
+        <div>{t("blood")}</div>
+        <div>{t("sugar")}</div>
       </div>
 
       <svg viewBox="0 0 300 110" className="w-full h-auto">
@@ -38,7 +41,7 @@ export default function SugarChart() {
 
         {/* X labels */}
         <text x="35" y="108" fontSize="9" fill="#666">7:00am</text>
-        <text x="255" y="108" fontSize="9" fill="#666" textAnchor="end">Now</text>
+        <text x="255" y="108" fontSize="9" fill="#666" textAnchor="end">{t("now")}</text>
       </svg>
     </div>
   );

@@ -1,4 +1,7 @@
+import { useTranslation } from "../lib/i18n";
+
 export default function ActionSheet({ visible, onCamera, onGallery, onClose }) {
+  const { t } = useTranslation();
   if (!visible) return null;
 
   return (
@@ -7,26 +10,26 @@ export default function ActionSheet({ visible, onCamera, onGallery, onClose }) {
 
       <div className="relative w-full bg-white rounded-t-2xl z-50 pb-6">
         <div className="text-center py-3 border-b">
-          <p className="font-semibold text-sm">Upload</p>
+          <p className="font-semibold text-sm">{t("upload")}</p>
         </div>
 
         <button
           onClick={onCamera}
           className="w-full py-3 text-center text-sm hover:bg-gray-50 border-b"
         >
-          Open Camera
+          {t("open_camera")}
         </button>
         <button
           onClick={onGallery}
           className="w-full py-3 text-center text-sm hover:bg-gray-50 border-b"
         >
-          Open Gallery
+          {t("open_gallery")}
         </button>
         <button
           onClick={onClose}
           className="w-full py-3 text-center text-sm text-red-500 hover:bg-gray-50"
         >
-          Cancel
+          {t("cancel")}
         </button>
       </div>
     </div>

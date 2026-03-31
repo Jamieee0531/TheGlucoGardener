@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { webmToWav } from "../lib/audioUtils";
+import { useTranslation } from "../lib/i18n";
 
 export default function InputBar({
   onSendText,
@@ -9,6 +10,7 @@ export default function InputBar({
   onOpenSheet,
   disabled,
 }) {
+  const { t } = useTranslation();
   const [text, setText] = useState("");
   const [showInput, setShowInput] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -91,7 +93,7 @@ export default function InputBar({
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
+            placeholder={t("type_message")}
             className="flex-1 bg-white rounded-full px-4 py-2 text-sm outline-none border border-gray-200"
             disabled={disabled}
           />
@@ -128,7 +130,7 @@ export default function InputBar({
         >
           <span className="text-4xl">🎙</span>
           {isRecording && (
-            <span className="text-xs text-white mt-1">Recording...</span>
+            <span className="text-xs text-white mt-1">{t("recording")}</span>
           )}
         </button>
 
