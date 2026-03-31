@@ -1,14 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { TEST_USERS, loginUser } from "../../lib/users";
+import { TEST_USERS, loginUser, isOnboardingCompleted } from "../../lib/users";
 
 export default function LoginPage() {
   const router = useRouter();
 
   const handleSelect = (userId) => {
     loginUser(userId);
-    router.push("/");
+    if (isOnboardingCompleted(userId)) {
+      router.push("/");
+    } else {
+      router.push("/onboarding");
+    }
   };
 
   return (
