@@ -3,40 +3,40 @@
 import { useState, useRef } from "react";
 import TopBar from "../../components/TopBar";
 import { useAuth } from "../../lib/useAuth";
+import { useTranslation } from "../../lib/i18n";
 
 const TASKS = [
   {
     id: "meals",
-    title: "Log your meals",
+    titleKey: "task_log_meals",
     emoji: "🍽",
     color: "#A7CBED",
-    description: "Small notes today, better insights tomorrow.",
+    descKey: "task_log_meals_desc",
     logType: "photo",
     completable: true,
-    completedLabel: "Meal Logged!",
+    completedKey: "task_meal_logged",
     buttonColor: "#7bb5e0",
   },
   {
     id: "body",
-    title: "Body check-in",
+    titleKey: "task_body_checkin",
     emoji: "✏️",
     color: "#F5C19E",
-    description: "Tracking your waist helps monitor metabolic health.",
+    descKey: "task_body_checkin_desc",
     logType: "form",
     completable: true,
-    completedLabel: "Checked In!",
+    completedKey: "task_checked_in",
     buttonColor: "#e8a878",
   },
   {
     id: "sunset",
-    title: "Sunset chaser",
+    titleKey: "task_sunset",
     emoji: "🌅",
     color: "#F4BAC1",
-    description:
-      "Personalised quest: Take a brisk walk at West Coast Park and capture the sunset.",
+    descKey: "task_sunset_desc",
     logType: "photo",
     completable: true,
-    completedLabel: "Logged!",
+    completedKey: "task_logged",
     buttonColor: "#e89098",
   },
 ];
@@ -48,6 +48,7 @@ const MAX_PLANT_PTS = 100;
 
 export default function TaskPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState("sunset");
   const [completedTasks, setCompletedTasks] = useState(new Set());
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -104,7 +105,7 @@ export default function TaskPage() {
 
   return (
     <div className="flex flex-col h-full bg-cream">
-      <TopBar title="Task" transparent />
+      <TopBar title={t("task_title")} transparent />
       <div className="flex-1 overflow-y-auto pb-4">
         {/* Card Stack */}
         <div className="px-4 mt-2">
@@ -134,13 +135,11 @@ export default function TaskPage() {
                       textDecoration: isCompleted ? "line-through" : "none",
                     }}
                   >
-                    {task.title} {task.emoji}
+                    {t(task.titleKey)} {task.emoji}
                   </h3>
                   {isCompleted ? (
                     <span className="text-sm font-bold italic text-[#ff6b8a]">
-                      10 pt
-                      <br />
-                      earned!
+                      10 {t("task_pt_earned")}
                     </span>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-white" />
@@ -162,7 +161,7 @@ export default function TaskPage() {
                       textDecoration: isCompleted ? "line-through" : "none",
                     }}
                   >
-                    {task.description}
+                    {t(task.descKey)}
                   </p>
 
                   {task.extraInfo && (
@@ -185,7 +184,7 @@ export default function TaskPage() {
                           : task.buttonColor,
                       }}
                     >
-                      {isCompleted ? task.completedLabel : "Log Here"}
+                      {isCompleted ? t(task.completedKey) : t("task_log_here")}
                     </button>
                   )}
                 </div>
@@ -199,12 +198,12 @@ export default function TaskPage() {
           {/* Left: stats */}
           <div className="flex-1">
             <p className="text-sm font-semibold text-gray-800">
-              Daily task completed
+              {t("task_daily_completed")}
             </p>
             <p className="text-2xl font-bold text-gray-900">
               {dailyPts}{" "}
               <span className="text-sm font-normal text-gray-500">
-                / {MAX_DAILY_PTS} pts
+                / {MAX_DAILY_PTS} {t("task_pts")}
               </span>
             </p>
             {/* Progress bar blue */}
@@ -220,12 +219,12 @@ export default function TaskPage() {
             </div>
 
             <p className="text-sm font-semibold text-gray-800">
-              Plant growth progress
+              {t("task_plant_progress")}
             </p>
             <p className="text-2xl font-bold text-gray-900">
               {plantPts}{" "}
               <span className="text-sm font-normal text-gray-500">
-                / {MAX_PLANT_PTS} pts
+                / {MAX_PLANT_PTS} {t("task_pts")}
               </span>
             </p>
             {/* Progress bar green */}
@@ -240,10 +239,10 @@ export default function TaskPage() {
               />
             </div>
 
-            <p className="text-sm font-semibold text-gray-800">Total pts</p>
+            <p className="text-sm font-semibold text-gray-800">{t("task_total_pts")}</p>
             <p className="text-2xl font-bold text-gray-900">
               {totalPts}
-              <span className="text-sm font-normal">pts</span>
+              <span className="text-sm font-normal">{t("task_pts")}</span>
             </p>
           </div>
 
@@ -267,18 +266,18 @@ export default function TaskPage() {
             }}
           />
           <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 p-4">
-            <p className="text-center text-sm font-semibold mb-3">Upload</p>
+            <p className="text-center text-sm font-semibold mb-3">{t("upload")}</p>
             <button
               onClick={() => cameraInputRef.current?.click()}
               className="block w-full text-center py-3 text-sm border-b border-gray-200"
             >
-              Open Camera
+              {t("open_camera")}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
               className="block w-full text-center py-3 text-sm border-b border-gray-200"
             >
-              Open Gallery
+              {t("open_gallery")}
             </button>
             <button
               onClick={() => {
@@ -287,7 +286,7 @@ export default function TaskPage() {
               }}
               className="block w-full text-center py-3 text-sm text-gray-500"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </>
@@ -304,11 +303,11 @@ export default function TaskPage() {
             }}
           />
           <div className="fixed top-1/3 left-6 right-6 bg-white rounded-2xl z-50 p-5 shadow-xl">
-            <h4 className="text-lg font-bold mb-4">Body Check-in</h4>
+            <h4 className="text-lg font-bold mb-4">{t("body_checkin_title")}</h4>
             <div className="space-y-3">
               <input
                 type="number"
-                placeholder="Waist (cm)"
+                placeholder={t("waist_cm")}
                 value={bodyForm.waist}
                 onChange={(e) =>
                   setBodyForm({ ...bodyForm, waist: e.target.value })
@@ -317,7 +316,7 @@ export default function TaskPage() {
               />
               <input
                 type="number"
-                placeholder="Weight (kg)"
+                placeholder={t("weight_kg")}
                 value={bodyForm.weight}
                 onChange={(e) =>
                   setBodyForm({ ...bodyForm, weight: e.target.value })
@@ -331,7 +330,7 @@ export default function TaskPage() {
               className="mt-4 w-full py-2 rounded-full text-white font-semibold text-sm disabled:opacity-40"
               style={{ backgroundColor: "#e8a878" }}
             >
-              Submit
+              {t("submit")}
             </button>
             <button
               onClick={() => {
@@ -341,7 +340,7 @@ export default function TaskPage() {
               }}
               className="mt-2 w-full text-center text-sm text-gray-500"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </>
