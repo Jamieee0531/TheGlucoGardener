@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import TopBar from "../../../components/TopBar";
 import { useAuth } from "../../../lib/useAuth";
 import { getLanguage, setLanguage } from "../../../lib/users";
+import { useTranslation } from "../../../lib/i18n";
 
 const LANGUAGES = [
   { code: "English", label: "English", flag: "\uD83C\uDDEC\uD83C\uDDE7" },
@@ -16,6 +17,7 @@ const LANGUAGES = [
 export default function LanguagePage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(() => getLanguage());
 
   if (loading || !user) return null;
@@ -27,11 +29,11 @@ export default function LanguagePage() {
 
   return (
     <div className="flex flex-col h-full bg-cream">
-      <TopBar title="Language" transparent />
+      <TopBar title={t("change_language")} transparent />
 
       <div className="px-6 mt-4">
         <p className="text-sm text-gray-500 mb-4">
-          Choose your preferred language
+          {t("choose_language")}
         </p>
 
         <div className="space-y-3">
@@ -58,7 +60,7 @@ export default function LanguagePage() {
         </div>
 
         <p className="text-xs text-gray-400 mt-6 text-center italic">
-          Language setting will be applied across the app
+          {t("language_applied")}
         </p>
       </div>
     </div>

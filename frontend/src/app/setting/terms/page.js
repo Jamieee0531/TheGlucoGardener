@@ -2,35 +2,35 @@
 
 import TopBar from "../../../components/TopBar";
 import { useAuth } from "../../../lib/useAuth";
+import { useTranslation } from "../../../lib/i18n";
 
 export default function TermsPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   if (loading || !user) return null;
 
   return (
     <div className="flex flex-col h-full bg-cream">
-      <TopBar title="Terms" transparent />
+      <TopBar title={t("terms_conditions")} transparent />
 
       <div className="flex-1 overflow-y-auto px-6 mt-2 pb-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-3">Terms & Conditions</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-3">{t("terms_heading")}</h2>
         <div className="text-sm text-gray-600 leading-relaxed space-y-3">
+          <p>{t("terms_intro")}</p>
           <p>
-            Welcome to The GlucoGardener. By using this application, you agree to the following terms and conditions.
+            <span className="font-semibold">{t("terms_purpose_title")}</span> {t("terms_purpose")}
           </p>
           <p>
-            <span className="font-semibold">1. Purpose.</span> This application is designed as a health companion tool for diabetes management. It is not a substitute for professional medical advice, diagnosis, or treatment.
+            <span className="font-semibold">{t("terms_data_title")}</span> {t("terms_data")}
           </p>
           <p>
-            <span className="font-semibold">2. Data Collection.</span> We collect health-related data including glucose readings, dietary information, and activity data to provide personalised recommendations.
+            <span className="font-semibold">{t("terms_user_title")}</span> {t("terms_user")}
           </p>
           <p>
-            <span className="font-semibold">3. User Responsibility.</span> Users are responsible for the accuracy of self-reported data. Always consult your healthcare provider for medical decisions.
-          </p>
-          <p>
-            <span className="font-semibold">4. Disclaimer.</span> The AI-generated advice provided by this application is for informational purposes only and should not replace professional medical guidance.
+            <span className="font-semibold">{t("terms_disclaimer_title")}</span> {t("terms_disclaimer")}
           </p>
           <p className="text-xs text-gray-400 italic mt-6">
-            Last updated: April 2026
+            {t("last_updated")}
           </p>
         </div>
       </div>

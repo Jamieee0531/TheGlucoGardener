@@ -2,35 +2,35 @@
 
 import TopBar from "../../../components/TopBar";
 import { useAuth } from "../../../lib/useAuth";
+import { useTranslation } from "../../../lib/i18n";
 
 export default function PrivacyPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   if (loading || !user) return null;
 
   return (
     <div className="flex flex-col h-full bg-cream">
-      <TopBar title="Privacy" transparent />
+      <TopBar title={t("privacy_policy")} transparent />
 
       <div className="flex-1 overflow-y-auto px-6 mt-2 pb-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-3">Privacy Policy</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-3">{t("privacy_heading")}</h2>
         <div className="text-sm text-gray-600 leading-relaxed space-y-3">
+          <p>{t("privacy_intro")}</p>
           <p>
-            The GlucoGardener is committed to protecting your privacy and personal health data.
+            <span className="font-semibold">{t("privacy_collect_title")}</span> {t("privacy_collect")}
           </p>
           <p>
-            <span className="font-semibold">Data We Collect.</span> Health metrics (glucose levels, heart rate), dietary logs, exercise data, and conversation history with the AI companion.
+            <span className="font-semibold">{t("privacy_use_title")}</span> {t("privacy_use")}
           </p>
           <p>
-            <span className="font-semibold">How We Use It.</span> Your data is used solely to provide personalised health insights, task recommendations, and alert notifications. We do not sell or share your data with third parties.
+            <span className="font-semibold">{t("privacy_storage_title")}</span> {t("privacy_storage")}
           </p>
           <p>
-            <span className="font-semibold">Data Storage.</span> All data is securely stored in encrypted databases. You may request deletion of your data at any time.
-          </p>
-          <p>
-            <span className="font-semibold">Clinician Access.</span> Aggregated, anonymized health summaries may be shared with your designated healthcare provider to support clinical decisions.
+            <span className="font-semibold">{t("privacy_clinician_title")}</span> {t("privacy_clinician")}
           </p>
           <p className="text-xs text-gray-400 italic mt-6">
-            Last updated: April 2026
+            {t("last_updated")}
           </p>
         </div>
       </div>
