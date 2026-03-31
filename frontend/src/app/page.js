@@ -3,8 +3,12 @@
 import Link from "next/link";
 import TopBar from "../components/TopBar";
 import SugarChart from "../components/SugarChart";
+import { useAuth } from "../lib/useAuth";
 
 export default function HomePage() {
+  const { user, loading } = useAuth();
+  if (loading || !user) return null;
+
   return (
     <div className="flex flex-col h-full bg-cream relative overflow-hidden">
       {/* ── Background blobs ── */}
@@ -47,7 +51,7 @@ export default function HomePage() {
         {/* ====== SECTION 1: Top-left — Greeting + Chat + Illustration ====== */}
         <div>
           <h2 className="text-2xl font-bold italic text-[#e8927c] mt-1">
-            Good Morning, User!
+            Good Morning, {user.name.split(" ")[0]}!
           </h2>
           <p className="text-base italic text-[#F4B95D] mt-0.5">
             How are you feeling today?
