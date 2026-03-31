@@ -3,6 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "../../../lib/useAuth";
 import { TEST_USERS } from "../../../lib/users";
+import { useTranslation } from "../../../lib/i18n";
 
 function getFlowerCount(points) {
   return Math.min(Math.floor(points / 500), 25);
@@ -28,6 +29,7 @@ export default function FriendGardenPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
 
   const friendId = searchParams.get("id");
   const friend = TEST_USERS.find((u) => u.user_id === friendId);
@@ -60,7 +62,7 @@ export default function FriendGardenPage() {
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
-          <span className="text-sm">Back</span>
+          <span className="text-sm">{t("back")}</span>
         </button>
       </div>
 
@@ -70,10 +72,10 @@ export default function FriendGardenPage() {
           <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" />
         </div>
         <h2 className="text-lg font-bold italic text-[#5a8a2e] mt-2">
-          {friend.name}&apos;s Garden
+          {friend.name}{t("garden_of")}
         </h2>
         <p className="text-xs text-[#7cb342] font-semibold mt-0.5">
-          {points} points
+          {points} {t("points")}
         </p>
       </div>
 
@@ -156,17 +158,17 @@ export default function FriendGardenPage() {
         <button
           onClick={() => {
             // TODO: connect to backend for actual point update
-            alert(`You visited ${friend.name}'s garden! +10 points`);
+            alert(t("visited_garden", { name: friend.name }));
           }}
           className="w-full py-3.5 rounded-full text-white font-semibold text-sm shadow-lg transition-all active:scale-95"
           style={{
             background: "linear-gradient(135deg, #7cb342, #558b2f)",
           }}
         >
-          Water their garden (+10 pts)
+          {t("water_garden")}
         </button>
         <p className="text-center text-xs text-gray-400 mt-2 italic">
-          You can visit once per day
+          {t("visit_once_per_day")}
         </p>
       </div>
 

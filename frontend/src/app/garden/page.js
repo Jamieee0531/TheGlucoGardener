@@ -4,17 +4,19 @@ import { useRouter } from "next/navigation";
 import TopBar from "../../components/TopBar";
 import { useAuth } from "../../lib/useAuth";
 import { TEST_USERS } from "../../lib/users";
+import { useTranslation } from "../../lib/i18n";
 
 export default function GardenPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   if (loading || !user) return null;
 
   const friends = TEST_USERS.filter((u) => u.user_id !== user.user_id);
 
   return (
     <div className="flex flex-col h-full bg-cream">
-      <TopBar title="Garden" transparent />
+      <TopBar title={t("garden_title")} transparent />
 
       {/* ── Garden display — one row of flowers, big center small sides, bottoms aligned ── */}
       <div className="flex items-end justify-center w-full px-2 mt-20 mb-6 overflow-hidden">
@@ -27,7 +29,7 @@ export default function GardenPage() {
 
       {/* ── Friends section ── */}
       <div className="px-6 pb-6">
-        <h3 className="text-xl font-bold italic text-[#7cb342] mb-3">Friends</h3>
+        <h3 className="text-xl font-bold italic text-[#7cb342] mb-3">{t("friends")}</h3>
 
         <div>
           {friends.map((friend, i) => (
@@ -44,7 +46,7 @@ export default function GardenPage() {
                   onClick={() => router.push(`/garden/visit?id=${friend.user_id}`)}
                   className="text-sm font-semibold text-gray-800 hover:text-[#7cb342] transition-colors"
                 >
-                  Visit&gt;&gt;
+                  {t("visit")}
                 </button>
               </div>
               {i < friends.length - 1 && <div className="h-3" />}
