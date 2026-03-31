@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { TEST_USERS, loginUser, isOnboardingCompleted } from "../../lib/users";
+import { useTranslation } from "../../lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleSelect = (userId) => {
     loginUser(userId);
@@ -53,16 +55,16 @@ export default function LoginPage() {
             className="w-[80px] h-auto object-contain mx-auto mb-4"
           />
           <h1 className="text-3xl font-bold italic text-[#e8927c]">
-            The GlucoGardener
+            {t("app_name")}
           </h1>
           <p className="text-sm text-gray-500 mt-1.5 italic">
-            Your health companion
+            {t("app_tagline")}
           </p>
         </div>
 
         {/* User selection */}
         <p className="text-base font-semibold text-gray-600 mb-5">
-          Who is gardening today?
+          {t("who_is_gardening")}
         </p>
 
         <div className="flex gap-5">
@@ -94,7 +96,7 @@ export default function LoginPage() {
       {/* Bottom decoration */}
       <div className="relative z-10 pb-8 text-center">
         <p className="text-[10px] text-gray-400 italic">
-          SG Innovation Challenge 2026
+          {t("sg_innovation")}
         </p>
       </div>
     </div>

@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserId, completeOnboarding, setLanguage, AVATARS } from "../../lib/users";
+import { useTranslation } from "../../lib/i18n";
 
 const STEPS = ["avatar", "personal", "health", "language", "done"];
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     avatar: "",
@@ -101,15 +103,15 @@ export default function OnboardingPage() {
               alt="GlucoGardener"
               className="w-[70px] h-auto object-contain mb-4"
             />
-            <h1 className="text-2xl font-bold italic text-[#e8927c] text-center">
-              Welcome to<br />The GlucoGardener!
+            <h1 className="text-2xl font-bold italic text-[#e8927c] text-center whitespace-pre-line">
+              {t("welcome_title")}
             </h1>
             <p className="text-sm text-gray-500 mt-2 mb-8 text-center">
-              Let&apos;s set up your profile
+              {t("setup_profile")}
             </p>
 
             <p className="text-sm font-semibold text-gray-600 mb-4">
-              Choose your avatar
+              {t("choose_avatar_prompt")}
             </p>
             <div className="flex gap-5">
               {AVATARS.map((av) => (
@@ -133,15 +135,15 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="flex-1">
             <h2 className="text-xl font-bold italic text-[#e8927c] mb-1">
-              Tell us about you
+              {t("tell_about_you")}
             </h2>
             <p className="text-sm text-gray-500 mb-6">
-              This helps us personalise your experience
+              {t("personalise_experience")}
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 font-medium">Name</label>
+                <label className="text-xs text-gray-500 font-medium">{t("name")}</label>
                 <input
                   type="text"
                   value={form.name}
@@ -151,7 +153,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 font-medium">Birth Year</label>
+                <label className="text-xs text-gray-500 font-medium">{t("birth_year")}</label>
                 <input
                   type="number"
                   value={form.birth_year}
@@ -161,16 +163,16 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 font-medium">Gender</label>
+                <label className="text-xs text-gray-500 font-medium">{t("gender")}</label>
                 <select
                   value={form.gender}
                   onChange={(e) => updateField("gender", e.target.value)}
                   className="w-full mt-1 px-4 py-3 bg-white rounded-xl text-sm border border-gray-200 focus:border-[#e8927c] focus:outline-none transition-colors"
                 >
-                  <option value="">Select...</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  <option value="">{t("select_placeholder")}</option>
+                  <option value="male">{t("male")}</option>
+                  <option value="female">{t("female")}</option>
+                  <option value="other">{t("other")}</option>
                 </select>
               </div>
             </div>
@@ -181,15 +183,15 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="flex-1">
             <h2 className="text-xl font-bold italic text-[#e8927c] mb-1">
-              Your health profile
+              {t("health_profile")}
             </h2>
             <p className="text-sm text-gray-500 mb-6">
-              We use this to give you better insights
+              {t("better_insights")}
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 font-medium">Height (cm)</label>
+                <label className="text-xs text-gray-500 font-medium">{t("height_cm")}</label>
                 <input
                   type="number"
                   value={form.height_cm}
@@ -199,7 +201,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 font-medium">Weight (kg)</label>
+                <label className="text-xs text-gray-500 font-medium">{t("weight_kg")}</label>
                 <input
                   type="number"
                   value={form.weight_kg}
@@ -209,7 +211,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 font-medium">Waist circumference (cm)</label>
+                <label className="text-xs text-gray-500 font-medium">{t("waist_circumference")}</label>
                 <input
                   type="number"
                   value={form.waist_cm}
@@ -226,10 +228,10 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="flex-1">
             <h2 className="text-xl font-bold italic text-[#e8927c] mb-1">
-              Choose your language
+              {t("choose_your_language")}
             </h2>
             <p className="text-sm text-gray-500 mb-6">
-              You can change this later in Settings
+              {t("change_later_settings")}
             </p>
 
             <div className="space-y-3">
@@ -271,13 +273,13 @@ export default function OnboardingPage() {
               className="w-[100px] h-auto object-contain mb-6"
             />
             <h2 className="text-2xl font-bold italic text-[#e8927c] text-center mb-2">
-              All set!
+              {t("all_set")}
             </h2>
             <p className="text-sm text-gray-500 text-center mb-2">
-              Your garden is ready to grow.
+              {t("garden_ready")}
             </p>
             <p className="text-xs text-gray-400 text-center italic">
-              Complete daily tasks to earn points and watch your garden bloom
+              {t("complete_tasks_bloom")}
             </p>
           </div>
         )}
@@ -291,7 +293,7 @@ export default function OnboardingPage() {
               className="w-full py-3.5 rounded-full text-white font-semibold text-sm transition-all disabled:opacity-40"
               style={{ backgroundColor: "#e8927c" }}
             >
-              Next
+              {t("next")}
             </button>
           ) : (
             <button
@@ -299,7 +301,7 @@ export default function OnboardingPage() {
               className="w-full py-3.5 rounded-full text-white font-semibold text-sm transition-all"
               style={{ backgroundColor: "#7cb342" }}
             >
-              Start Gardening
+              {t("start_gardening")}
             </button>
           )}
 
@@ -308,7 +310,7 @@ export default function OnboardingPage() {
               onClick={() => setStep(step - 1)}
               className="w-full mt-2 py-2 text-sm text-gray-400 text-center"
             >
-              Back
+              {t("back")}
             </button>
           )}
         </div>
