@@ -7,10 +7,11 @@ import InputBar from "../../components/InputBar";
 import ActionSheet from "../../components/ActionSheet";
 import ImagePreview from "../../components/ImagePreview";
 import { sendMessageStream } from "../../lib/api";
-
-const USER_ID = "demo_user";
+import { useAuth } from "../../lib/useAuth";
 
 export default function ChatPage() {
+  const { user, loading } = useAuth();
+
   const [messages, setMessages] = useState([]);
   const [sessionId, setSessionId] = useState(null);
   const [agentType, setAgentType] = useState("companion");
@@ -22,6 +23,8 @@ export default function ChatPage() {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const msgIdRef = useRef(0);
+
+  if (loading || !user) return null;
 
   const nextId = () => {
     msgIdRef.current += 1;
@@ -49,7 +52,7 @@ export default function ChatPage() {
     setIsLoading(true);
 
     sendMessageStream({
-      userId: USER_ID,
+      userId: user.user_id,
       sessionId,
       text: text || undefined,
       image: image || undefined,
