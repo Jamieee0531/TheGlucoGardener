@@ -5,6 +5,14 @@ import TopBar from "../../components/TopBar";
 import { useAuth } from "../../lib/useAuth";
 import { logoutUser } from "../../lib/users";
 
+const MENU_ROUTES = {
+  "Account": "/setting/account",
+  "Change Language": "/setting/language",
+  "Terms & Conditions": "/setting/terms",
+  "Privacy Policy": "/setting/privacy",
+  "About": "/setting/about",
+};
+
 const MENU_ITEMS = [
   {
     label: "Account",
@@ -86,6 +94,8 @@ export default function SettingPage() {
                 if (item.label === "Logout") {
                   logoutUser();
                   router.push("/login");
+                } else if (MENU_ROUTES[item.label]) {
+                  router.push(MENU_ROUTES[item.label]);
                 }
               }}
               className="flex items-center w-full py-4 text-left text-gray-600 hover:text-gray-900"
