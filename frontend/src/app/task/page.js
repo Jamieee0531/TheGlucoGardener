@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import TopBar from "../../components/TopBar";
+import { useAuth } from "../../lib/useAuth";
 
 const TASKS = [
   {
@@ -57,6 +58,7 @@ const MAX_DAILY_PTS = 40;
 const MAX_PLANT_PTS = 100;
 
 export default function TaskPage() {
+  const { user, loading } = useAuth();
   const [expandedId, setExpandedId] = useState("sunset");
   const [completedTasks, setCompletedTasks] = useState(new Set());
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -66,6 +68,8 @@ export default function TaskPage() {
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+
+  if (loading || !user) return null;
 
   const completedCount = TASKS.filter(
     (t) => t.completable && completedTasks.has(t.id)
