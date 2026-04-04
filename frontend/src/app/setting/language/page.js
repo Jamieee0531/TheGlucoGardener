@@ -31,6 +31,18 @@ export default function LanguagePage() {
     <div className="flex flex-col h-full bg-cream">
       <TopBar title={t("change_language")} transparent />
 
+      <div className="flex items-center px-4 pb-2">
+        <button
+          onClick={() => router.push("/setting")}
+          className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+          </svg>
+          <span className="text-sm">{t("back")}</span>
+        </button>
+      </div>
+
       <div className="px-6 mt-4">
         <p className="text-sm text-gray-500 mb-4">
           {t("choose_language")}
