@@ -21,6 +21,7 @@ from pydantic import BaseModel
 from chatbot.graph.builder import app as graph_app
 from chatbot.utils.llm_factory import set_token_callback, clear_token_callback
 from chatbot.memory.rag.retriever import get_retriever
+from chatbot.api.garden import router as garden_router
 
 # ── FastAPI app ──────────────────────────────────────────────────
 api = FastAPI(title="Health Companion Chatbot", version="0.1.0")
@@ -32,6 +33,8 @@ async def _warmup():
     import asyncio
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, lambda: get_retriever()._init())
+
+api.include_router(garden_router)
 
 api.add_middleware(
     CORSMiddleware,
