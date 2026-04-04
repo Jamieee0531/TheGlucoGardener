@@ -39,6 +39,7 @@ const dict = {
   nav_setting: { English: "Setting", Chinese: "设置", Malay: "Tetapan", Tamil: "அமைப்புகள்" },
   nav_soft_alert: { English: "Soft Alert", Chinese: "温和提醒", Malay: "Amaran Lembut", Tamil: "மென் எச்சரிக்கை" },
   nav_hard_alert: { English: "Hard Alert", Chinese: "紧急提醒", Malay: "Amaran Keras", Tamil: "கடும் எச்சரிக்கை" },
+  nav_demo: { English: "Demo Console", Chinese: "演示控制台", Malay: "Konsol Demo", Tamil: "டெமோ கன்சோல்" },
 
   // ── Chat ──
   recording: { English: "Recording...", Chinese: "录音中...", Malay: "Merakam...", Tamil: "பதிவு செய்கிறது..." },
