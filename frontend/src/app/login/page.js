@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { TEST_USERS, loginUser, isOnboardingCompleted } from "../../lib/users";
+import { TEST_USERS, loginUser, isOnboardingCompleted, createNewUserId } from "../../lib/users";
 import { useTranslation } from "../../lib/i18n";
 
 export default function LoginPage() {
@@ -91,6 +91,18 @@ export default function LoginPage() {
             </button>
           ))}
         </div>
+
+        {/* Create New Account */}
+        <button
+          onClick={() => {
+            const newId = createNewUserId();
+            loginUser(newId);
+            router.push("/onboarding");
+          }}
+          className="mt-6 px-6 py-2.5 rounded-full text-sm font-semibold text-[#e8927c] border-2 border-[#e8927c]/30 bg-white/50 backdrop-blur-sm hover:bg-[#e8927c]/10 active:scale-95 transition-all duration-200"
+        >
+          {t("create_account")}
+        </button>
       </div>
 
       {/* Bottom decoration */}

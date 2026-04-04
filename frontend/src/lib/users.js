@@ -11,6 +11,7 @@ export const TEST_USERS = [
     weight_kg: 58.0,
     waist_cm: 80.0,
     language: "English",
+    onboarding_completed: true,
   },
   {
     user_id: "user_002",
@@ -54,6 +55,11 @@ export function loginUser(userId) {
       localStorage.setItem(`profile_${userId}`, JSON.stringify(user));
     }
   }
+}
+
+export function createNewUserId() {
+  const timestamp = Date.now().toString(36);
+  return `user_${timestamp}`;
 }
 
 export function logoutUser() {

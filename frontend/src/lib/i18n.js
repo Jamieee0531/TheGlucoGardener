@@ -15,6 +15,7 @@ const dict = {
   app_name: { English: "The GlucoGardener", Chinese: "The GlucoGardener", Malay: "The GlucoGardener", Tamil: "The GlucoGardener" },
   app_tagline: { English: "Your health companion", Chinese: "您的健康伙伴", Malay: "Teman kesihatan anda", Tamil: "உங்கள் உடல்நல தோழர்" },
   who_is_gardening: { English: "Who is gardening today?", Chinese: "今天谁来照顾花园？", Malay: "Siapa berkebun hari ini?", Tamil: "இன்று யார் தோட்டம் பராமரிக்கிறார்?" },
+  create_account: { English: "Create New Account", Chinese: "创建新账户", Malay: "Buat Akaun Baru", Tamil: "புதிய கணக்கை உருவாக்கு" },
   sg_innovation: { English: "SG Innovation Challenge 2026", Chinese: "SG Innovation Challenge 2026", Malay: "SG Innovation Challenge 2026", Tamil: "SG Innovation Challenge 2026" },
 
   // ── Home ──
