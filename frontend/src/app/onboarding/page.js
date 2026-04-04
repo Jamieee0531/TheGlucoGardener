@@ -148,7 +148,7 @@ export default function OnboardingPage() {
                   type="text"
                   value={form.name}
                   onChange={(e) => updateField("name", e.target.value)}
-                  placeholder="e.g. Alice Tan"
+                  placeholder="e.g. Mdm Chen"
                   className="w-full mt-1 px-4 py-3 bg-white rounded-xl text-sm border border-gray-200 focus:border-[#e8927c] focus:outline-none transition-colors"
                 />
               </div>
@@ -158,7 +158,7 @@ export default function OnboardingPage() {
                   type="number"
                   value={form.birth_year}
                   onChange={(e) => updateField("birth_year", e.target.value)}
-                  placeholder="e.g. 1975"
+                  placeholder="e.g. 1958"
                   className="w-full mt-1 px-4 py-3 bg-white rounded-xl text-sm border border-gray-200 focus:border-[#e8927c] focus:outline-none transition-colors"
                 />
               </div>
@@ -196,7 +196,7 @@ export default function OnboardingPage() {
                   type="number"
                   value={form.height_cm}
                   onChange={(e) => updateField("height_cm", e.target.value)}
-                  placeholder="e.g. 165"
+                  placeholder="e.g. 155"
                   className="w-full mt-1 px-4 py-3 bg-white rounded-xl text-sm border border-gray-200 focus:border-[#e8927c] focus:outline-none transition-colors"
                 />
               </div>
@@ -206,7 +206,7 @@ export default function OnboardingPage() {
                   type="number"
                   value={form.weight_kg}
                   onChange={(e) => updateField("weight_kg", e.target.value)}
-                  placeholder="e.g. 70"
+                  placeholder="e.g. 58"
                   className="w-full mt-1 px-4 py-3 bg-white rounded-xl text-sm border border-gray-200 focus:border-[#e8927c] focus:outline-none transition-colors"
                 />
               </div>
@@ -216,7 +216,7 @@ export default function OnboardingPage() {
                   type="number"
                   value={form.waist_cm}
                   onChange={(e) => updateField("waist_cm", e.target.value)}
-                  placeholder="e.g. 85"
+                  placeholder="e.g. 80"
                   className="w-full mt-1 px-4 py-3 bg-white rounded-xl text-sm border border-gray-200 focus:border-[#e8927c] focus:outline-none transition-colors"
                 />
               </div>

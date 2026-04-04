@@ -4,7 +4,7 @@ export const TEST_USERS = [
   {
     user_id: "user_001",
     name: "Mdm Chen",
-    avatar: "/avatar1.jpg",
+    avatar: "/avatar_1.jpg",
     birth_year: 1958,
     gender: "female",
     height_cm: 155,
@@ -15,7 +15,7 @@ export const TEST_USERS = [
   {
     user_id: "user_002",
     name: "Marcus",
-    avatar: "/avatar2.jpg",
+    avatar: "/avatar_2.jpg",
     birth_year: 1968,
     gender: "male",
     height_cm: 175,
@@ -27,7 +27,7 @@ export const TEST_USERS = [
   {
     user_id: "user_003",
     name: "Auntie Lin",
-    avatar: "/avatar3.jpg",
+    avatar: "/avatar_3.jpg",
     birth_year: 1974,
     gender: "female",
     height_cm: 160,
@@ -39,9 +39,9 @@ export const TEST_USERS = [
 ];
 
 export const AVATARS = [
-  { id: "avatar1.jpg", src: "/avatar1.jpg" },
-  { id: "avatar2.jpg", src: "/avatar2.jpg" },
-  { id: "avatar3.jpg", src: "/avatar3.jpg" },
+  { id: "avatar_1.jpg", src: "/avatar_1.jpg" },
+  { id: "avatar_2.jpg", src: "/avatar_2.jpg" },
+  { id: "avatar_3.jpg", src: "/avatar_3.jpg" },
 ];
 
 export function loginUser(userId) {

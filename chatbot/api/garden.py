@@ -25,9 +25,9 @@ _MOCK_FRIENDS = {
 }
 
 _MOCK_USERS = {
-    "user_001": {"name": "Mdm Chen", "avatar": "/avatar1.jpg"},
-    "user_002": {"name": "Marcus", "avatar": "/avatar2.jpg"},
-    "user_003": {"name": "Auntie Lin", "avatar": "/avatar3.jpg"},
+    "user_001": {"name": "Mdm Chen", "avatar": "/avatar_1.jpg"},
+    "user_002": {"name": "Marcus", "avatar": "/avatar_2.jpg"},
+    "user_003": {"name": "Auntie Lin", "avatar": "/avatar_3.jpg"},
 }
 
 # Track watering: {(user_id, friend_id): date}
