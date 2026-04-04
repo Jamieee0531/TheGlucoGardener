@@ -43,8 +43,8 @@ const TASKS = [
   },
 ];
 
-const PTS_PER_TASK = 10;
-const MAX_DAILY_PTS = 40;
+const PTS_PER_TASK = 20;
+const MAX_DAILY_PTS = 60;
 const MAX_PLANT_PTS = 100;
 
 export default function TaskPage() {
@@ -62,6 +62,8 @@ export default function TaskPage() {
   const [totalPts, setTotalPts] = useState(0);
   const [plantProgress, setPlantProgress] = useState(0);
   const [dbDailyCompleted, setDbDailyCompleted] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [resultModal, setResultModal] = useState(null); // { success, title, message }
 
   useEffect(() => {
     if (!user) return;
@@ -81,14 +83,22 @@ export default function TaskPage() {
       .then((r) => r.json())
       .then((data) => setDbDailyCompleted(data.completed || 0))
       .catch(() => {});
+
+    // Check which tasks are already completed
+    fetch(`${API_BASE}/health/task-status?user_id=${uid}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const done = new Set();
+        if (data.body_checkin_done) done.add("body");
+        if (data.breakfast_done || data.lunch_done || data.dinner_done) done.add("meals");
+        setCompletedTasks(done);
+      })
+      .catch(() => {});
   }, [user]);
 
   if (loading || !user) return null;
 
-  const completedCount = TASKS.filter(
-    (t) => t.completable && completedTasks.has(t.id)
-  ).length;
-  const dailyPts = (dbDailyCompleted + completedCount) * PTS_PER_TASK;
+  const dailyPts = dbDailyCompleted * PTS_PER_TASK;
 
   const handleCardClick = (taskId) => {
     if (taskId === "sunset") return;
@@ -109,17 +119,106 @@ export default function TaskPage() {
     setCompletedTasks((prev) => new Set([...prev, taskId]));
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.files?.[0]) {
-      completeTask(activeTaskId);
-      setShowPhotoModal(false);
-      setActiveTaskId(null);
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || activeTaskId !== "meals") {
+      // Non-meal photo tasks: just mark complete locally
+      if (file) {
+        completeTask(activeTaskId);
+        setShowPhotoModal(false);
+        setActiveTaskId(null);
+      }
+      e.target.value = "";
+      return;
     }
+
+    // Meal photo: call Vision Agent via API
+    setUploading(true);
+    setShowPhotoModal(false);
+    try {
+      const form = new FormData();
+      form.append("user_id", user.user_id);
+      form.append("image", file);
+
+      const res = await fetch(`${API_BASE}/health/log-meal`, {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        completeTask("meals");
+        // Refresh points and daily tasks
+        fetch(`${API_BASE}/garden/my?user_id=${user.user_id}`)
+          .then((r) => r.json())
+          .then((d) => {
+            setTotalPts(d.total_points || 0);
+            setPlantProgress(d.accumulated_points % 500);
+          });
+        fetch(`${API_BASE}/health/daily-tasks?user_id=${user.user_id}`)
+          .then((r) => r.json())
+          .then((d) => setDbDailyCompleted(d.completed || 0));
+        setResultModal({
+          success: true,
+          title: data.food_name,
+          message: `${data.total_calories} kcal · ${data.gi_level} GI\n+${data.reward_points} pts earned!`,
+        });
+      } else {
+        setResultModal({
+          success: false,
+          title: t("upload_failed") || "Upload Failed",
+          message: data.message,
+        });
+      }
+    } catch (err) {
+      console.error("Log meal failed:", err);
+      setResultModal({
+        success: false,
+        title: t("upload_failed") || "Upload Failed",
+        message: "Failed to upload. Please try again.",
+      });
+    }
+    setUploading(false);
+    setActiveTaskId(null);
     e.target.value = "";
   };
 
-  const handleBodySubmit = () => {
-    completeTask(activeTaskId);
+  const handleBodySubmit = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/health/body-checkin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: user.user_id,
+          waist_cm: parseFloat(bodyForm.waist),
+          weight_kg: parseFloat(bodyForm.weight),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        completeTask(activeTaskId);
+        // Refresh points
+        fetch(`${API_BASE}/garden/my?user_id=${user.user_id}`)
+          .then((r) => r.json())
+          .then((d) => {
+            setTotalPts(d.total_points || 0);
+            setPlantProgress(d.accumulated_points % 500);
+          });
+        // Refresh daily task count
+        fetch(`${API_BASE}/health/daily-tasks?user_id=${user.user_id}`)
+          .then((r) => r.json())
+          .then((d) => setDbDailyCompleted(d.completed || 0));
+      }
+      if (data.already_done) {
+        setResultModal({
+          success: false,
+          title: t("body_already_done") || "Already Done",
+          message: t("body_already_done_msg") || "You already completed this check-in this week.",
+        });
+      }
+    } catch (e) {
+      console.error("Body check-in failed:", e);
+    }
     setShowBodyModal(false);
     setActiveTaskId(null);
     setBodyForm({ waist: "", weight: "" });
@@ -161,7 +260,7 @@ export default function TaskPage() {
                   </h3>
                   {isCompleted ? (
                     <span className="text-sm font-bold italic text-[#ff6b8a]">
-                      10 {t("task_pt_earned")}
+                      20 {t("task_pt_earned")}
                     </span>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-white" />
@@ -194,19 +293,33 @@ export default function TaskPage() {
 
                   {task.logType !== "none" && (
                     <button
-                      disabled={isCompleted}
+                      disabled={isCompleted || (uploading && task.id === "meals")}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleLogClick(task);
                       }}
-                      className="mt-3 px-6 py-2 rounded-full text-sm font-semibold text-white"
+                      className="mt-3 px-6 py-2 rounded-full text-sm font-semibold text-white flex items-center gap-2"
                       style={{
                         backgroundColor: isCompleted
                           ? "#8bc34a"
+                          : (uploading && task.id === "meals")
+                          ? "#999"
                           : task.buttonColor,
                       }}
                     >
-                      {isCompleted ? t(task.completedKey) : t("task_log_here")}
+                      {uploading && task.id === "meals" ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          {t("analysing") || "Analysing..."}
+                        </>
+                      ) : isCompleted ? (
+                        t(task.completedKey)
+                      ) : (
+                        t("task_log_here")
+                      )}
                     </button>
                   )}
                 </div>
@@ -274,6 +387,28 @@ export default function TaskPage() {
             alt="Plant"
             className="w-[120px] h-auto object-contain ml-2"
           />
+        </div>
+
+        {/* Reset button — small icon bottom-right */}
+        <div className="flex justify-end px-5 mt-2 mb-2">
+          <button
+            onClick={async () => {
+              const form = new FormData();
+              form.append("user_id", user.user_id);
+              await fetch(`${API_BASE}/health/reset-tasks`, { method: "POST", body: form });
+              setCompletedTasks(new Set());
+              // Refresh all data
+              const uid = user.user_id;
+              fetch(`${API_BASE}/garden/my?user_id=${uid}`).then(r => r.json()).then(d => { setTotalPts(d.total_points || 0); setPlantProgress(d.accumulated_points % 500); });
+              fetch(`${API_BASE}/health/daily-tasks?user_id=${uid}`).then(r => r.json()).then(d => setDbDailyCompleted(d.completed || 0));
+            }}
+            className="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors opacity-40 hover:opacity-70"
+            title="Reset tasks"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#666" className="w-3.5 h-3.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -363,6 +498,36 @@ export default function TaskPage() {
               className="mt-2 w-full text-center text-sm text-gray-500"
             >
               {t("cancel")}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Result Modal */}
+      {resultModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={() => setResultModal(null)}
+          />
+          <div className="fixed top-1/3 left-6 right-6 bg-white rounded-2xl z-50 p-6 shadow-xl text-center">
+            <div className="text-4xl mb-3">
+              {resultModal.success ? "🎉" : "😅"}
+            </div>
+            <h4 className="text-lg font-bold text-gray-800 mb-2">
+              {resultModal.title}
+            </h4>
+            <p className="text-sm text-gray-600 whitespace-pre-line mb-4">
+              {resultModal.message}
+            </p>
+            <button
+              onClick={() => setResultModal(null)}
+              className="w-full py-2.5 rounded-full text-white font-semibold text-sm"
+              style={{
+                backgroundColor: resultModal.success ? "#7cb342" : "#e8927c",
+              }}
+            >
+              {t("ok") || "OK"}
             </button>
           </div>
         </>
