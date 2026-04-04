@@ -158,8 +158,8 @@ export default function FriendGardenPage() {
           {/* Flowers — 3x3 grid cell centers */}
           {Array.from({ length: flowerCount }).map((_, i) => {
             const [row, col] = GRID_POSITIONS[i] || [1, 1];
-            const cx = 193 + (col - row) * 52;
-            const cy = 103 + (col + row) * 30;
+            const cx = 153 + (col - row) * 52;
+            const cy = 73 + (col + row) * 30;
             return (
               <img
                 key={i}
@@ -182,7 +182,7 @@ export default function FriendGardenPage() {
 
           {/* Empty soil dots on unfilled grid cells */}
           {GRID_POSITIONS.slice(flowerCount, 9).map(([row, col], i) => {
-            const cx = 193 + (col - row) * 52;
+            const cx = 143 + (col - row) * 52;
             const cy = 103 + (col + row) * 30;
             return (
               <div
