@@ -1,20 +1,55 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import TopBar from "../components/TopBar";
 import SugarChart from "../components/SugarChart";
 import { useAuth } from "../lib/useAuth";
 import { useTranslation } from "../lib/i18n";
 
+const API_BASE = "http://localhost:8080";
+
 export default function HomePage() {
   const { user, loading } = useAuth();
   const { t } = useTranslation();
+  const [bmi, setBmi] = useState("—");
+  const [mealsLogged, setMealsLogged] = useState("0/3");
+
+  useEffect(() => {
+    if (!user) return;
+    const uid = user.user_id;
+
+    // Fetch profile for BMI
+    fetch(`${API_BASE}/users/${uid}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.height_cm && data.weight_kg && data.height_cm > 0) {
+          const val = data.weight_kg / ((data.height_cm / 100) ** 2);
+          setBmi(val.toFixed(1));
+        }
+      })
+      .catch(() => {
+        // Fall back to local user data
+        if (user.height_cm && user.weight_kg && user.height_cm > 0) {
+          const val = user.weight_kg / ((user.height_cm / 100) ** 2);
+          setBmi(val.toFixed(1));
+        }
+      });
+
+    // Fetch meals today
+    fetch(`${API_BASE}/health/meals-today?user_id=${uid}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMealsLogged(`${data.count}/${data.total}`);
+      })
+      .catch(() => {});
+  }, [user]);
+
   if (loading || !user) return null;
 
   return (
     <div className="flex flex-col h-full bg-cream relative overflow-hidden">
       {/* ── Background blobs ── */}
-      {/* Gray/beige circle - LOWEST z, middle-right */}
       <div
         className="absolute z-0"
         style={{
@@ -23,7 +58,6 @@ export default function HomePage() {
           top: 250, left: 100,
         }}
       />
-      {/* Pink circle - HIGH z, top-left quarter visible */}
       <div
         className="absolute z-[1]"
         style={{
@@ -32,7 +66,6 @@ export default function HomePage() {
           top: -210, left: -250,
         }}
       />
-      {/* Mint circle - MID z, bottom-left, only top-right quarter visible */}
       <div
         className="absolute z-[1]"
         style={{
@@ -79,8 +112,8 @@ export default function HomePage() {
             {t("todays_snapshot")}
           </h3>
           <div className="mt-3 space-y-0.5 text-sm text-gray-800 text-right pr-1">
-            <p><span className="font-semibold">{t("bmi")}</span> 23.0</p>
-            <p><span className="font-semibold">{t("meals_logged")}</span> 1/3</p>
+            <p><span className="font-semibold">{t("bmi")}</span> {bmi}</p>
+            <p><span className="font-semibold">{t("meals_logged")}</span> {mealsLogged}</p>
           </div>
 
           <Link
@@ -105,7 +138,7 @@ export default function HomePage() {
           <h3 className="text-2xl font-bold italic text-[#454545] leading-tight">
             {t("check_sugar")}
           </h3>
-          <SugarChart />
+          <SugarChart userId={user.user_id} />
         </div>
       </div>
     </div>

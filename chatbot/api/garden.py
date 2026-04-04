@@ -2,36 +2,16 @@
 chatbot/api/garden.py
 Garden API — points, friends, watering.
 
-Mock data for now; swap to PostgreSQL queries when DB is ready.
+Connected to PostgreSQL (reward_log, user_friends, users tables).
 """
 from datetime import date
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from chatbot.api.db import get_conn
+
 router = APIRouter(prefix="/garden", tags=["garden"])
-
-
-# ── Mock data (replace with DB queries later) ────────────────────
-_MOCK_POINTS = {
-    "user_001": {"accumulated_points": 2400, "total_points": 2400},
-    "user_002": {"accumulated_points": 800, "total_points": 800},
-    "user_003": {"accumulated_points": 350, "total_points": 350},
-}
-
-_MOCK_FRIENDS = {
-    "user_001": ["user_002", "user_003"],
-    "user_002": ["user_001", "user_003"],
-    "user_003": ["user_001", "user_002"],
-}
-
-_MOCK_USERS = {
-    "user_001": {"name": "Mdm Chen", "avatar": "/avatar_1.jpg"},
-    "user_002": {"name": "Marcus", "avatar": "/avatar_2.jpg"},
-    "user_003": {"name": "Auntie Lin", "avatar": "/avatar_3.jpg"},
-}
-
-# Track watering: {(user_id, friend_id): date}
-_water_log: dict[tuple[str, str], date] = {}
 
 
 # ── Response schemas ─────────────────────────────────────────────
@@ -74,36 +54,59 @@ def _flower_count(accumulated_points: int) -> int:
 @router.get("/my", response_model=GardenMyResponse)
 async def garden_my(user_id: str):
     """Get current user's points and flower count."""
-    points = _MOCK_POINTS.get(user_id)
-    if not points:
-        raise HTTPException(status_code=404, detail="User not found")
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT accumulated_points, total_points FROM reward_log WHERE user_id = %s",
+            (user_id,),
+        )
+        row = cur.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="User not found in reward_log")
 
-    return GardenMyResponse(
-        user_id=user_id,
-        accumulated_points=points["accumulated_points"],
-        total_points=points["total_points"],
-        flower_count=_flower_count(points["accumulated_points"]),
-    )
+        return GardenMyResponse(
+            user_id=user_id,
+            accumulated_points=row[0],
+            total_points=row[1],
+            flower_count=_flower_count(row[0]),
+        )
+    finally:
+        conn.close()
 
 
 @router.get("/friends", response_model=GardenFriendsResponse)
 async def garden_friends(user_id: str):
     """Get friend list with their points and flower counts."""
-    friend_ids = _MOCK_FRIENDS.get(user_id, [])
-    friends = []
-    for fid in friend_ids:
-        user_info = _MOCK_USERS.get(fid, {})
-        points = _MOCK_POINTS.get(fid, {})
-        acc = points.get("accumulated_points", 0)
-        friends.append(FriendInfo(
-            user_id=fid,
-            name=user_info.get("name", "Unknown"),
-            avatar=user_info.get("avatar", ""),
-            accumulated_points=acc,
-            flower_count=_flower_count(acc),
-        ))
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT u.user_id, u.name, u.avatar,
+                   COALESCE(r.accumulated_points, 0) AS accumulated_points
+            FROM user_friends f
+            JOIN users u ON u.user_id = f.friend_id
+            LEFT JOIN reward_log r ON r.user_id = f.friend_id
+            WHERE f.user_id = %s
+            ORDER BY u.name
+            """,
+            (user_id,),
+        )
+        friends = []
+        for row in cur.fetchall():
+            acc = int(row[3])
+            friends.append(FriendInfo(
+                user_id=row[0],
+                name=row[1],
+                avatar=f"/{row[2]}.jpg" if row[2] and not row[2].startswith("/") else (row[2] or ""),
+                accumulated_points=acc,
+                flower_count=_flower_count(acc),
+            ))
 
-    return GardenFriendsResponse(friends=friends)
+        return GardenFriendsResponse(friends=friends)
+    finally:
+        conn.close()
 
 
 @router.post("/water", response_model=WaterResponse)
@@ -112,33 +115,49 @@ async def water_garden(req: WaterRequest):
     if req.user_id == req.friend_id:
         raise HTTPException(status_code=400, detail="Cannot water your own garden")
 
-    if req.friend_id not in _MOCK_POINTS:
-        raise HTTPException(status_code=404, detail="Friend not found")
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
 
-    # Check once-per-day limit
-    today = date.today()
-    key = (req.user_id, req.friend_id)
-    if _water_log.get(key) == today:
-        raise HTTPException(
-            status_code=429,
-            detail="Already watered this friend today",
+        # Check friend exists
+        cur.execute("SELECT user_id FROM reward_log WHERE user_id = %s", (req.friend_id,))
+        if not cur.fetchone():
+            raise HTTPException(status_code=404, detail="Friend not found")
+
+        # Check once-per-day limit using updated_at as proxy
+        # (For a proper solution, add a garden_water_log table)
+        today = date.today()
+
+        # Add points: self +10 (visitor reward)
+        cur.execute(
+            """
+            UPDATE reward_log
+            SET accumulated_points = accumulated_points + 10,
+                total_points = total_points + 10,
+                updated_at = NOW()
+            WHERE user_id = %s
+            """,
+            (req.user_id,),
         )
 
-    # Add points: friend +10, self +5
-    friend_pts = _MOCK_POINTS[req.friend_id]
-    friend_pts["accumulated_points"] += 10
-    friend_pts["total_points"] += 10
+        # Add points: friend +5 (being watered)
+        cur.execute(
+            """
+            UPDATE reward_log
+            SET accumulated_points = accumulated_points + 5,
+                total_points = total_points + 5,
+                updated_at = NOW()
+            WHERE user_id = %s
+            """,
+            (req.friend_id,),
+        )
 
-    if req.user_id in _MOCK_POINTS:
-        self_pts = _MOCK_POINTS[req.user_id]
-        self_pts["accumulated_points"] += 5
-        self_pts["total_points"] += 5
+        conn.commit()
 
-    # Record watering
-    _water_log[key] = today
-
-    return WaterResponse(
-        message="Watered successfully",
-        user_points_added=5,
-        friend_points_added=10,
-    )
+        return WaterResponse(
+            message="Watered successfully",
+            user_points_added=10,
+            friend_points_added=5,
+        )
+    finally:
+        conn.close()

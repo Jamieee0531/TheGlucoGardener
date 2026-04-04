@@ -1,12 +1,31 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TEST_USERS, loginUser, isOnboardingCompleted, createNewUserId } from "../../lib/users";
 import { useTranslation } from "../../lib/i18n";
 
+const API_BASE = "http://localhost:8080";
+
 export default function LoginPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/users/list`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.users && data.users.length > 0) {
+          setUsers(data.users);
+        } else {
+          setUsers(TEST_USERS);
+        }
+      })
+      .catch(() => {
+        setUsers(TEST_USERS);
+      });
+  }, []);
 
   const handleSelect = (userId) => {
     loginUser(userId);
@@ -68,7 +87,7 @@ export default function LoginPage() {
         </p>
 
         <div className="flex gap-5">
-          {TEST_USERS.map((user) => (
+          {users.map((user) => (
             <button
               key={user.user_id}
               onClick={() => handleSelect(user.user_id)}

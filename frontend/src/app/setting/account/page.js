@@ -7,6 +7,8 @@ import { useAuth } from "../../../lib/useAuth";
 import { getCurrentUserId, saveProfile, AVATARS } from "../../../lib/users";
 import { useTranslation } from "../../../lib/i18n";
 
+const API_BASE = "http://localhost:8080";
+
 export default function AccountPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -19,14 +21,44 @@ export default function AccountPage() {
   const [contacts, setContacts] = useState([]);
 
   useEffect(() => {
-    if (user) {
-      setForm({ ...user });
-      // Load lists from localStorage
-      const uid = user.user_id;
-      try { setExercises(JSON.parse(localStorage.getItem(`exercises_${uid}`)) || []); } catch {}
-      try { setPlaces(JSON.parse(localStorage.getItem(`places_${uid}`)) || []); } catch {}
-      try { setContacts(JSON.parse(localStorage.getItem(`contacts_${uid}`)) || []); } catch {}
-    }
+    if (!user) return;
+    const uid = user.user_id;
+
+    // Fetch profile from API, fall back to local user
+    fetch(`${API_BASE}/users/${uid}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user_id) {
+          setForm(data);
+        } else {
+          setForm({ ...user });
+        }
+      })
+      .catch(() => setForm({ ...user }));
+
+    // Fetch exercises from API, fall back to localStorage
+    fetch(`${API_BASE}/users/${uid}/exercise-patterns`)
+      .then((res) => res.json())
+      .then((data) => setExercises(data.patterns || []))
+      .catch(() => {
+        try { setExercises(JSON.parse(localStorage.getItem(`exercises_${uid}`)) || []); } catch {}
+      });
+
+    // Fetch places from API, fall back to localStorage
+    fetch(`${API_BASE}/users/${uid}/known-places`)
+      .then((res) => res.json())
+      .then((data) => setPlaces(data.places || []))
+      .catch(() => {
+        try { setPlaces(JSON.parse(localStorage.getItem(`places_${uid}`)) || []); } catch {}
+      });
+
+    // Fetch contacts from API, fall back to localStorage
+    fetch(`${API_BASE}/users/${uid}/emergency-contacts`)
+      .then((res) => res.json())
+      .then((data) => setContacts(data.contacts || []))
+      .catch(() => {
+        try { setContacts(JSON.parse(localStorage.getItem(`contacts_${uid}`)) || []); } catch {}
+      });
   }, [user]);
 
   if (loading || !user || !form) return null;
@@ -41,12 +73,66 @@ export default function AccountPage() {
   const RELATIONSHIPS = ["rel_family", "rel_friend", "rel_doctor"];
   const NOTIFY_OPTIONS = ["hard_low_glucose", "hard_high_hr", "data_gap"];
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const userId = getCurrentUserId();
+
+    // Save profile via API
+    try {
+      await fetch(`${API_BASE}/users/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          birth_year: form.birth_year,
+          gender: form.gender,
+          height_cm: form.height_cm,
+          weight_kg: form.weight_kg,
+          waist_cm: form.waist_cm,
+          avatar: form.avatar,
+          language: form.language,
+        }),
+      });
+    } catch {
+      // Fall back to localStorage
+      saveProfile(userId, form);
+    }
+
+    // Save exercises via API
+    try {
+      await fetch(`${API_BASE}/users/${userId}/exercise-patterns`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(exercises),
+      });
+    } catch {
+      localStorage.setItem(`exercises_${userId}`, JSON.stringify(exercises));
+    }
+
+    // Save places via API
+    try {
+      await fetch(`${API_BASE}/users/${userId}/known-places`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(places),
+      });
+    } catch {
+      localStorage.setItem(`places_${userId}`, JSON.stringify(places));
+    }
+
+    // Save contacts via API
+    try {
+      await fetch(`${API_BASE}/users/${userId}/emergency-contacts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contacts),
+      });
+    } catch {
+      localStorage.setItem(`contacts_${userId}`, JSON.stringify(contacts));
+    }
+
+    // Also keep localStorage in sync for offline fallback
     saveProfile(userId, form);
-    localStorage.setItem(`exercises_${userId}`, JSON.stringify(exercises));
-    localStorage.setItem(`places_${userId}`, JSON.stringify(places));
-    localStorage.setItem(`contacts_${userId}`, JSON.stringify(contacts));
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

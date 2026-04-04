@@ -22,6 +22,8 @@ from chatbot.graph.builder import app as graph_app
 from chatbot.utils.llm_factory import set_token_callback, clear_token_callback
 from chatbot.memory.rag.retriever import get_retriever
 from chatbot.api.garden import router as garden_router
+from chatbot.api.users import router as users_router
+from chatbot.api.health import router as health_router
 
 # ── FastAPI app ──────────────────────────────────────────────────
 api = FastAPI(title="Health Companion Chatbot", version="0.1.0")
@@ -35,6 +37,8 @@ async def _warmup():
     await loop.run_in_executor(None, lambda: get_retriever()._init())
 
 api.include_router(garden_router)
+api.include_router(users_router)
+api.include_router(health_router)
 
 api.add_middleware(
     CORSMiddleware,

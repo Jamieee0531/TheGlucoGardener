@@ -1,29 +1,28 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "../../../lib/useAuth";
-import { TEST_USERS } from "../../../lib/users";
 import { useTranslation } from "../../../lib/i18n";
 
+const API_BASE = "http://localhost:8080";
+
 function getFlowerCount(points) {
-  return Math.min(Math.floor(points / 500), 25);
+  return Math.min(Math.floor(points / 500), 9);
 }
 
-// Pre-defined grid positions for flowers on the isometric field (row, col)
+// 3x3 grid positions (row, col), ordered from center outward
 const GRID_POSITIONS = [
-  [2, 2], [1, 3], [3, 1], [0, 2], [2, 4],
-  [4, 2], [1, 1], [3, 3], [0, 4], [4, 0],
-  [2, 0], [0, 0], [4, 4], [1, 0], [3, 4],
-  [0, 1], [2, 3], [4, 3], [1, 4], [3, 0],
-  [0, 3], [2, 1], [4, 1], [1, 2], [3, 2],
+  [1, 1], // center
+  [0, 1], // top-center
+  [2, 1], // bottom-center
+  [1, 0], // center-left
+  [1, 2], // center-right
+  [0, 0], // top-left
+  [0, 2], // top-right
+  [2, 0], // bottom-left
+  [2, 2], // bottom-right
 ];
-
-// Mock points for demo (will come from DB later)
-const MOCK_POINTS = {
-  user_001: 1200,
-  user_002: 800,
-  user_003: 350,
-};
 
 export default function FriendGardenPage() {
   const router = useRouter();
@@ -32,16 +31,66 @@ export default function FriendGardenPage() {
   const { t } = useTranslation();
 
   const friendId = searchParams.get("id");
-  const friend = TEST_USERS.find((u) => u.user_id === friendId);
+  const [friend, setFriend] = useState(null);
+  const [points, setPoints] = useState(0);
+  const [watered, setWatered] = useState(false);
+
+  useEffect(() => {
+    if (!user || !friendId) return;
+
+    // Fetch friend's data from the friends list
+    fetch(`${API_BASE}/garden/friends?user_id=${user.user_id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const f = (data.friends || []).find((fr) => fr.user_id === friendId);
+        if (f) {
+          setFriend(f);
+          setPoints(f.accumulated_points);
+        }
+      })
+      .catch((e) => console.error("Failed to fetch friend:", e));
+  }, [user, friendId]);
 
   if (loading || !user) return null;
-  if (!friend) {
+  if (!friendId) {
     router.replace("/garden");
     return null;
   }
 
-  const points = MOCK_POINTS[friendId] || 0;
   const flowerCount = getFlowerCount(points);
+
+  const handleWater = async () => {
+    if (watered) return;
+    try {
+      const res = await fetch(`${API_BASE}/garden/water`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.user_id, friend_id: friendId }),
+      });
+      if (res.ok) {
+        setWatered(true);
+        // Refresh friend's points from backend
+        const refreshRes = await fetch(`${API_BASE}/garden/friends?user_id=${user.user_id}`);
+        const refreshData = await refreshRes.json();
+        const updated = (refreshData.friends || []).find((fr) => fr.user_id === friendId);
+        if (updated) setPoints(updated.accumulated_points);
+      } else {
+        const err = await res.json();
+        alert(err.detail || "Failed to water");
+      }
+    } catch (e) {
+      console.error("Water failed:", e);
+    }
+  };
+
+  // Show loading while fetching friend data
+  if (!friend) {
+    return (
+      <div className="flex flex-col h-full bg-cream items-center justify-center">
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full bg-cream relative overflow-hidden">
@@ -83,7 +132,7 @@ export default function FriendGardenPage() {
       <div className="relative z-10 flex-1 flex items-center justify-center">
         <div className="relative" style={{ width: 300, height: 300 }}>
 
-          {/* Isometric grass platform (no flowers inside) */}
+          {/* Isometric grass platform */}
           <div
             style={{
               width: 220,
@@ -97,21 +146,20 @@ export default function FriendGardenPage() {
               boxShadow: "0 8px 0 #5a8a2e, 0 12px 0 #4a7a20, 0 16px 8px rgba(0,0,0,0.15)",
             }}
           >
-            {/* Grid lines */}
-            {[1, 2, 3, 4].map((i) => (
-              <div key={`h-${i}`} style={{ position: "absolute", top: `${i * 20}%`, left: 0, right: 0, height: 1, backgroundColor: "rgba(255,255,255,0.15)" }} />
+            {/* 3x3 grid lines */}
+            {[1, 2].map((i) => (
+              <div key={`h-${i}`} style={{ position: "absolute", top: `${i * 33.33}%`, left: 0, right: 0, height: 1, backgroundColor: "rgba(255,255,255,0.2)" }} />
             ))}
-            {[1, 2, 3, 4].map((i) => (
-              <div key={`v-${i}`} style={{ position: "absolute", left: `${i * 20}%`, top: 0, bottom: 0, width: 1, backgroundColor: "rgba(255,255,255,0.15)" }} />
+            {[1, 2].map((i) => (
+              <div key={`v-${i}`} style={{ position: "absolute", left: `${i * 33.33}%`, top: 0, bottom: 0, width: 1, backgroundColor: "rgba(255,255,255,0.2)" }} />
             ))}
           </div>
 
-          {/* Flowers floating above the grass (NOT inside the rotated div) */}
+          {/* Flowers — 3x3 grid cell centers */}
           {Array.from({ length: flowerCount }).map((_, i) => {
-            const [row, col] = GRID_POSITIONS[i] || [2, 2];
-            // Map grid positions to pixel positions on the isometric projection
-            const x = 128 + (col - row) * 22;
-            const y = 110 + (col + row) * 13;
+            const [row, col] = GRID_POSITIONS[i] || [1, 1];
+            const cx = 193 + (col - row) * 52;
+            const cy = 103 + (col + row) * 30;
             return (
               <img
                 key={i}
@@ -119,10 +167,11 @@ export default function FriendGardenPage() {
                 alt="Flower"
                 style={{
                   position: "absolute",
-                  left: x,
-                  top: y - 45,
-                  width: 50,
+                  left: cx - 27,
+                  top: cy - 55,
+                  width: 55,
                   height: "auto",
+                  zIndex: row + col,
                   filter: "drop-shadow(0 4px 4px rgba(0,0,0,0.2))",
                   animation: `sway ${2 + (i % 3) * 0.5}s ease-in-out infinite alternate`,
                   animationDelay: `${i * 0.2}s`,
@@ -131,17 +180,17 @@ export default function FriendGardenPage() {
             );
           })}
 
-          {/* Empty soil dots on the grass */}
-          {GRID_POSITIONS.slice(flowerCount, 10).map(([row, col], i) => {
-            const x = 128 + (col - row) * 22;
-            const y = 110 + (col + row) * 13;
+          {/* Empty soil dots on unfilled grid cells */}
+          {GRID_POSITIONS.slice(flowerCount, 9).map(([row, col], i) => {
+            const cx = 193 + (col - row) * 52;
+            const cy = 103 + (col + row) * 30;
             return (
               <div
                 key={`empty-${i}`}
                 style={{
                   position: "absolute",
-                  left: x + 18,
-                  top: y - 5,
+                  left: cx - 5,
+                  top: cy - 3,
                   width: 10,
                   height: 6,
                   borderRadius: "50%",
@@ -153,19 +202,19 @@ export default function FriendGardenPage() {
         </div>
       </div>
 
-      {/* Visit bonus button */}
+      {/* Water button */}
       <div className="relative z-10 px-8 pb-10">
         <button
-          onClick={() => {
-            // TODO: connect to backend for actual point update
-            alert(t("visited_garden", { name: friend.name }));
-          }}
-          className="w-full py-3.5 rounded-full text-white font-semibold text-sm shadow-lg transition-all active:scale-95"
+          onClick={handleWater}
+          disabled={watered}
+          className="w-full py-3.5 rounded-full text-white font-semibold text-sm shadow-lg transition-all active:scale-95 disabled:opacity-50"
           style={{
-            background: "linear-gradient(135deg, #7cb342, #558b2f)",
+            background: watered
+              ? "linear-gradient(135deg, #9e9e9e, #757575)"
+              : "linear-gradient(135deg, #7cb342, #558b2f)",
           }}
         >
-          {t("water_garden")}
+          {watered ? t("watered") || "Watered!" : t("water_garden")}
         </button>
         <p className="text-center text-xs text-gray-400 mt-2 italic">
           {t("visit_once_per_day")}

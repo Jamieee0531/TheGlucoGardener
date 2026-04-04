@@ -1,19 +1,56 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslation } from "../lib/i18n";
 
-export default function SugarChart() {
+const API_BASE = "http://localhost:8080";
+
+export default function SugarChart({ userId }) {
   const { t } = useTranslation();
-  // Simple blood sugar line on L-shaped axis
-  const points = [
-    [40, 75],
-    [70, 60],
-    [110, 50],
-    [150, 55],
-    [190, 40],
-    [230, 48],
-    [260, 35],
-  ];
+  const [points, setPoints] = useState([]);
+  const [startLabel, setStartLabel] = useState("");
+
+  useEffect(() => {
+    if (!userId) return;
+
+    fetch(`${API_BASE}/health/glucose?user_id=${userId}&hours=24`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.readings || data.readings.length === 0) return;
+
+        const readings = data.readings;
+        const xMin = 40;
+        const xMax = 260;
+        const yMin = 20;
+        const yMax = 85;
+
+        // Find glucose range for scaling
+        const glucoseValues = readings.map((r) => r.glucose);
+        const gMin = Math.min(...glucoseValues);
+        const gMax = Math.max(...glucoseValues);
+        const gRange = gMax - gMin || 1;
+
+        const mapped = readings.map((r, i) => {
+          const x = xMin + (i / Math.max(readings.length - 1, 1)) * (xMax - xMin);
+          // Invert Y: higher glucose = lower Y value (higher on chart)
+          const y = yMax - ((r.glucose - gMin) / gRange) * (yMax - yMin);
+          return [Math.round(x), Math.round(y)];
+        });
+
+        setPoints(mapped);
+
+        // Set start label from first reading
+        const first = new Date(readings[0].recorded_at);
+        const hours = first.getHours();
+        const mins = first.getMinutes().toString().padStart(2, "0");
+        const ampm = hours >= 12 ? "pm" : "am";
+        const h12 = hours % 12 || 12;
+        setStartLabel(`${h12}:${mins}${ampm}`);
+      })
+      .catch(() => {
+        // Keep mock points on failure
+      });
+  }, [userId]);
 
   const linePath = points
     .map((p, i) => `${i === 0 ? "M" : "L"} ${p[0]} ${p[1]}`)
@@ -42,7 +79,7 @@ export default function SugarChart() {
         <path d={linePath} fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 
         {/* X labels */}
-        <text x="35" y="108" fontSize="9" fill="#666">7:00am</text>
+        <text x="35" y="108" fontSize="9" fill="#666">{startLabel}</text>
         <text x="255" y="108" fontSize="9" fill="#666" textAnchor="end">{t("now")}</text>
       </svg>
     </div>
