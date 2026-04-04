@@ -23,6 +23,11 @@ class MealsTodayResponse(BaseModel):
     total: int
 
 
+class DailyTasksResponse(BaseModel):
+    completed: int
+    total: int
+
+
 @router.get("/glucose", response_model=GlucoseResponse)
 async def glucose_readings(user_id: str, hours: int = 24) -> GlucoseResponse:
     conn = get_conn()
@@ -60,5 +65,23 @@ async def meals_today(user_id: str) -> MealsTodayResponse:
         )
         count = cur.fetchone()[0]
         return MealsTodayResponse(count=count, total=3)
+    finally:
+        conn.close()
+
+
+@router.get("/daily-tasks", response_model=DailyTasksResponse)
+async def daily_tasks(user_id: str) -> DailyTasksResponse:
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        today = datetime.now().strftime("%Y-%m-%d")
+        cur.execute(
+            """SELECT COUNT(*) FROM routine_task_log
+               WHERE user_id = %s AND task_status = 'completed'
+               AND created_at::date = %s""",
+            (user_id, today),
+        )
+        completed = cur.fetchone()[0]
+        return DailyTasksResponse(completed=completed, total=4)
     finally:
         conn.close()

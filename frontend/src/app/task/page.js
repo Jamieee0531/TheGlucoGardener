@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import TopBar from "../../components/TopBar";
 import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
+
+const API_BASE = "http://localhost:8080";
 
 const TASKS = [
   {
@@ -41,7 +43,6 @@ const TASKS = [
   },
 ];
 
-const MOCK_BASE_PTS = 2000;
 const PTS_PER_TASK = 10;
 const MAX_DAILY_PTS = 40;
 const MAX_PLANT_PTS = 100;
@@ -58,15 +59,36 @@ export default function TaskPage() {
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+  const [totalPts, setTotalPts] = useState(0);
+  const [plantProgress, setPlantProgress] = useState(0);
+  const [dbDailyCompleted, setDbDailyCompleted] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const uid = user.user_id;
+
+    // Fetch points from reward_log
+    fetch(`${API_BASE}/garden/my?user_id=${uid}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setTotalPts(data.total_points || 0);
+        setPlantProgress(data.accumulated_points % 500);
+      })
+      .catch(() => {});
+
+    // Fetch today's completed routine tasks
+    fetch(`${API_BASE}/health/daily-tasks?user_id=${uid}`)
+      .then((r) => r.json())
+      .then((data) => setDbDailyCompleted(data.completed || 0))
+      .catch(() => {});
+  }, [user]);
 
   if (loading || !user) return null;
 
   const completedCount = TASKS.filter(
     (t) => t.completable && completedTasks.has(t.id)
   ).length;
-  const dailyPts = completedCount * PTS_PER_TASK;
-  const plantPts = completedCount * PTS_PER_TASK;
-  const totalPts = MOCK_BASE_PTS + completedCount * PTS_PER_TASK;
+  const dailyPts = (dbDailyCompleted + completedCount) * PTS_PER_TASK;
 
   const handleCardClick = (taskId) => {
     if (taskId === "sunset") return;
@@ -222,9 +244,9 @@ export default function TaskPage() {
               {t("task_plant_progress")}
             </p>
             <p className="text-2xl font-bold text-gray-900">
-              {plantPts}{" "}
+              {plantProgress}{" "}
               <span className="text-sm font-normal text-gray-500">
-                / {MAX_PLANT_PTS} {t("task_pts")}
+                / 500 {t("task_pts")}
               </span>
             </p>
             {/* Progress bar green */}
@@ -232,7 +254,7 @@ export default function TaskPage() {
               <div
                 className="h-2 rounded-full"
                 style={{
-                  width: `${(plantPts / MAX_PLANT_PTS) * 100}%`,
+                  width: `${(plantProgress / 500) * 100}%`,
                   backgroundColor: "#c8e6a0",
                   transition: "width 300ms ease",
                 }}
