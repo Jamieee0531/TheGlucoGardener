@@ -1,0 +1,37 @@
+{
+  "scenario_id": "marcus_hard_low_glucose",
+  "title": "Scenario B: Exercise Hard Low Glucose",
+  "description": "Marcus ignored soft alert. 7 min into workout, glucose crashes to 3.8.",
+  "user_id": "user_002",
+  "steps": [
+    {
+      "offset_minutes": 0,
+      "demo_time": "13:38:00",
+      "endpoint": "POST /telemetry/hr",
+      "body": {"heart_rate": 138, "gps_lat": 1.3200, "gps_lng": 103.8400},
+      "note": "Marcus exercising, HR elevated"
+    },
+    {
+      "offset_minutes": 0,
+      "demo_time": "13:38:00",
+      "endpoint": "POST /telemetry/cgm",
+      "body": {"glucose": 4.5},
+      "note": "Glucose dropping, still safe"
+    },
+    {
+      "offset_minutes": 3,
+      "demo_time": "13:45:00",
+      "endpoint": "POST /telemetry/hr",
+      "body": {"heart_rate": 155, "gps_lat": 1.3200, "gps_lng": 103.8400},
+      "note": "High exertion, mid-rep"
+    },
+    {
+      "offset_minutes": 3,
+      "demo_time": "13:45:00",
+      "endpoint": "POST /telemetry/cgm",
+      "body": {"glucose": 3.8},
+      "note": "CRITICAL: < 3.9 -> HARD TRIGGER -> Emergency"
+    }
+  ],
+  "expected_outcome": "HARD_TRIGGER -> EmergencyService -> App push + red modal"
+}

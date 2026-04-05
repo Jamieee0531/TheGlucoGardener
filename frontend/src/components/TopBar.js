@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { key: "nav_setting", href: "/setting" },
   { key: "nav_soft_alert", suffix: "-Beta", href: "/soft-alert" },
   { key: "nav_hard_alert", suffix: "-Beta", href: "/hard-alert" },
+  { key: "nav_demo", suffix: "", href: "/demo" },
 ];
 
 export default function TopBar({ title = "Chat", agentType, transparent = false }) {
