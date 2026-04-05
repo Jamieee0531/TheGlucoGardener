@@ -34,7 +34,7 @@
 ## 前置条件
 
 - **Node.js** >= 18
-- **Python** >= 3.13（3.11/3.12 的 SQLAlchemy 兼容性有问题）
+- **Python** >= 3.11
 - **Redis**（macOS: `brew install redis`）
 - 项目根目录有 `.env` 文件（数据库、API Key 等）
 - 项目根目录有 `config.py`（Python 后端共享配置，读取 `.env`）
@@ -84,6 +84,7 @@ redis-server
 > 也可以后台运行：`brew services start redis`
 
 ### 终端 2 — Gateway API (port 8000)
+
 
 ```bash
 source .venv/bin/activate
@@ -139,7 +140,7 @@ celery -A alert_agent.main worker --loglevel=info
 
 1. `http://localhost:3000` → 登录 → 汉堡菜单 → **Demo Console**
 2. 选一个 Scenario → 点 **Play All**
-3. 右侧观察 Live Telemetry / Investigator Node / Agent Pipeline Output
+3. 右侧观察 Live Telemetry / Glucose Trend / Intervention Timeline
 4. 汉堡菜单切到 **Home** 页：
    - **Scenario B（硬预警）**：红色弹窗立即出现
    - **Scenario A（软预警）**：等 ~30s Agent 处理，首页文案变化
@@ -152,7 +153,7 @@ celery -A alert_agent.main worker --loglevel=info
 | 文件 | 作用 |
 |---|---|
 | `.env` | 环境变量：数据库、Redis、API Key、Twilio 等 |
-| `config.py`（根目录） | Alert 系统共享配置，用 pydantic-settings 读取 `.env`（SEA-LION API、Redis 等） |
+| `config.py`（根目录） | Python 后端共享配置，用 pydantic-settings 读取 `.env` |
 | `chatbot/config/settings.py` | Chatbot 独立配置（SEA-LION、MERaLiON 模型参数） |
 | `frontend/next.config.mjs` | Next.js 配置 |
 
