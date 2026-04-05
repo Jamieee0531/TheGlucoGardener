@@ -1,0 +1,23 @@
+{
+  "scenario_id": "marcus_no_trigger",
+  "title": "Scenario C: Normal Readings (Control)",
+  "description": "Normal Saturday readings. System correctly stays silent.",
+  "user_id": "user_002",
+  "steps": [
+    {
+      "offset_minutes": 0,
+      "demo_time": "10:00:00",
+      "endpoint": "POST /telemetry/hr",
+      "body": {"heart_rate": 72, "gps_lat": 1.3521, "gps_lng": 103.8198},
+      "note": "Marcus at home, resting"
+    },
+    {
+      "offset_minutes": 0,
+      "demo_time": "10:00:00",
+      "endpoint": "POST /telemetry/cgm",
+      "body": {"glucose": 6.5},
+      "note": "6.5 - safe range, no trigger"
+    }
+  ],
+  "expected_outcome": "No trigger. No notifications. System quiet = system normal."
+}
