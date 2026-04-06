@@ -1,8 +1,15 @@
 from typing import Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text, select
-from datetime import date, datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from task_agent.db.models import User
+
+_SGT = timezone(timedelta(hours=8))
+
+def _sgt_today_start_utc() -> datetime:
+    """SGT midnight expressed as naive UTC, for querying UTC-stored timestamps."""
+    midnight_sgt = datetime.now(_SGT).replace(hour=0, minute=0, second=0, microsecond=0)
+    return midnight_sgt.astimezone(timezone.utc).replace(tzinfo=None)
 
 
 async def fetch_context(db: AsyncSession, user_id: str) -> Dict[str, Any]:
@@ -22,7 +29,7 @@ async def fetch_context(db: AsyncSession, user_id: str) -> Dict[str, Any]:
         "language_pref": user.language_pref if user else "en",
     }
 
-    today_start = datetime.combine(date.today(), datetime.min.time())
+    today_start = _sgt_today_start_utc()
     two_hours_ago = datetime.utcnow() - timedelta(hours=2)
 
     # 2. Calories burned today

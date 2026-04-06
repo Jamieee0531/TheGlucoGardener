@@ -1,5 +1,11 @@
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timezone, timedelta
+
+_SGT = timezone(timedelta(hours=8))
+
+def _sgt_today_start_utc() -> datetime:
+    midnight_sgt = datetime.now(_SGT).replace(hour=0, minute=0, second=0, microsecond=0)
+    return midnight_sgt.astimezone(timezone.utc).replace(tzinfo=None)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, text
 from task_agent.db.models import DynamicTaskLog, RewardLog
@@ -12,7 +18,7 @@ async def daily_task_guard(db: AsyncSession, user_id: str) -> bool:
     """Returns True (skip) if a dynamic task already exists for this user today."""
     stmt = select(DynamicTaskLog.task_id).where(
         DynamicTaskLog.user_id == user_id,
-        func.date(DynamicTaskLog.created_at) == date.today(),
+        DynamicTaskLog.created_at >= _sgt_today_start_utc(),
     ).limit(1)
     exists = await db.scalar(stmt)
     return exists is not None

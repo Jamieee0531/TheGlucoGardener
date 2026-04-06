@@ -1,3 +1,5 @@
+import json as _json
+
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -13,6 +15,17 @@ from task_agent.agent.context_loader import fetch_context
 from task_agent.agent.rule_engine import get_rule_for_user, calculate
 
 router = APIRouter()
+
+
+def _content(task) -> dict:
+    """Return task_content as dict, handling TEXT columns that come back as JSON strings."""
+    c = task.task_content
+    if isinstance(c, str):
+        try:
+            return _json.loads(c)
+        except Exception:
+            return {}
+    return c or {}
 
 
 class SelectDestinationReq(BaseModel):
@@ -55,7 +68,7 @@ async def get_active_dynamic_task(user_id: str, db: AsyncSession = Depends(get_d
             "task_id": task.task_id,
             "task_status": "awaiting_selection",
             "expires_at": task.expires_at.isoformat() if task.expires_at else None,
-            "parks": task.task_content.get("parks", [])
+            "parks": _content(task).get("parks", [])
         }
 
     if task.task_status == "photo_required":
@@ -63,76 +76,75 @@ async def get_active_dynamic_task(user_id: str, db: AsyncSession = Depends(get_d
             "task_id": task.task_id,
             "task_status": "photo_required",
             "expires_at": task.expires_at.isoformat() if task.expires_at else None,
-            "destination": task.task_content.get("destination", {})
+            "destination": _content(task).get("destination", {})
         }
 
+    tc = _content(task)
     return {
         "task_id": task.task_id,
         "task_status": "pending",
         "expires_at": task.expires_at.isoformat() if task.expires_at else None,
-        "task_content": task.task_content if task.task_content.get("title") else None,
-        "destination": task.task_content.get("destination", {})
+        "task_content": tc if tc.get("title") else None,
+        "destination": tc.get("destination", {})
     }
 
 
-def _run_langgraph_background(task_id: int, user_id: str, selected_park: dict, parks: list):
-    """Runs LangGraph pipeline in a background thread with its own async session."""
-    import asyncio
+async def _run_langgraph_background(task_id: int, user_id: str, selected_park: dict, parks: list):
+    """Runs LangGraph copy pipeline as an async FastAPI background task (main event loop)."""
     from task_agent.db.session import AsyncSessionLocal
+    import logging as _logging
+    _log = _logging.getLogger(__name__)
 
-    async def _inner():
-        async with AsyncSessionLocal() as db:
+    async with AsyncSessionLocal() as db:
+        try:
+            ctx = await fetch_context(db, user_id)
+            rule = await get_rule_for_user(db, user_id)
+            rule_res = calculate(ctx, rule)
+
+            state_in = {
+                "user_id": user_id,
+                "trigger_source": "user_selection",
+                "user_profile": ctx["user_profile"],
+                "calories_burned_today": ctx["calories_burned_today"],
+                "avg_bg_last_2h": ctx["avg_bg_last_2h"],
+                "exercise_history": ctx["exercise_history"],
+                "last_gps": ctx["last_gps"],
+                "rule": dict(rule) if hasattr(rule, "items") else rule,
+                "rule_result": rule_res,
+                "selected_park": selected_park,
+                "park_candidates": parks,
+            }
+
+            final_state = await copy_subgraph.ainvoke(state_in)
+            content = final_state.get("task_content") or {}
+            content["destination"] = selected_park
+
+            result = await db.execute(
+                select(DynamicTaskLog).where(DynamicTaskLog.task_id == task_id)
+            )
+            task = result.scalar_one_or_none()
+            if task:
+                task.task_content = content
+                await db.commit()
+                _log.info(f"LangGraph copy written for task {task_id}")
+        except Exception as e:
+            _log.error(f"Background LangGraph failed for task {task_id}: {e}")
             try:
-                ctx = await fetch_context(db, user_id)
-                rule = await get_rule_for_user(db, user_id)
-                rule_res = calculate(ctx, rule)
-
-                state_in = {
-                    "user_id": user_id,
-                    "trigger_source": "user_selection",
-                    "user_profile": ctx["user_profile"],
-                    "calories_burned_today": ctx["calories_burned_today"],
-                    "avg_bg_last_2h": ctx["avg_bg_last_2h"],
-                    "exercise_history": ctx["exercise_history"],
-                    "last_gps": ctx["last_gps"],
-                    "rule": dict(rule) if hasattr(rule, "items") else rule,
-                    "rule_result": rule_res,
-                    "selected_park": selected_park,
-                    "park_candidates": parks,
-                }
-
-                final_state = await copy_subgraph.ainvoke(state_in)
-                content = final_state.get("task_content") or {}
-                content["destination"] = selected_park
-
                 result = await db.execute(
                     select(DynamicTaskLog).where(DynamicTaskLog.task_id == task_id)
                 )
                 task = result.scalar_one_or_none()
-                if task:
-                    task.task_content = content
+                if task and not _content(task).get("title"):
+                    task.task_content = {
+                        "destination": selected_park,
+                        "title": "Time for your walk!",
+                        "body": f"Head to {selected_park['name']} for a 30-minute walk.",
+                        "cta": "I have arrived",
+                        "_fallback": True,
+                    }
                     await db.commit()
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).error(f"Background LangGraph failed for task {task_id}: {e}")
-                try:
-                    result = await db.execute(
-                        select(DynamicTaskLog).where(DynamicTaskLog.task_id == task_id)
-                    )
-                    task = result.scalar_one_or_none()
-                    if task and not task.task_content.get("title"):
-                        task.task_content = {
-                            "destination": selected_park,
-                            "title": "Time for your walk!",
-                            "body": f"Head to {selected_park['name']} for a 30-minute walk.",
-                            "cta": "I have arrived",
-                            "_fallback": True,
-                        }
-                        await db.commit()
-                except Exception:
-                    pass
-
-    asyncio.run(_inner())
+            except Exception:
+                pass
 
 
 @router.post("/tasks/dynamic/{task_id}/select-destination")
@@ -154,7 +166,7 @@ async def select_destination(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found or not in awaiting_selection state")
 
-    parks = task.task_content.get("parks", [])
+    parks = _content(task).get("parks", [])
     if req.park_index < 0 or req.park_index >= len(parks):
         raise HTTPException(status_code=400, detail="Invalid park index")
 
@@ -225,7 +237,7 @@ async def upload_task_photo(
     return {
         "task_id": task.task_id,
         "status": "pending",
-        "task_content": task.task_content if task.task_content.get("title") else None,
+        "task_content": _content(task) if _content(task).get("title") else None,
     }
 
 
@@ -294,12 +306,32 @@ async def mock_sync_data(req: MockSyncReq, db: AsyncSession = Depends(get_db)):
 
 @router.delete("/internal/test/reset-tasks")
 async def reset_tasks_for_testing(user_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(DynamicTaskLog).where(DynamicTaskLog.user_id == user_id))
-    tasks = result.scalars().all()
+    from task_agent.agent.context_loader import _sgt_today_start_utc
+    from sqlalchemy import delete as sql_delete
+    today_start = _sgt_today_start_utc()
+
+    # Delete today's dynamic tasks
+    r = await db.execute(select(DynamicTaskLog).where(DynamicTaskLog.user_id == user_id))
+    tasks = r.scalars().all()
     for t in tasks:
         await db.delete(t)
+
+    # Clear today's seeded sensor data so calories don't accumulate across demo runs
+    await db.execute(sql_delete(UserExerciseLog).where(
+        UserExerciseLog.user_id == user_id,
+        UserExerciseLog.started_at >= today_start,
+    ))
+    await db.execute(sql_delete(UserCgmLog).where(
+        UserCgmLog.user_id == user_id,
+        UserCgmLog.recorded_at >= today_start,
+    ))
+    await db.execute(sql_delete(UserHrLog).where(
+        UserHrLog.user_id == user_id,
+        UserHrLog.recorded_at >= today_start,
+    ))
+
     await db.commit()
-    return {"deleted": len(tasks), "user_id": user_id}
+    return {"deleted_tasks": len(tasks), "sensor_data_cleared": True, "user_id": user_id}
 
 
 # --- 8.3 Points and flower ---

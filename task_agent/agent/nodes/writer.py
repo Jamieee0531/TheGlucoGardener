@@ -40,14 +40,15 @@ Writing rules:
 3. Always include: the park name, the recommended duration.
 4. If snack_before_exercise is present, weave it in naturally.
    Example: "...maybe grab a small banana before you head out."
-5. Based on the user's bg_status and snack suggestion, craft ONE short personalized tip (under 15 words). Examples: "Your glucose is a bit high — a gentle walk will help bring it down." or "Have a small snack before you head out."
-6. Keep the entire message under 60 words.
-7. End with one short encouraging phrase (under 8 words).
+5. Based on the user's bg_status and snack suggestion, craft ONE short personalized tip (under 20 words). Examples: "Your glucose is a bit high — a gentle walk will help bring it down." or "Have a small snack before you head out."
+6. Keep the entire message under 70 words.
+7. End with one short encouraging phrase (under 14 words).
+8. IMPORTANT: The "body" field must NOT contain the phrase "I have arrived" — that belongs only in the "cta" field.
 
 Return ONLY a JSON object with these exact keys:
 {
   "title": "<short notification title, under 8 words>",
-  "body":  "<the full message>",
+  "body":  "<the full message, do NOT include 'I have arrived'>",
   "cta":   "I have arrived"
 }
 
@@ -77,6 +78,11 @@ Snack needed:    {advice["snack_before_exercise"] or "none"}"""
         )
         task_content = _extract_json(response.text)
         assert "title" in task_content and "body" in task_content
+        # Strip CTA phrase if SEA-LION accidentally appended it to body
+        body = task_content["body"]
+        for phrase in [" I have arrived.", " I have arrived", "I have arrived."]:
+            body = body.rstrip().removesuffix(phrase.strip()).rstrip(" .")
+        task_content["body"] = body.strip()
         print(f"[{_time.strftime('%H:%M:%S')}] [Writer] OK elapsed={_time.time()-_t0:.1f}s")
         return {"task_content": task_content}
 

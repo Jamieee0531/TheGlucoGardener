@@ -8,7 +8,11 @@ async def get_rule_for_user(db: AsyncSession, user_id: str) -> Dict[str, Any]:
         text("SELECT * FROM dynamic_task_rule WHERE is_active=1 LIMIT 1")
     )).mappings().first()
     if r:
-        return dict(r)
+        result = dict(r)
+        result.setdefault("exercise_pts", 50)
+        result.setdefault("meal_pts", 20)
+        result.setdefault("weekly_pts", 30)
+        return result
     return {
         "base_calorie": 300,
         "trigger_threshold": 0.60,
