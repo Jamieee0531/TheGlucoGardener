@@ -72,11 +72,13 @@ async def get_active_dynamic_task(user_id: str, db: AsyncSession = Depends(get_d
         }
 
     if task.task_status == "photo_required":
+        tc = _content(task)
         return {
             "task_id": task.task_id,
             "task_status": "photo_required",
             "expires_at": task.expires_at.isoformat() if task.expires_at else None,
-            "destination": _content(task).get("destination", {})
+            "destination": tc.get("destination", {}),
+            "task_content": tc if tc.get("title") else None,
         }
 
     tc = _content(task)

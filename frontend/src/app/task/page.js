@@ -6,6 +6,7 @@ import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
 
 const API_BASE = "http://localhost:8080";
+const TASK_AGENT_API = "http://localhost:8001";
 
 const TASKS = [
   {
@@ -30,17 +31,6 @@ const TASKS = [
     completedKey: "task_checked_in",
     buttonColor: "#e8a878",
   },
-  {
-    id: "sunset",
-    titleKey: "task_sunset",
-    emoji: "🌅",
-    color: "#F4BAC1",
-    descKey: "task_sunset_desc",
-    logType: "photo",
-    completable: true,
-    completedKey: "task_logged",
-    buttonColor: "#e89098",
-  },
 ];
 
 const PTS_PER_TASK = 20;
@@ -50,7 +40,7 @@ const MAX_PLANT_PTS = 100;
 export default function TaskPage() {
   const { user, loading } = useAuth();
   const { t } = useTranslation();
-  const [expandedId, setExpandedId] = useState("sunset");
+  const [expandedId, setExpandedId] = useState(null);
   const [completedTasks, setCompletedTasks] = useState(new Set());
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [activeTaskId, setActiveTaskId] = useState(null);
@@ -59,6 +49,14 @@ export default function TaskPage() {
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+  const dynFileRef = useRef(null);
+
+  const [dynTask, setDynTask] = useState(null);
+  const [dynCompleted, setDynCompleted] = useState(false);
+  const [dynUploading, setDynUploading] = useState(false);
+  const [dynPoints, setDynPoints] = useState(null);
+  const [dynEarned, setDynEarned] = useState(null);
+  const [dynTitle, setDynTitle] = useState(null);
   const [totalPts, setTotalPts] = useState(0);
   const [plantProgress, setPlantProgress] = useState(0);
   const [dbDailyCompleted, setDbDailyCompleted] = useState(0);
@@ -96,12 +94,77 @@ export default function TaskPage() {
       .catch(() => {});
   }, [user]);
 
+  // Poll task_agent for dynamic task
+  useEffect(() => {
+    if (!user) return;
+    const poll = async () => {
+      try {
+        const res = await fetch(`${TASK_AGENT_API}/tasks/dynamic/active?user_id=${user.user_id}`);
+        const data = await res.json();
+        if (data.task_id) setDynTask(data);
+      } catch {}
+    };
+    poll();
+    const id = setInterval(poll, 5000);
+    return () => clearInterval(id);
+  }, [user]);
+
   if (loading || !user) return null;
 
   const dailyPts = dbDailyCompleted * PTS_PER_TASK;
 
+  const handleDynUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !dynTask) return;
+    e.target.value = "";
+    setDynUploading(true);
+    try {
+      // Save title before clearing task
+      const savedTitle = dynTask.task_content?.title || "Chase the golden hour";
+
+      // 1. Baseline points
+      const beforePts = await fetch(`${TASK_AGENT_API}/points/summary?user_id=${user.user_id}`)
+        .then(r => r.json()).catch(() => ({ total_points: 0 }));
+
+      // 2. Upload photo
+      const form = new FormData();
+      form.append("photo", file);
+      const upRes = await fetch(
+        `${TASK_AGENT_API}/tasks/dynamic/${dynTask.task_id}/upload-photo?user_id=${user.user_id}`,
+        { method: "POST", body: form }
+      );
+      if (!upRes.ok) throw new Error("Upload failed");
+
+      // 3. Simulate arrival using destination coords
+      const dest = dynTask.task_content?.destination || dynTask.destination || {};
+      const lat = dest.lat ?? 1.3526;
+      const lng = dest.lng ?? 103.8352;
+      const arrRes = await fetch(
+        `${TASK_AGENT_API}/tasks/dynamic/${dynTask.task_id}/arrive?user_id=${user.user_id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat, lng }),
+        }
+      );
+      const arrData = await arrRes.json();
+      if (!arrData.passed) throw new Error("Arrival check failed");
+
+      // 4. Fetch updated points and compute earned
+      const ptsData = await fetch(`${TASK_AGENT_API}/points/summary?user_id=${user.user_id}`)
+        .then(r => r.json());
+      setDynEarned(ptsData.total_points - beforePts.total_points);
+      setDynPoints(ptsData.total_points);
+      setDynTitle(savedTitle);
+      setDynCompleted(true);
+      setDynTask(null);
+    } catch (err) {
+      setResultModal({ success: false, title: "Upload failed", message: err.message });
+    }
+    setDynUploading(false);
+  };
+
   const handleCardClick = (taskId) => {
-    if (taskId === "sunset") return;
     setExpandedId((prev) => (prev === taskId ? null : taskId));
   };
 
@@ -228,11 +291,102 @@ export default function TaskPage() {
     <div className="flex flex-col h-full bg-cream">
       <TopBar title={t("task_title")} transparent />
       <div className="flex-1 overflow-y-auto pb-4">
+        {/* Dynamic Quest Card */}
+        <div className="px-4 mt-2 mb-1">
+          <div className="rounded-2xl p-4" style={{ backgroundColor: "#F4BAC1" }}>
+            {dynCompleted ? (
+              /* Completed state */
+              <>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-white font-bold italic text-lg leading-tight">
+                    Chase the golden hour 🌅
+                  </p>
+                  <div className="w-8 h-8 rounded-full bg-white flex-shrink-0 ml-2" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-white text-xl">🌸</p>
+                  <div>
+                    <p className="text-white font-bold italic text-base">Quest Complete!</p>
+                    <p className="text-white/90 text-sm">
+                      {dynEarned != null ? `+${dynEarned} pts` : "+50 pts"}{" "}
+                      {dynPoints != null && <span className="text-white/70">· Total: {dynPoints} pts</span>}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : dynTask?.task_content?.title ? (
+              /* Active — copy ready */
+              <>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-white text-xs font-semibold uppercase tracking-wide opacity-80">
+                    Your quest for today ✨
+                  </p>
+                  <div className="w-8 h-8 rounded-full bg-white flex-shrink-0" />
+                </div>
+                <p className="text-white font-bold italic text-lg leading-tight">
+                  {dynTask.task_content.title} 🌅
+                </p>
+                <p className="text-white/90 text-sm mt-2 mb-3">
+                  {dynTask.task_content.body}
+                </p>
+                <button
+                  disabled={dynUploading}
+                  onClick={() => dynFileRef.current?.click()}
+                  className="px-5 py-2 rounded-full text-sm font-semibold text-white flex items-center gap-2"
+                  style={{ backgroundColor: dynUploading ? "#c08890" : "#e89098" }}
+                >
+                  {dynUploading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                      Logging...
+                    </>
+                  ) : "📸 Log Proof"}
+                </button>
+              </>
+            ) : dynTask ? (
+              /* Task exists but copy not ready yet */
+              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 py-1 flex-1">
+                <svg className="animate-spin h-5 w-5 text-white/70 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                <div>
+                  <p className="text-white font-semibold text-sm italic">Chase the golden hour 🌅</p>
+                  <p className="text-white/70 text-xs mt-0.5">Personalising your quest...</p>
+                </div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white flex-shrink-0" />
+              </div>
+            ) : (
+              /* Locked — no task yet */
+              <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-white font-bold italic text-base">Chase the golden hour 🌅</p>
+                <p className="text-white/80 text-sm mt-1 mb-3">
+                  Your personalised quest will appear once today's activity triggers the system 🌿
+                </p>
+                <button
+                  disabled
+                  className="px-5 py-2 rounded-full text-sm font-semibold opacity-40"
+                  style={{ backgroundColor: "#e89098", color: "white" }}
+                >
+                  📸 Log Proof
+                </button>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white flex-shrink-0 mt-1" />
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Card Stack */}
         <div className="px-4 mt-2">
           {TASKS.map((task) => {
-            const isExpanded =
-              task.id === "sunset" || expandedId === task.id;
+            const isExpanded = expandedId === task.id;
             const isCompleted = completedTasks.has(task.id);
 
             return (
@@ -547,6 +701,14 @@ export default function TaskPage() {
         capture="environment"
         className="hidden"
         onChange={handleFileChange}
+      />
+      <input
+        ref={dynFileRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleDynUpload}
       />
     </div>
   );

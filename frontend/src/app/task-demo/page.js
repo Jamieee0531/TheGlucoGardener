@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import TopBar from "../../components/TopBar";
 
 const API = "http://localhost:8001";
@@ -24,6 +25,7 @@ export default function TaskDemoPage() {
   const [profile, setProfile] = useState(null);  // loaded from DB
 
   const pollRef = useRef(null);
+  const router = useRouter();
 
   const addLog = (msg) => setLog((prev) => [...prev, msg]);
 
@@ -150,16 +152,6 @@ export default function TaskDemoPage() {
         body: JSON.stringify({ park_index: parkIndex }),
       });
 
-      // Auto-upload a fake photo to advance past photo_required
-      addLog("📸 Auto-uploading proof photo...");
-      const fakeJpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, ...new Array(50).fill(0)]);
-      const form = new FormData();
-      form.append("photo", new Blob([fakeJpeg], { type: "image/jpeg" }), "proof.jpg");
-      await fetch(`${API}/tasks/dynamic/${taskId}/upload-photo?user_id=${USER_ID}`, {
-        method: "POST",
-        body: form,
-      });
-
       setSelectedPark(park);
       addLog("⏳ Writer generating task copy via SEA-LION...");
       setStep(3);
@@ -208,32 +200,10 @@ export default function TaskDemoPage() {
 
   useEffect(() => () => clearInterval(pollRef.current), []);
 
-  // ── Step 4: Simulate arrival ──────────────────────────────────────────────
-  async function handleArrive() {
-    setLoading(true);
-    setError(null);
-    try {
-      addLog(`📍 Simulating arrival at "${selectedPark.name}"...`);
-      const res = await fetch(`${API}/tasks/dynamic/${taskId}/arrive?user_id=${USER_ID}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat: selectedPark.lat, lng: selectedPark.lng }),
-      });
-      const data = await res.json();
-      if (!data.passed) throw new Error("Arrival check failed: " + JSON.stringify(data));
-
-      addLog("🎉 Arrival verified!");
-
-      const pts = await fetch(`${API}/points/summary?user_id=${USER_ID}`);
-      const ptsData = await pts.json();
-      setPoints(ptsData.total_points);
-      addLog(`🌸 Total points: ${ptsData.total_points}`);
-      setStep(5);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
+  // ── Step 4: Go to Task page to upload proof ──────────────────────────────
+  function handleGoToTask() {
+    addLog("📲 Redirecting to Task page to upload proof photo...");
+    router.push("/task");
   }
 
   function handleReset() {
@@ -388,37 +358,23 @@ export default function TaskDemoPage() {
           </div>
         )}
 
-        {/* Step 4: Arrive button */}
+        {/* Step 4: Go to Task page */}
         {step === 4 && selectedPark && (
           <div className="bg-white rounded-2xl p-4 shadow-sm mb-3">
-            <p className="text-sm text-gray-600 mb-3">
-              Simulate {profile?.name ?? "user"} arriving at <strong>{selectedPark.name}</strong>
+            <p className="text-sm text-gray-600 mb-1">
+              Your quest is ready! Head to <strong>{selectedPark.name}</strong> and log your proof photo.
             </p>
+            <p className="text-xs text-gray-400 mb-3">Task page will show your personalised quest.</p>
             <button
-              onClick={handleArrive}
-              disabled={loading}
+              onClick={handleGoToTask}
               className="w-full py-3 rounded-full text-white font-bold text-sm"
-              style={{ backgroundColor: "#8bc34a" }}
+              style={{ backgroundColor: "#7bb5e0" }}
             >
-              {loading ? "Checking..." : "📍 Simulate Arrival"}
+              📲 View Quest in Task Page
             </button>
           </div>
         )}
 
-        {/* Step 5: Done */}
-        {step === 5 && (
-          <div className="bg-[#c8e6a0] rounded-2xl p-5 shadow-sm mb-3 text-center">
-            <p className="text-3xl mb-1">🌸</p>
-            <p className="font-bold text-gray-800">Task Complete!</p>
-            <p className="text-sm text-gray-600 mt-1">+50 pts awarded · Total: <strong>{points} pts</strong></p>
-            <button
-              onClick={handleReset}
-              className="mt-4 px-6 py-2 rounded-full text-sm font-semibold text-gray-600 bg-white/70"
-            >
-              ↩ Run Again
-            </button>
-          </div>
-        )}
 
         {/* Error */}
         {error && (
