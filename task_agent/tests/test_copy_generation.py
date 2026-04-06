@@ -5,7 +5,7 @@ These tests make real HTTP calls to the SEA-LION API.
 Run them manually to verify the LLM pipeline end-to-end.
 
 Run with:
-    pytest tests/task_agent/test_copy_generation.py -v -s -m integration
+    pytest task_agent/tests/test_copy_generation.py -v -s -m integration
 """
 import pytest
 from task_agent.agent.graph import copy_subgraph
@@ -89,8 +89,6 @@ async def test_writer_low_bg_scenario():
     print(f"\n  body: {content.get('body')}")
 
     assert "_fallback_reason" not in content
-    # Advisor sets snack = "15g fast carbs (e.g. banana slices)" when BG < 4.5
-    # Writer should weave it in naturally
     body = content.get("body", "").lower()
     assert any(word in body for word in ["snack", "banana", "carb", "eat", "grab"]), (
         "Low BG scenario: expected snack mention in copy"
@@ -115,7 +113,6 @@ async def test_writer_chinese_output():
 
     assert "_fallback_reason" not in content
     body = content.get("body", "")
-    # Check for Chinese characters
     assert any('\u4e00' <= c <= '\u9fff' for c in body), (
         "Expected Chinese characters in body when language_pref=zh-CN"
     )

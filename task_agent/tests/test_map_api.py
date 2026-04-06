@@ -5,7 +5,7 @@ These tests make real HTTP calls — run them manually to verify API connectivit
 They are excluded from the default test suite via the `integration` mark.
 
 Run with:
-    pytest tests/task_agent/test_map_api.py -v -s -m integration
+    pytest task_agent/tests/test_map_api.py -v -s -m integration
 """
 import pytest
 from task_agent.agent.map_tool import find_nearby_parks

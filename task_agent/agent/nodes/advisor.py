@@ -54,7 +54,6 @@ async def advisor_node(state: AgentState) -> Dict[str, Any]:
         "exercise_type": "walking",
         "duration_min": duration_min,
         "intensity": intensity,
-        "personalized_tip": None,
         "snack_before_exercise": snack,
         "confidence": confidence,
         "reasoning": "; ".join(reasoning_parts),
