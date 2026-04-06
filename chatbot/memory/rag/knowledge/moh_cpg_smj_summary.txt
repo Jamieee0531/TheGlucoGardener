@@ -1,0 +1,1378 @@
+Singapore Med J 2014; 55(6): 334-347
+doi: 10.11622/smedj.2014079
+Clinical Practice Guidelines
+
+List of institutions in alphabetical order
+Changi General Hospital, Gleneagles Medical Centre, Khoo Teck Puat Hospital, KK Women’s and Children’s Hospital, Raffles Hospital, Singapore General Hospital, Singapore
+National Eye Centre, SingHealth Polyclinics, Ministry of Health, National Healthcare Group (HQ), National University Health System, TOUCH Community Services
+Correspondence: Dr Goh Su Yen, Senior Consultant, Department of Endocrinology, Singapore General Hospital, Outram Road, Singapore 169608. goh.su.yen@sgh.com.sg
+1.1  Objectives and scope of guideline
+The first edition of the MOH clinical practice guidelines on
+diabetes mellitus for Singapore was published in 1999. Since that
+time, more facts about this important condition have emerged,
+not only with regard to its diagnosis and treatment, but also about
+whether or not type 2 diabetes may be prevented, and, if so, how
+this may be achieved.
+As diabetes mellitus has great public health significance in
+developed countries and developing nations alike, managing it
+properly involves a consideration, not just of clinical issues, but
+also of health economics. This second edition of the guidelines
+attempts to address some of these complex issues wherever
+evidence-based information pertaining to them is available.
+1.2  Target group
+The main aim of these guidelines is to help physicians make
+sound clinical decisions about diabetes mellitus by presenting
+up-to-date information about diagnosis, classification, treatment,
+outcomes, and follow-up.
+These guidelines are developed for all health care professionals
+in Singapore. We hope they would be helpful especially to
+primary care physicians who care for patients with diabetes
+mellitus.
+1.3  Guideline development
+These guidelines have been produced by a committee of
+endocrinologists, family practitioners and primary care
+specialists, ophthalmologist, dietitian, social worker,
+and patient representative, appointed by the Ministry of
+Health. They were developed by the adaptation of existing
+guidelines, by the review of relevant literature and by expert
+clinical consensus with consideration of local practice. The
+guidance does not override the individual responsibility of
+healthcare professionals to make decisions appropriate to the
+circumstances of the individual patient, in consultation with
+the patient and/or guardian or carer.
+1.4  What’s new in the revised guidelines
+The following is a list of the major revisions and additions to the
+previous guidelines:
+•
+In Chapter 3, we have explained the rationale for criteria in
+diagnosing diabetes. In particular, for asymptomatic patients
+with a first test that meets criteria, we have attempted to
+provide more clarity on how to choose a second test, and
+how to interpret the findings.
+•
+Chapter 4 is a new chapter which brings emphasis to two
+areas contributing towards positive outcomes in diabetes
+care: diabetes self-management education, and psychosocial
+assessment and holistic care of the person with diabetes.
+•
+Chapter 5 on pharmacotherapy in diabetes mellitus has been
+updated to take into account recent clinical trial evidence of
+the efficacy of the newer classes of pharmacological agents.
+•
+Chapter 6 focuses on glycaemic control, and emphasizes
+the importance of individualised targets, balancing the
+benefits of achieving targets without incurring undue risk of
+hypoglycaemia or other adverse effects, and considering the
+risk profile of the patient.
+•
+In Chapter  7 on prevention of cardiovascular disease in
+diabetes mellitus, recommendations on decision-making in
+the area of therapeutics have been updated and harmonised
+with current local guidance on lipid, blood pressure
+and cardiovascular management. Target blood pressure
+CMEArticle
+Ministry of Health Clinical Practice Guidelines:
+Diabetes Mellitus
+Su Yen Goh, Seng Bin Ang, Yong Mong Bee, Richard YT Chen, Daphne Gardner, Emily Ho, Kala Adaikan, Alvin Lee,
+Chung Horn Lee, Fong Seng Lim, Hwee Boon Lim, Su Chi Lim, Julie Seow, Abel Wah Ek Soh, Chee Fang Sum,
+E Shyong Tai, Ah Chuan Thai, Tien Yin Wong, Fabian Yap
+ABSTRACT The Ministry of Health (MOH) have updated the clinical practice guidelines on Diabetes Mellitus to provide
+doctors and patients in Singapore with evidence-based treatment for diabetes mellitus. This article reproduces the
+introduction and executive summary (with recommendations from the guidelines) from the MOH clinical practice guidelines
+on Diabetes Mellitus, for the information of SMJ readers. Chapters and page numbers mentioned in the reproduced
+extract refer to the full text of the guidelines, which are available from the Ministry of Health website: http://www.moh.
+gov.sg/content/moh_web/healthprofessionalsportal/doctors/guidelines/cpg_medical.html. The recommendations should
+be used with reference to the full text of the guidelines. Following this article are multiple choice questions based on
+the full text of the guidelines.
+
+Clinical Practice Guidelines
+
+ranges and LDL levels are discussed, as well as the role of
+antiplatelet therapy.
+•
+Chapter  8 on prevention and management of diabetic
+nephropathy has been revised to present recent clinical
+trial evidence regarding the efficacy of, and indications for,
+the use of angiotensin-converting enzyme inhibitors and
+angiotensin receptor blockers.
+•
+Chapter  9 on the prevention and management of eye
+complications has been updated to include developments
+such as intravitreal injection of anti-vascular endothelial
+growth factor in patients with diabetic macular oedema.
+•
+Chapter  11 on pre-gestational and gestational diabetes has
+been updated. Women at high risk for gestational diabetes,
+but who are not found to have glucose intolerance in early
+pregnancy, are now recommended to be re-evaluated with a
+75 gram OGTT at 24–28 weeks gestation.
+•
+Chapter 13 is a new chapter outlining key principles in the
+management of the adult with type 1 diabetes, relevant to
+the primary care healthcare professional.
+1.5  Review of guidelines
+Evidence-based clinical practice guidelines are only as current
+as the evidence that supports them. Users must keep in mind
+that new evidence could supersede recommendations in these
+guidelines. The workgroup advises that these guidelines be
+scheduled for review four years after publication, or earlier if new
+evidence emerges that necessitates substantive changes to the
+recommendations.
+Future revisions may include management of hypoglycaemia
+in persons with diabetes, and evolving areas like bariatric surgery
+and pancreas/islet cell transplantation.
+EXECUTIVE SUMMARY OF RECOMMENDATIONS
+Details of the recommendations listed can be found in the main
+text as the pages indicated.
+Diagnosis and screening of diabetes mellitus in Singapore
+D     In patients with hyperglycaemic crisis, diabetes mellitus
+can be diagnosed without further testing (pg 42).
+Grade D, Level 4
+B     In patients with typical symptoms, diabetes mellitus can
+be diagnosed if any one of the following is present.
+
+  1.	 Casual plasma glucose >11.1 mmol/l
+
+  2.	 Fasting plasma glucose >7.0 mmol/l
+
+  3.	 2-hour post-challenge plasma glucose >11.1 mmol/l
+Other individuals should have a repeat test on a subsequent
+day (pg 42).
+Grade B, Level 2++
+D    When two different tests are available for the same patient
+and the results for both tests are above the diagnostic
+thresholds, the diagnosis of diabetes is confirmed (pg 42).
+Grade D, Level 4
+D    When two different tests are available in an individual and
+the results are discordant, the test whose result is above the
+diagnostic cut point (usually the fasting plasma glucose or
+2-hour post-challenge glucose) should be repeated (pg 42).
+Grade D, Level 4
+D    Fasting plasma glucose measured in an accredited
+laboratory is the preferred test for the diagnosis of
+diabetes mellitus (pg 43).
+Grade D, Level 4
+B     All subjects with fasting plasma glucose from 6.1 to
+6.9 mmol/l should undergo a 75 g oral glucose tolerance
+test to determine if they have impaired glucose tolerance
+or diabetes mellitus (pg 43).
+Grade B, Level 2++
+D    If a second test fails to confirm the diagnosis, barring
+a laboratory error, such patients are likely to have test
+results near the margins of the threshold for a diagnosis.
+The healthcare professional might opt to follow the patient
+closely and repeat the testing in 6–12 months (pg 43).
+Grade D, Level 4
+GPP  HbA1c is not recommended as a screening and diagnostic
+tool for diabetes mellitus until its performance in our multiethnic population has been evaluated (pg 43).
+GPP
+B     Intermediate states of glucose metabolism termed impaired
+fasting glucose and impaired glucose tolerance should be
+recognised as defined in Table 1 (pg 46).
+Grade B, Level 2++
+D    Screening should be considered in adults of any age who
+have one or more risk factors for diabetes. In those without
+risk factors, testing should begin at 40 years (pg 47).
+Grade D, Level 4
+D    Subsequently, screening should be carried out every three
+years for those with normal glucose tolerance and annually
+for those with impaired fasting glycaemia (IFG) or impaired
+glucose tolerance (IGT) (pg 47).
+Grade D, Level 4
+Lifestyle modification
+D    Individuals who have diabetes should receive individualised
+medical nutritional therapy as needed to achieve treatment
+goals, preferably provided by a dietitian familiar with the
+components of diabetes medical nutrition therapy (pg 49).
+Grade D, Level 4
+GPP  Special attention should be paid to the diabetic patient’s
+dietary requirements during periods of sickness, fasting,
+travel and exercise (pg 49).
+GPP
+
+Clinical Practice Guidelines
+
+D    A diet for diabetes should contain a good balance of
+carbohydrate, protein and fat, adjusted to meet the
+individual’s metabolic goals and preferences (pg 50).
+Grade D, Level 4
+D    Individualised meal planning for diabetes should include
+optimisation of food choices to meet recommended dietary
+allowance for all micronutrients, providing adequate
+vitamins and minerals (pg 50).
+Grade D, Level 4
+B     Meal and snack carbohydrate intake for diabetes should
+be consistently distributed throughout the day, on a day to
+day basis, as consistency in carbohydrate intake has been
+shown to result in improved glycaemic control (pg 50).
+Grade B, Level 2+
+D    Consumption of macronutrients is based on recommended
+dietary allowance (RDA) for healthy eating; 50–60% of
+total energy from carbohydrates should be encouraged
+(pg 50).
+Grade D, Level 4
+B    If weight reduction is needed, it should be attempted gradually
+(0.25 to 1.0 kg/week). In overweight or obese patients with
+type 2 diabetes, a weight loss of 5–10% of body weight
+achieved through lifestyle interventions is a realistic goal
+(pg 51).
+Grade B, Level 2+
+D    Dietary protein intake of approximately 15–20% of daily
+energy intake is appropriate for most patients with type 2
+diabetes (pg 51).
+Grade D, Level 4
+D    It is recommended that total calories from fat intake be kept
+to <30% of total calorie intake in diabetic patients (pg 51).
+Grade D, Level 4
+D    Trans fats should be limited to 1% of total energy intake
+and cholesterol intake (<200 mg daily) to reduce risk
+for cardiovascular disease. These goals are similar for
+individuals with pre-existing cardiovascular disease
+(pg 52).
+Grade D, Level 4
+B     Recommendations for fibre intake for people with
+diabetes are similar to the recommendation for the general
+population. A daily consumption of a diet containing
+20–35 g of dietary fibre from a wide variety of food sources
+is recommended (pg 52).
+Grade B, Level 2+
+D    Sodium intake should be restricted to <2 g per day for
+diabetic individuals with hypertension (pg 52).
+Grade D, Level 4
+D    Diabetes patients with poor glycaemic control or are
+overweight should abstain from alcohol. If individuals choose
+to drink, intake should be limited to a moderate amount, as per
+the general population (no more than two drinks for women
+per day and no more than three drinks per day for men) (pg 52).
+Grade D, Level 4
+B     Individuals who choose to use non-nutritive sweeteners
+should be advised that some of these products might
+contain energy and carbohydrate from sources that might
+need to be accounted for (pg 52).
+Grade B, Level 2+
+D    For exercise more vigorous than brisk walking, a preexercise physician evaluation is recommended for
+individuals with diabetes to identify cardiovascular risks
+and any complications of severe neuropathy or severe
+diabetic retinopathy that may contraindicate certain
+activities and predispose to injury (pg 53).
+Grade D, Level 4
+D    Individuals with severe proliferative diabetic retinopathy
+should avoid activities that greatly increase intraocular
+pressure and risk of haemorrhage (pg 54).
+Grade D, Level 3
+B     Individuals with peripheral neuropathy and without acute
+ulceration may participate in moderate weight-bearing
+exercise. Comprehensive foot care, use of appropriate
+footwear and daily foot check is recommended (pg 54).
+Grade B, Level 2+
+B     Individuals with type 2 diabetes should undertake at least
+150 mins/week of moderate to vigorous aerobic exercise
+spread out during at least 3 days of the week, with no more
+than 2 consecutive days between bouts of exercise (pg 54).
+Grade B, Level 1+
+D    Individuals with diabetes, especially those on insulin
+treatment or secretagogues, may require medication dose
+adjustments and should receive specific education on the
+prevention of exercise induced hypoglycaemia (pg 55).
+Grade D, Level 4
+C    Individuals with diabetes should be encouraged to stop
+smoking (pg 55).
+Grade C, Level 3
+B     People with diabetes should receive Diabetes SelfManagement Education (DSME) when their diabetes is
+diagnosed and as needed thereafter (pg 57).
+Grade B, Level 2+
+D    Assessment of psychological and social wellbeing should
+be included as an ongoing part of diabetes management
+(pg 59).
+Grade D, Level 4
+
+Clinical Practice Guidelines
+
+D    Clinicians should provide the following psychosocial
+support to patients during the diagnosis phase of diabetes
+management:
+
+  •	 Provide medical information and psychological support.
+
+  •	 Be accessible and sensitive to patient’s needs.
+
+  •	 Provide information and repeat if necessary as they
+may not retain much at this stage.
+
+  •	 Introduce to other patients to get them support and an
+accepting environment
+
+  •	 Involve other family members if necessary (pg 59).
+Grade D, Level 4
+D    Clinicians should provide the following psychosocial
+support to patients during the maintenance phase of
+diabetes management:
+
+  •	 Motivate patient and family to maintain optimal
+control
+
+  •	 Create an individualised workable regimen and help
+patient adhere to it
+
+  •	 Ensure good support from diabetes team
+
+  •	 Check for signs of diabetes burnout
+
+  •	 Consider educational intervention
+
+  •	 Follow up and review behavioural changes
+
+  •	 Modify treatment if necessary (pg 60).
+Grade D, Level 4
+D    Clinicians should provide the following psychosocial
+support to patients during the complications phase of
+diabetes management:
+
+  •	 Giving them the space to vent and providing them
+with a lot of realistic reassurance is important
+
+  •	 Do not overwhelm with information but allow for
+grieving first
+
+  •	 Gentle motivation to encourage patients to maintain
+adherence to treatment regimen and possibly revising
+some of the information or education will be helpful
+
+  •	 Counselling is important but needs to be timely (pg 60).
+Grade D, Level 4
+D    Patients with diabetes should be encouraged to find
+support from other persons and families living with
+diabetes and community programmes which reinforces
+diabetes education and promotes living well with diabetes.
+These community based programmes provide a safe and
+accepting environment for learning and sharing with others
+who live with the same condition (pg 60).
+Grade D, Level 4
+Pharmacotherapy
+B     Long-acting sulphonylureas e.g., chlorpropamide and
+glibenclamide, carry a high risk of hypoglycaemia and
+are not recommended (pg 62).
+Grade B, Level 2++
+A    Patients with type 2 diabetes may initially be treated with
+lifestyle modification (diet and exercise) unless they are
+symptomatic or severely hyperglycaemic (i.e. random blood
+glucose >15 mmol/l or fasting blood glucose >10 mmol/l) –
+in which case pharmacological therapy should be initiated
+together with lifestyle intervention (pg 63).
+Grade A, Level 1+
+A    Oral glucose lowering agents should be started if glycaemic
+targets are not achieved in a timely and appropriate
+manner (pg 63).
+Grade A, Level 1+
+A    If glycaemic targets are not reached with a single oral agent,
+combination therapy with one or more agents (including
+insulin) from other classes may be considered. However,
+one would need to monitor carefully for adverse events
+such as hypoglycaemia or fluid retention (pg 63).
+Grade A, Level 1+
+A    Insulin therapy should be considered, if optimal
+combination therapy fails to attain target control
+(i.e., 2 consecutive HbA1c values failed to reach ≤ 8%
+over 3–6 months interval) (pg 63).
+Grade A, Level 1+
+A    Metformin is usually considered first-line pharmacotherapy,
+and sulphonylureas/dipeptidyl peptidase 4 (DPP-IV)
+inhibitors/alpha-glucosidase inhibitors are reasonable
+alternatives as first-line pharmacotherapy (pg 64).
+Grade A, Level 1+
+A    For type 2 diabetes, two or more oral agents, or insulin
+therapy, either alone or in combination with oral agents,
+may be required (pg 64).
+Grade A, Level 1+
+A    For type  2 diabetes, other oral agents are acceptable
+alternatives to metformin as initial monotherapy, if the
+person does not tolerate metformin, or where metformin
+is contraindicated (pg 64).
+Grade A, Level 1+
+A    In the setting of severely uncontrolled type 2 diabetes
+(for example, HbA1c >10%, random glucose levels
+consistently above 16.7mmol/L), the presence of
+ketonuria, or symptomatic diabetes with polyuria,
+polydipsia and weight loss, insulin therapy in combination
+with lifestyle intervention may be the initial treatment of
+choice (pg 64).
+Grade A, Level 1+
+D    In elderly patients, initiating therapy with low-dose, shortacting oral glucose lowering agents is recommended
+(pg 65).
+Grade D, Level 4
+
+Clinical Practice Guidelines
+
+D    Metformin is usually contraindicated in the presence of
+severe renal or hepatic insufficiency as it may be associated
+with lactic acidosis (pg 65).
+Grade D, Level 4
+D    It is advisable to use metformin with caution in those at risk
+of a sudden deterioration in renal function and those with
+eGFR <45ml/min/1.73m2 and to cease metformin usage if
+the eGFR is below 30ml/min/1.73m2 (pg 65).
+Grade D, Level 4
+D    Metformin must be used with care in the presence of comorbid conditions which increase the risk of lactic acidosis
+(e.g., class III or IV cardiac failure) (pg 66).
+Grade D, Level 4
+D    Thiazolidinediones (in particular, rosiglitazone) are
+contraindicated in patients with acute coronary syndrome,
+ischaemic heart disease, and all classes of heart failure
+(including New York Heart Association (NYHA) Functional
+Classification Class I/II heart failure patients) and are also
+not recommended for use in patients with peripheral arterial
+disease (pg 66).
+Grade D, Level 4
+GPP   Treatment choices should be individualised and culturally
+appropriate, and patients should have the opportunity to
+make informed decisions on their care and treatment options,
+in partnership with their healthcare providers (pg 67).
+GPP
+D    The use of exenatide is not recommended in type  2
+diabetes patients with a history of pancreatitis (pg 68).
+Grade D, Level 4
+A    All patients with type 1 diabetes must receive insulin.
+Multiple daily injections (3 or more) or the use of
+continuous subcutaneous insulin infusion (CSII or insulin
+pump therapy) may be required to achieve target glucose
+levels (pg 68).
+Grade A, Level 1+
+D    Patients on insulin must be equipped not only with the
+skills of insulin administration, but also should be educated
+on self-monitoring of blood glucose, hypoglycaemia
+management, matching of insulin dose and carbohydrate
+intake, and dose adjustments during sick days, travel,
+exercise, and changes in food intake (pg 68).
+Grade D, Level 4
+B     Insulin therapy should be managed with relevant
+and regular insulin and hypoglycaemia-related selfmanagement training with the common goal of improved
+glycaemic control and reduction in risk of severe
+hypoglycaemia (pg 69).
+Grade B, Level 2++
+D    In type 2 diabetes, introduction of insulin should not be
+delayed if metabolic control becomes suboptimal. This
+may be initiated as a bedtime dose of intermediate-acting
+or long-acting insulin with maintenance of oral agents
+during the day (pg 75).
+Grade D, Level 4
+D    When glycaemic control is not achieved despite the
+addition of basal insulin to oral agents, discontinuing
+sulphonylureas and switching to premixed twice daily
+or basal-bolus insulin regimens becomes necessary.
+However, metformin and a-glucosidase inhibitors may
+still be used in conjunction with exogenous insulin to
+attenuate the insulin dose. Fine-tuning of insulin doses
+is best determined by home blood glucose monitoring.
+Patients with type 2 diabetes who are switched to insulin
+therapy temporarily during episodes of acute stress,
+such as sepsis, may be put back on oral agents when
+their glycaemic control improves with declining insulin
+resistance and glucotoxicity (pg 75).
+Grade D, Level 4
+Glycaemic control: assessment and targets
+B     Self-monitoring of blood glucose is recommended for
+patients with type 1 or type 2 diabetes who are using
+insulin (pg 77).
+Grade B, Level 2++
+D    Self-monitoring of blood glucose should be considered in
+the following groups of patients with type 2 diabetes who
+are not treated with insulin:
+
+  •	 Those at increased risk of developing hypoglycaemia
+or its consequences (e.g.,  patients who are using
+sulphonylureas)
+
+  •	 Those pregnant patients with pre-existing diabetes or
+gestational diabetes
+
+  •	 Those experiencing acute illness
+
+  •	 Those who have failed to achieve glycaemic goals
+
+  •	 Those undergoing fasting, for example, during Ramadan
+(pg 78).
+Grade D, Level 4
+B     Self-monitoring of blood glucose should be carried out 3 or
+more times daily for patients with type 1 diabetes (pg 79).
+Grade B, Level 2++
+GPP   For patients with unstable metabolic control, changes in
+daily routine, alterations of treatment regimens or acute
+illness, the frequency of self-monitoring of blood glucose
+should be increased (pg 79).
+GPP
+GPP   Health care professionals should be familiar with the
+practical use of glucometers (pg 79).
+GPP
+
+Clinical Practice Guidelines
+
+B     To ensure optimal benefit from self-monitoring of blood
+glucose, patients must be educated on the interpretation
+of glucose levels (pg 80).
+Grade B, Level 1+
+GPP   Periodic reviews are recommended to verify users’
+competency, together with comparisons between results
+from patient self-testing of blood glucose in the clinic and
+simultaneous laboratory testing (pg 80).
+GPP
+GPP   It is recommended that calibration checks of meters are
+periodically conducted using standard solutions according
+to the manufacturer’s recommendations (pg 80).
+GPP
+D    Continuous glucose monitoring (CGM) may be
+used as a supplemental tool to SMBG in patients
+with hypoglycaemia unawareness and/or frequent
+hypoglycaemic episodes (pg 81).
+Grade D, Level 3
+B    Self-monitoring of urine glucose is not recommended for
+monitoring of glycaemic status (pg 81).
+Grade B, Level 1+
+A    Ketone monitoring should be performed during sustained
+hyperglycaemia (e.g., blood glucose > 14.0 mmol/l) in
+patients with type  1 diabetes, especially during acute
+illness. Blood ketone monitoring is preferable to urine
+ketone monitoring (pg 81).
+Grade A, Level 1+
+D    Glycated haemoglobin (HbA1c) should be performed
+routinely in all patients with diabetes, at initial assessment
+and then as part of follow-up care (pg 82).
+Grade D, Level 4
+D    The measurement of HbA1c should be done in laboratories
+that utilise DCCT-aligned assays (DCCT - Diabetes Control
+and Complications Trial) (pg 83).
+Grade D, Level 4
+D    The following schedule is recommended for HbA1c testing
+in patients with diabetes:
+
+  •	 3-  to 4-monthly in patients with unstable glycaemic
+control, failure to meet treatment goals, recent
+adjustment in therapy, or intensive insulin therapy.
+
+  •	 6-monthly in patients who have stable glycaemic
+control and who are meeting treatment goals (pg 83).
+Grade D, Level 4
+B     HbA1c result should be made available at the time that the
+patient with diabetes is seen (pg 83).
+Grade B, Level 2++
+D    The targets of glycaemic control should be individualised
+(pg 83).
+Grade D, Level 4
+GPP   Patients should participate in the process of defining their
+targets of glycaemic control (See Table 6) (pg 84).
+GPP
+A    The HbA1c target for most non-pregnant adults with type 1
+or type 2 diabetes should be ≤7.0% or ≤53 mmol/mol
+(pg 84).
+Grade A, Level 1++
+B     Lowering HbA1c target to ≤6.5% or ≤47.5 mmol/mol may
+be considered for some patients with type 2 diabetes at
+doctor and patient judgement, if this can be achieved
+without significant hypoglycaemia. Such patients include
+those with short duration of diabetes, long life expectancy
+and no significant cardiovascular disease (pg 85).
+Grade B, Level 1+
+D    Less stringent HbA1c target (e.g.,  7.0 to 8.5% or
+53 mmol/mol to 69.4 mmol/mol) may be adopted for some
+patients vulnerable to the harmful effects associated with
+tight glycaemic control. Such patients include those with
+very long duration of diabetes, known history of severe
+hypoglycaemia, advanced atherosclerosis and advanced
+age (pg 85).
+Grade D, Level 4
+GPP   Doctors should be vigilant in preventing hypoglycaemia
+by reviewing treatment regimens in patients
+with near-normal HbA1c levels (e.g.,  <6.0% or
+42.1 mmol/mol), especially those treated with insulin
+or insulin secretagogues (pg 86).
+GPP
+Prevention of cardiovascular disease in people with
+diabetes mellitus
+GPP    The assessment of cardiovascular risk in persons with
+type 2 diabetes mellitus should include:
+History – which should include:
+
+  •	 Smoking
+
+  •	 Hypertension
+
+  •	 Pre-existing cardiovascular disease (including angina,
+myocardial infarction, stroke, PAD)
+
+  •	 Family history of premature coronary artery disease
+(non-modifiable).
+Physical examination – which should include:
+
+  •	 Assessment for peripheral vascular disease
+
+  •	 Measurement of blood pressure at every visit.
+Tests – which should include:
+
+  •	 Fasting serum lipids at or soon after diagnosis and at
+least annually
+
+  •	 Urine microalbumin or protein at least annually
+
+  •	 Serum creatinine and estimation of eGFR (See chapter 8)
+
+Clinical Practice Guidelines
+
+  •	 Electrocardiogram (resting) routinely at baseline.
+Subsequent ECG may be performed when clinically
+indicated (pg 88).
+GPP
+B     For patients with type  2 diabetes mellitus who have
+hypertension, an acceptable treatment-initiation and target
+blood pressure is <140/80 mm Hg (pg 91).
+Grade B, Level 2+
+B     An angiotensin-converting-enzyme (ACE) inhibitor or
+angiotensin receptor blocker (ARB) should be included as
+part of antihypertensive regimen for people with type 2
+diabetes requiring pharmacotherapy for hypertension,
+unless not well tolerated (pg 93).
+Grade B, Level 2+
+D    All persons with type 2 diabetes mellitus should have
+a full lipid profile, including low density lipoprotein
+(LDL) cholesterol, fasting triglyceride and high density
+lipoprotein (HDL) cholesterol, measured at the time of
+diagnosis. These should be obtained after 10–12 hours
+of fasting (pg 96).
+Grade D, Level 4
+D    If optimal, serum lipids should be measured 12-monthly
+in persons with type 2 diabetes (pg 96).
+Grade D, Level 4
+D    The majority of patients with type 2 diabetes mellitus should
+have a primary low density lipoprotein (LDL) cholesterol
+goal <2.6 mmol/L and should receive medical nutrition
+and pharmacological therapy to achieve this goal (pg 96).
+Grade D, Level 4
+D     Patients with diabetes who have overt cardiovascular
+disease and/or chronic kidney disease but are not on
+maintenance hemodialysis should have low density
+lipoprotein (LDL) cholesterol lowered with combination
+of dietary and pharmacological means to a target of <2.1
+mmol/L (pg 96).
+Grade D, Level 4
+D    When making a therapeutic decision with the patient,
+the potential benefits of adding/increasing lipid-lowering
+pharmacological treatment, needs to be considered
+together with the potential risks of such treatment (pg 96).
+Grade D, Level 4
+D    For most patients with type 2 diabetes mellitus where low
+density lipoprotein (LDL) cholesterol is >2.6 mmol/L, an
+HMG CoA reductase inhibitor (statin) should be started
+concurrently with therapeutic lifestyle modification (pg 97).
+Grade D, Level 4
+D    It is reasonable to initiate low dose aspirin for primary
+prevention in people with diabetes and no previous
+history of vascular disease at age 50 years for men, and
+60 years for women, provided they also have at least
+one more of the following cardiovascular risk factors:
+smoking, hypertension, dyslipidaemia, family history
+of premature cardiovascular disease and albuminuria
+(pg 99).
+Grade D, Level 4
+GPP   In the presence of aspirin allergy, other antiplatelet agents
+such as clopidogrel (75 mg per day) may be a reasonable
+alternative for patients with high risk (pg 99).
+GPP
+Diabetic nephropathy – screening and treatment
+D    It is recommended to perform an annual test to assess
+urine albumin excretion in type 1 diabetic patients with
+diabetes duration of 5 years and in all type 2 diabetic
+patients, starting at diagnosis (pg 101).
+Grade D, Level 4
+D    Measure serum creatinine at least annually in all adults
+with diabetes (regardless of the degree of urine albumin
+excretion) is recommended. The serum creatinine should
+be used to estimate glomerular filtration rate (GFR)
+and stage the level of chronic kidney disease (CKD), if
+present (pg 102).
+Grade D, Level 4
+C     It is only recommended to estimate renal function with
+the Modification of Diet in Renal Disease (MDRD)
+equation when eGFR is below 60  mls/min/1.73m2
+(pg 103).
+Grade C, Level 2+
+A    To reduce the risk or slow the progression of nephropathy,
+optimised glucose control is recommended (pg 104).
+Grade A, Level 1+
+A    To reduce the risk or slow the progression of nephropathy,
+optimised blood pressure control is recommended
+(pg 104).
+Grade A, Level 1+
+A    It is recommended that in the treatment of the nonpregnant patient with micro-  or macroalbuminuria,
+either angiotensin-converting enzyme (ACE) inhibitors
+or angiotensin receptor blockers (ARBs) should be used
+(pg 105).
+Grade A, Level 1+
+A    In patients with type 1 diabetes, with hypertension and any
+degree of albuminuria, angiotensin-converting enzyme
+(ACE) inhibitors are recommended (pg 105).
+Grade A, Level 1+
+A    In patients with type  2 diabetes, hypertension, and
+microalbuminuria, angiotensin-converting enzyme (ACE)
+
+Clinical Practice Guidelines
+
+inhibitors or angiotensin receptor blockers (ARBs) are
+recommended (pg 105).
+Grade A, Level 1+
+A    In patients with type  2 diabetes, hypertension,
+macroalbuminuria, and renal insufficiency (serum
+creatinine >1.5  mg/dl), angiotensin receptor blockers
+(ARBs) are recommended (pg 105).
+Grade A, Level 1+
+D    In patients with diabetes, if one class [either angiotensinconverting enzyme (ACE) inhibitors or angiotensin receptor
+blockers (ARBs)] is not tolerated, the other should be
+substituted (pg 105).
+Grade D, Level 4
+D    When angiotensin-converting enzyme (ACE) inhibitors,
+angiotensin receptor blockers (ARBs) or diuretics are
+used, it is recommended to monitor serum creatinine
+and potassium levels for the development of acute kidney
+disease and hyperkalemia (pg 106).
+Grade D, Level 4
+A    To reduce the risk or slow the progression of nephropathy,
+optimised lipid control is recommended (pg 106).
+Grade A, Level 1+
+A    Reduction of protein intake to 0.8–1.0 g per kg body wt
+per day in individuals with diabetes and earlier stages of
+chronic kidney disease (CKD) and to 0.8 g per kg body
+wt per day in the later stages of CKD is recommended
+to improve measures of renal function (urine albumin
+excretion rate, GFR) (pg 107).
+Grade A, Level 1+
+A    It is recommended to consider a low-dose aspirin in diabetic
+individuals with a history of vascular disease (pg 107).
+Grade A, Level 1+
+D    It is recommended to consider low-dose aspirin in diabetic
+individuals who carry significant cardiovascular risk
+burden (pg 107).
+Grade D, Level 4
+D    Continual monitoring of urine albumin excretion to assess
+both response to therapy and progression of disease is
+recommended for both type 1 and type 2 diabetes patients
+(pg 108).
+Grade D, Level 4
+D    It is recommended that when estimated GFR (eGFR) is
+<60  ml.min/1.73 m2, evaluate and manage potential
+complications of Chronic Kidney Disease (CKD) (pg 108).
+Grade D, Level 4
+D    It is recommended to consider referral to a physician
+experienced in the care of kidney disease when there is
+uncertainty about the etiology of kidney disease (heavy
+proteinuria, active urine sediment, absence of retinopathy,
+rapid decline in GFR), difficult management issues, or
+advanced kidney disease (pg 108).
+Grade D, Level 4
+Prevention and management of eye complications
+D    All patients diagnosed with diabetes require regular
+visual acuity assessment and eye examinations by trained
+personnel to screen for diabetic retinopathy using a test of
+adequate sensitivity (pg 110).
+Grade D, Level 4
+D    Retinal screening preferably using retinal photography
+or direct ophthalmoscopy (if retinal photography is not
+available) through dilated pupils is recommended (pg 110).
+Grade D, Level 4
+D    Type 1 diabetic patients should have an eye examination
+3–5 years after diagnosis of diabetes, and at least once
+yearly subsequently. Type 2 diabetic patients should have
+an ocular assessment at the time of diagnosis and at least
+once yearly subsequently (pg 111).
+Grade D, Level 4
+D    Women with diabetes mellitus who intend to have
+children should preferably have an eye examination
+prior to conception, followed by one during the early
+first trimester. Further eye examinations during pregnancy
+may be done depending on the results of the first trimester
+examination (pg 111).
+Grade D, Level 4
+A    Good glycaemic control (HbA1c preferably 6.5 to 7.5%
+or 47.5 to 58.5 mmol/mol) should be instituted to reduce
+the risk and progression of diabetic retinopathy (pg 113).
+Grade A, Level 1+
+D    Rapid normalisation of blood glucose may worsen
+retinopathy and thus retinal assessment should be carried
+out before initiation of intensive insulin therapy and then
+at 3-monthly intervals for 6–12 months. Patients should be
+carefully monitored during this period (pg 114).
+Grade D, Level 3
+A    Good control of blood pressure at or below 130/80 mmHg
+should be instituted to reduce the risk and progression of
+diabetic retinopathy (pg 114).
+Grade A, Level 1+
+B     Significant hyperlipidaemia should be treated to retard
+diabetic retinopathy. Consideration should be given to
+using fenofibrate (pg 115).
+Grade B, Level 1+
+GPP   Diabetic patients found to have diabetic macular oedema
+or moderate and more severe non-retinopathy by their
+
+Clinical Practice Guidelines
+
+physicians should be referred for further ophthalmological
+assessment (pg 117).
+GPP
+A    Timely laser therapy should be offered to patients with
+proliferative diabetic retinopathy and diabetic macular
+oedema (pg 118).
+Grade A, Level 1+
+GPP   Diabetic patients with visual acuity of 6/18 or worse or
+with diabetic macular oedema should be referred for
+further ophthalmological assessment (pg 118).
+GPP
+A    Pan-retinal laser photocoagulation should be instituted for
+severe and proliferative diabetic retinopathy as it produces
+a 50% reduction in risk for severe visual loss and need for
+vitrectomy (pg 119).
+Grade A, Level 1+
+A    Focal/grid laser photocoagulation should be instituted for
+diabetic macular oedema as it results in a 50% reduction
+in risk for moderate visual loss (pg 119).
+Grade A, Level 1+
+A    Intravitreal injection of anti-vascular endothelial growth
+factor (anti-VEGF) agents may be offered to patients with
+diabetic macular oedema, particularly in cases where laser
+photocoagulation has not been effective (pg 120).
+Grade A, Level 1+
+B      Vitrectomy may be offered to selected patients with
+advanced diabetic retinopathy (pg 121).
+Grade B, Level 1+
+Prevention of diabetic foot complications
+B     All individuals with diabetes should receive an annual
+foot examination to identify high-risk foot conditions
+(pg 124).
+Grade B, Level 2+
+B     The assessment of the feet involves risk identification,
+treatment and patient education appropriate to the level
+of risk (pg 124).
+Grade B, Level 2+
+GPP   All patients, regardless of risk category, should receive
+ongoing education on footcare and footwear advice
+(pg 124).
+GPP
+C    Patients identified with foot-related risk conditions should
+have access to a specialised footcare team which should
+include diabetes specialist, podiatrist, physiotherapist
+trained in diabetes, diabetes nurse educator, vascular and
+orthopaedic surgeons (pg 126).
+Grade C, Level 3
+GPP   Urgent referral to a specialised footcare team is needed
+in the presence of ulcerations, severe foot infection and
+gangrene (pg 128).
+GPP
+Management of women with pre-gestational and
+gestational diabetes mellitus
+B     All women with diabetes in the reproductive age group
+should receive prepregnancy counselling, particularly
+before starting a family (pg 132).
+Grade B, Level 1GPP   Wherever possible, prepregnancy counselling should
+be performed jointly by a multi-disciplinary team
+skilled in diabetes care, including the physician,
+obstetrician, dietician, nurse-educator and other
+specialists (pg 133).
+GPP
+D    Risk assessment for gestational diabetes should be
+undertaken at the first antenatal visit (pg 133).
+Grade D, Level 4
+B     Women at high-risk for gestational diabetes (GDM) should
+undergo an oral glucose tolerance test (OGTT) as early in
+pregnancy as feasible. Re-evaluation should be performed
+at 24–28 weeks of gestation if glucose intolerance is not
+present at the early screen (pg 134).
+Grade B, Level 1+
+D    In pregnant women who are not at high risk for gestational
+diabetes, urine for glucose should be obtained at each
+antenatal visit and random blood sugar levels ascertained
+when there is ≥1+ glycosuria. A diagnostic test is necessary
+if the random plasma blood glucose >6.6 mmol/l more
+than 2 hours after a meal, or >7.0 mmol/l within 2 hours
+of a meal (pg 135).
+Grade D, Level 3
+B     Gestational diabetes is diagnosed with a 75 g oral glucose
+tolerance test (OGTT). A fasting venous plasma glucose
+≥7.0 mmol/l or a 2-hour venous plasma glucose of ≥7.8
+mmol/l is diagnostic of gestational diabetes. Casual venous
+plasma levels ≥11.1 mmol/l on 2 successive occasions
+would confirm gestational diabetes without recourse to
+oral glucose tolerance testing (pg 135).
+Grade B, Level 1
+D    All women diagnosed with pregestational diabetes and
+those diagnosed with gestational diabetes should receive
+specialised care (pg 135).
+Grade D, Level 3
+B     In gestational diabetes, dietary control should be used in
+the first instance to attain glycaemic goals. Sweet foods
+should be avoided and caloric intake reduced if the woman
+is overweight or obese. The diet should contain more
+
+Clinical Practice Guidelines
+
+complex carbohydrates, more fibre, and less saturated fat.
+Nutritional counselling should be individualised, taking
+into account the patient’s body weight, weight gain and
+physical activity (pg 136).
+Grade B, Level 2++
+B     If nutritional therapy does not consistently maintain a
+fasting or pre-meal capillary blood glucose of <5.5 mmol/l
+and/or a 1-hour postprandial capillary glucose of <7.8
+mmol/l or a 2-hour postprandial capillary blood glucose of
+<6.7 mmol/l on two or more occasions within a 1–2 week
+interval, insulin therapy should be considered (pg 136).
+Grade B, Level 2++
+C    In pregestational diabetes, individualised intensive (multidose) insulin therapy is often necessary to achieve and
+maintain target blood glucose levels (pg 137).
+Grade C, Level 2+
+D    Maintain maternal capillary blood glucose concentrations
+as near normal as possible at <5.5 mmol/l in the fasting or
+pre-meal state, and/or <7.8 mmol/l one hour after meals,
+or <6.7 mmol/l two hours after meals (pg 137).
+Grade D, Level 4
+D    Self-monitoring of blood glucose (SMBG) is essential
+during pregnancy for women with gestational diabetes and
+pregestational diabetes. Both preprandial and postprandial
+testing are recommended to guide therapy in order to
+achieve glycaemic targets (pg 137).
+Grade D, Level 3
+D    Women with pregestational type 1 diabetes should be
+advised to test for ketonuria or ketonaemia if they become
+hyperglycaemic or unwell (pg 137).
+Grade D, Level 4
+D    Oral glucose-lowering drugs are not recommended during
+pregnancy under normal circumstances. Women with
+pregestational type 2 diabetes who become pregnant while
+taking oral glucose-lowering drugs should be switched to
+insulin therapy (pg 138).
+Grade D, Level 4
+D    An early pregnancy scan should be performed to confirm
+viability and accurately date the pregnancy in women
+with pregestational diabetes, especially when glycaemic
+control is suboptimal or changes in medications are
+required (pg 138).
+Grade D, Level 4
+B     A detailed foetal anomaly scan, including four-chamber
+cardiac view and outflow tracts, should be performed
+between 18–22  weeks in women with pregestational
+diabetes or when overt diabetes is diagnosed in the early
+pregnancy (pg 138).
+Grade B, Level 2++
+D    Women with pregestational diabetes and gestational
+diabetes should be offered ultrasound monitoring of foetal
+growth (foetal abdominal circumference and/or estimated
+foetal weight) and amniotic fluid volume every 4 weeks
+from 28 to 36 weeks (pg 139).
+Grade D, Level 4
+D    Mothers with gestational diabetes mellitus and
+pregestational diabetes should be taught to monitor foetal
+movements during the last 10–12 weeks of pregnancy and
+to report immediately any reduction in the perception of
+foetal movements (pg 139).
+Grade D, Level 4
+C     Non-stress testing with cardiotocography and
+umbilical doppler flow studies may be considered in
+cases where hyperglycaemia warrants insulin therapy
+and in cases where other high-risk factors are present
+(pg 139).
+Grade C, Level 2+
+C    In women with gestational diabetes mellitus as well as
+those with pregestational diabetes, the measurement of
+blood pressure and dipstick testing for urinary protein
+is recommended at each antenatal visit to detect the
+development of pregnancy-induced hypertension and preeclampsia, especially if there is pre-existing nephropathy
+(pg 139).
+Grade C, Level 2+
+GPP   Women with pregestational diabetes should have their
+serum creatinine and electrolytes assessed at the first
+antenatal visit and in the third trimester (pg 139).
+GPP
+B     For women with pregestational diabetes, a retinal
+assessment should be performed as soon as possible
+after the first antenatal visit if it has not been done in
+the preceding 12 months. If any diabetic retinopathy is
+present, an additional assessment should be performed
+at 16–20  weeks of gestation. If the first assessment is
+normal, an assessment should be repeated at 28 weeks
+of gestation (pg 140).
+Grade B, Level 2++
+GPP   More frequent assessment may be required in women with
+poor glycaemic control, hypertension and/or pre-existing
+retinopathy (pg 140).
+GPP
+D    Women with insulin-treated pregestational diabetes
+or gestational diabetes mellitus who are receiving
+corticosteroids for foetal lung maturation should receive
+additional insulin treatment and close monitoring of
+glucose levels (pg 140).
+Grade D, Level 4
+
+Clinical Practice Guidelines
+
+B     Betamimetic drugs (e.g., salbutamol) should not be used
+for tocolysis in women with diabetes as they may lead to
+significant hyperglycaemia (pg 140).
+Grade B, Level 2++
+D    Delivery should be at term for women with pregestational
+diabetes and gestational diabetes mellitus unless
+specific obstetric or medical factors dictate otherwise
+(e.g.,  foetal macrosomia, poor glycaemic control,
+polyhydramnios, pre-eclampsia, intrauterine growth
+restriction) (pg 140).
+Grade D, Level 4
+D    Vaginal delivery is preferable unless there is an obstetric or
+medical contraindication. The presence of diabetes should
+not itself constitute an indication for elective caesarean
+delivery (pg 141).
+Grade D, Level 4
+D    During labour and birth, capillary blood glucose should be
+monitored every 1–4 hours in women with pregestational
+diabetes and gestational diabetes mellitus and maintained
+at 4–7 mmol/l (pg 141).
+Grade D, Level 4
+D    Intravenous dextrose and insulin infusion is recommended
+during labour and birth for women whose blood glucose
+is not maintained at 4–7 mmol/l (pg 141).
+Grade D, Level 4
+D    Women with pregestational type 1 diabetes should be
+considered for intravenous dextrose and insulin infusion
+from the onset of established labour (pg 141).
+Grade D, Level 4
+D    The neonatologist should be informed of deliveries
+of infants of women with diabetes so that possible
+complications like neonatal hypoglycaemia may be
+monitored and treated early (pg 141).
+Grade D, Level 4
+C    Screening for abnormalities should also be performed in
+infants of woman with diabetes soon after birth (pg 141).
+Grade C, Level 2+
+D    Babies of women with diabetes should be fed as soon as
+possible after birth (within 30 minutes)(pg 141).
+Grade D, Level 4
+B     Infants of women with diabetes who present with
+clinical signs of hypoglycaemia should have their blood
+glucose tested and be treated with intravenous dextrose
+as soon as possible. Close monitoring of blood glucose
+levels is necessary within the first 48 hours of the baby’s
+life (pg 141).
+Grade B, Level 2+
+B     Close monitoring of blood glucose levels is necessary
+within the first 48 hours of the baby’s life. Infants of
+diabetic mothers should be fed early (pg 142).
+Grade B, Level 2+
+D    Women with gestational diabetes should discontinue
+glucose-lowering treatment immediately after birth and
+monitor their blood glucose levels (pg 142).
+Grade D, Level 4
+D    Women with insulin-treated pregestational diabetes should
+reduce their insulin doses immediately after birth and
+monitor their blood glucose levels carefully to establish
+the appropriate dose (pg 142).
+Grade D, Level 4
+GPP   Women who are treated with insulin post-delivery
+should be informed that they are at increased risk of
+hypoglycaemia in the postnatal period, especially when
+breastfeeding, and should be advised to have a meal or
+snack available before or during feeds (pg 142).
+GPP
+D    Breastfeeding is recommended for infants of women with
+diabetes (pg 142).
+Grade D, Level 3
+GPP   Insulin is recommended for glycaemic control in women
+with diabetes who breastfeed (pg 142).
+GPP
+GPP   Women with pregestational diabetes who are breastfeeding
+should continue to avoid any drugs for the treatment of
+diabetes complications that were discontinued for safety
+reasons in the pre-conception period (pg 143).
+GPP
+B     All subsequent pregnancies in women with gestational
+diabetes carry a risk for gestational diabetes mellitus.
+Early evaluation of glucose tolerance in future pregnancies
+should be stressed (pg 143).
+Grade B, Level 2++
+D    Women with a history of gestational diabetes mellitus
+should be offered lifestyle advice aimed at diet
+modification, weight control and increasing physical
+activity to reduce their risk of subsequent development
+of diabetes (pg 143).
+Grade D, Level 4
+C    For women with gestational diabetes, a 75  g 2-h oral
+glucose tolerance test (OGTT) should be performed
+6–12 weeks postpartum and the woman reclassified and
+counselled according to criteria accepted in the nonpregnant state (pg 143).
+Grade C, Level 2+
+
+Clinical Practice Guidelines
+
+D    Women with a history of gestational diabetes should have
+lifelong screening for the development of prediabetes or
+diabetes at least once every 3 years (pg 144).
+Grade D, Level 4
+D    In women with prediabetes or overt diabetes, glucose and
+lipid profiles should be monitored if low-dose oestrogenprogestin oral contraceptives are used. These should,
+however, be avoided in women with complications of
+diabetes and/or other risk factors for vascular disease.
+Progestin-only preparations may be suitable for these
+women (pg 144).
+Grade D, Level 3
+D    Low-dose oestrogen-progestin oral contraceptives and
+intrauterine devices are not contraindicated in women
+with previous gestational diabetes (pg 144).
+Grade D, Level 3
+D    Oestrogen-progestogen contraceptives should be avoided
+in women with complications of diabetes and/or other risk
+factors for vascular disease (pg 144).
+Grade D, Level 3
+Management of the child and adolescent with diabetes
+mellitus
+GPP   Children and adolescents with suspected diabetes should
+be referred to a specialist for early assessment, where
+possible, on the same day (pg 145).
+GPP
+B     Children and adolescents with either type 1 diabetes or type 2
+diabetes should be provided ongoing and structured diabetes
+care by a multi-disciplinary diabetes care team (pg 146).
+Grade B, Level 2++
+GPP   Diabetes education should involve the family and child
+to include learning about blood glucose monitoring,
+insulin administration, hypoglycaemia and sick day
+management. As the child matures, diabetes education
+should emphasise self-care responsibilities shifting
+from the parent to child, under parental guidance and
+supervision (pg 146).
+GPP
+D    Include psycho-educational intervention strategies and
+planned transition in the management of adolescents with
+diabetes (pg 147).
+Grade D, Level 4
+GPP   Blood glucose targets should be individually determined
+with a goal to achieving a value as close to normal as
+possible as there is little age-related scientific evidence
+for strict glucose targets (pg 148).
+GPP
+A    Children and adolescents with type 1 diabetes mellitus
+or type 2 diabetes mellitus, and their families should be
+informed that the target for long term blood glucose control
+is a HbA1c level of less than 7.5% or 58.5 mmol/mol
+without frequent hypoglycaemia (pg 148).
+Grade A, Level 1+
+A    Children and adolescents with type  1 diabetes should
+be encouraged to use blood glucose measurements for
+monitoring of glycaemic control because it is associated
+with reduced levels of HbA1c (pg 148).
+Grade A, Level 1+
+GPP   Consider the possibility of antecedent nocturnal
+hypoglycaemia if fasting blood glucose is <4mmol/l (pg 148).
+GPP
+C    Screening for type 2 diabetes in asymptomatic children
+and adolescents is not recommended as a public health
+strategy (pg 149).
+Grade C, Level 2+
+GPP   Type 1 diabetes mellitus in children and adolescents
+should be managed by an endocrinologist or physician
+with a special interest in childhood diabetes (pg 149).
+GPP
+C    Self-monitoring of blood glucose is an essential tool in the
+optimal management of childhood and adolescent type 1
+diabetes mellitus and should be used in conjunction with
+insulin treatment (pg 150).
+Grade C, Level 2+
+C    Children and adolescents with type 1 diabetes mellitus
+should be offered screening for:
+
+  •	Thyroid disease at diagnosis and annually thereafter.
+
+  •	Retinopathy annually from the age of 12 years.
+
+  •	Microalbuminuria annually from the age of 12 years
+(pg 150).
+Grade C, Level 2+
+C    Children with type 2 diabetes mellitus may initially be
+treated with lifestyle modification (diet and exercise), unless
+they are symptomatic or severely hyperglycaemic (pg 151).
+Grade C, Level 2+
+C    Lifestyle changes in diet and exercise should be
+recommended for all children with type 2 diabetes mellitus
+and continued, even after addition of pharmacologic
+therapy (pg 152).
+Grade C, Level 2+
+C    Metformin may be started as the first-line oral agent in
+children with type 2 diabetes mellitus if blood glucose
+targets are not achieved. Insulin therapy should be started
+if oral agents fail to attain target control (pg 152).
+Grade C, Level 2+
+
+Clinical Practice Guidelines
+
+A    Metformin is contraindicated in children with impaired
+renal function and hepatic disease, and should be
+discontinued with any acute illness associated with
+dehydration or hypoxaemia (pg 152).
+Grade A, Level 1+
+A    If monotherapy with metformin over 3–6 months has
+failed, insulin should be added to the treatment (pg 152).
+Grade A, Level 1+
+C    Children and adolescents with type 2 diabetes mellitus
+should be offered co-morbidity screening for:
+
+  •	Albuminuria at diagnosis and annually thereafter.
+
+  •	Hypertension at diagnosis and annually thereafter.
+
+  •	Dyslipidaemia soon after diagnosis and annually
+thereafter (pg 153).
+Grade C, Level 2+
+GPP   Albuminuria should be evaluated at diagnosis and blood
+pressure should be evaluated at every visit. Confirmed
+hypertension (BP >95% for age, gender and height) or
+albuminuria can be treated with an angiotensin-converting
+enzyme (ACE) inhibitor (pg 153).
+GPP
+GPP   Pharmacotherapy is warranted if low density lipoprotein
+remains elevated (≥3.4mmol/l) after 6  months of
+optimised glucose control and diet. Statin therapy has
+been shown to be safe and effective in children as in
+adults and should be the first pharmacologic intervention,
+although long term safety data are not available (pg 153).
+GPP
+GPP   Evaluation for non-alcoholic fatty liver disease (NAFLD)
+and inquiries about puberty, menstrual irregularities and
+obstructive sleep apnea should be done at diagnosis and
+annually thereafter (pg 153).
+GPP
+Diagnosis and management of the adult with type 1
+diabetes mellitus
+GPP   Patients who are suspected to have type 1 diabetes should
+be referred to the specialist promptly for assessment (pg
+154).
+GPP
+GPP   Individuals with type 1 diabetes should have access to a
+multi-disciplinary team consisting of an endocrinologist,
+a nurse educator, a dietitian and a mental health
+professional qualified to provide up to date education
+and support (pg 155).
+GPP
+A    Most people with type  1 diabetes should be treated
+with multiple dose insulin (MDI) injections (at least
+three injections per day of prandial insulin and at least
+one injection per day of basal insulin) or continuous
+subcutaneous insulin infusion (CSII) (pg 155).
+Grade A, Level 1+
+A    Most people with type  1 diabetes should use insulin
+analogues to reduce the risk of hypoglycaemia (pg 155).
+Grade A, Level 1+
+A    Individuals using rapid-acting insulin by injection or
+insulin pump should adjust the meal and snack insulin
+doses based on the carbohydrate content of the meals
+and snacks (pg 155).
+Grade A, Level 1+
+B     People with diabetes should receive diabetes selfmanagement education and ongoing support (pg 156).
+Grade B, Level 2+
+C    Screening of psychosocial functioning, especially anxiety
+and depression should be performed.Those with positive
+screening should be referred promptly for treatment (pg 157).
+Grade C, Level 2+
+GPP   Patients with type 1 diabetes should have thyroid function
+checked every 1–2 years (pg 157).
+GPP
+Prevention of type 2 diabetes mellitus
+B   Screening for asymptomatic individuals for type 2 diabetes
+mellitus should be carried out on an opportunistic basis.
+Testing should be considered in adults of any age who have
+one or more risk factors for diabetes. In those without risk
+factors, testing should begin at 40 years (pg 159).
+Grade B, Level 2++
+A  Lifestyle changes with modest weight loss (5–10% of body
+weight) and moderate intensity physical activity (~30 minutes
+daily) is the treatment of choice with individuals with impaired
+fasting glucose/impaired glucose tolerance (pg 161).
+Grade A, Level 1++
+B   Metformin may be considered for the very high risk individual
+(please refer to chapter on Diagnosis and screening) with
+impaired fasting glucose/impaired glucose tolerance of age
+<60 and BMI ≥35 kg/m2 (pg 162).
+Grade B, Level 2++
+Clinical quality improvement
+A  Measures of process of diabetes care should include the
+initial and ongoing performance of medical indicators which
+have been proven to influence long-term outcome (pg 166).
+Grade A, Level 1+
+GPP   Data to measure the outcomes of diabetes management
+should be obtained from the individual with diabetes
+(pg 166).
+GPP
+
+Clinical Practice Guidelines
+
+SINGAPORE MEDICAL COUNCIL CATEGORY 3B CME PROGRAMME
+(Code SMJ 201406B)
+Question 1. With regards to diagnosis of diabetes mellitus:
+(a)	 In patients with hyperglycaemic crisis, diabetes mellitus can be diagnosed without further testing.
+(b)	 Diabetes mellitus can be diagnosed if fasting plasma glucose is 6.5 mmol/l.
+(c)	 When two different tests are available for the same patient and the results for both tests are above the diagnostic
+thresholds, the diagnosis of diabetes is confirmed.
+(d)	 Fasting plasma glucose measured in an accredited laboratory is the preferred test for the diagnosis of
+diabetes mellitus.
+Question 2. With regards to lifestyle modification:
+(a)	 Medical nutrition therapy in diabetes only addresses glycaemic control.
+(b)	 A diet for diabetes should contain a good balance of carbohydrate, protein and fat.
+(c)	 If weight reduction is needed, it should be attempted rapidly  (1.00 to 2.0 kg/week).
+(d)	 All individuals with type 2 diabetes should undertake at least 100 mins/week of moderate to vigorous
+aerobic exercise.
+Question 3. With regards to pharmacotherapy:
+(a)	 All patients with type 1 diabetes need insulin treatment.
+(b)	 Biguanides (metformin) decrease hepatic glucose release, enhance peripheral glucose disposal and
+delay glucose absorption.
+(c)	 In patients type 2 diabetes, one does not need to monitor for adverse events such as hypoglycaemia or fluid
+retention.
+(d)	 Metformin is the preferred choice for first-line oral glucose lowering therapy.
+Question 4. When assessing glycaemic control:
+(a)	 Self-monitoring of blood glucose should be considered for pregnant patients with pre-existing diabetes.
+(b)	 Self-monitoring of blood glucose should be carried out 3 or more times daily for patients with type 1 diabetes.
+(c)	 Self-monitoring of urine glucose is recommended for monitoring of glycaemic status.
+(d)	 Glycated haemoglobin (HbA1c) should be performed routinely in all patients with diabetes, at initial
+assessment and then as part of follow-up care.
+Question 5. In terms of reducing the risk of additional complications in patients with diabetes:
+(a)	 To reduce the risk or slow the progression of nephropathy, optimised blood pressure control is recommended.
+(b)	 The recommended time of first eye examination is within one year after diagnosis of diabetes once
+patient is aged ten years or older.
+(c)	 All individuals with diabetes should receive an annual foot examination to identify high-risk foot conditions.
+(d)	 Women with diabetes who are in the reproductive age group should receive prepregnancy counselling.
+  True      False
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+  □      □
+These questions are based on the full text of the guidelines which may be found at http://www.moh.gov.sg/content/moh_web/
+healthprofessionalsportal/doctors/guidelines/cpg_medical.html
+SUBMISSION INSTRUCTIONS:
+(1) Log on at the SMJ website: http://www.sma.org.sg/publications/smjcurrentissue.aspx and select the appropriate set of questions. (2) Provide your name, email address and MCR
+number. (3) Select your answers and click “Submit”.
+RESULTS:
+(1) Answers will be published in the SMJ August 2014 issue. (2) The MCR numbers of successful candidates will be posted online at the SMJ website by 4 August 2014. (3) Passing
+mark is 60%. No mark will be deducted for incorrect answers. (4) The SMJ editorial office will submit the list of successful candidates to the Singapore Medical Council. (5) One
+CME point is awarded for successful candidates.
+Deadline for submission: (June 2014 SMJ 3B CME programme): 12 noon, 28 July 2014.
+Doctor’s particulars:
+Name in full
+:_______________________________________________________________________________________________
+MCR number
+:________________________________________  Specialty:  _____________________________________________
+Email address
+:_______________________________________________________________________________________________
