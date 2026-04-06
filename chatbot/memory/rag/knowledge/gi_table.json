@@ -1,0 +1,86 @@
+[
+  {
+    "food": "They are grouped according to: Low GI ( or less)",
+    "gi": "55",
+    "gi_category": "high",
+    "section": ""
+  },
+  {
+    "food": "Moderate GI ( to ) or",
+    "gi": "56",
+    "gi_category": "medium",
+    "section": ""
+  },
+  {
+    "food": "High GI ( or more)",
+    "gi": "70",
+    "gi_category": "medium",
+    "section": ""
+  },
+  {
+    "food": "Foods with GI values marked with the symbol * may be high in saturated fat. Check the food labels for saturated fat content. If the saturated fat is more than % of the total fat",
+    "gi": "20",
+    "gi_category": "high",
+    "section": ""
+  },
+  {
+    "food": "or more",
+    "gi": "70",
+    "gi_category": "high",
+    "section": ""
+  },
+  {
+    "food": "or less",
+    "gi": "55",
+    "gi_category": "low",
+    "section": ""
+  },
+  {
+    "food": "or more",
+    "gi": "70",
+    "gi_category": "high",
+    "section": "Rice"
+  },
+  {
+    "food": "or less",
+    "gi": "55",
+    "gi_category": "low",
+    "section": "Rice"
+  },
+  {
+    "food": "MEDIUM GI to",
+    "gi": "56",
+    "gi_category": "medium",
+    "section": "Biscuits"
+  },
+  {
+    "food": "or more",
+    "gi": "70",
+    "gi_category": "high",
+    "section": "Biscuits"
+  },
+  {
+    "food": "or less",
+    "gi": "55",
+    "gi_category": "low",
+    "section": "Biscuits"
+  },
+  {
+    "food": "or more",
+    "gi": "70",
+    "gi_category": "high",
+    "section": "Beverages"
+  },
+  {
+    "food": "or less",
+    "gi": "55",
+    "gi_category": "low",
+    "section": "Beverages"
+  },
+  {
+    "food": "This information is for educational purpose only. This is not intended for use in the diagnosis or treatment of any health condition without consulting a qualified healthcare professional. Yishun Health shall not be responsible for any injury nor damage caused to any individual as a result of using this information, directly or indirectly. You should seek the advice of your healthcare professionals in relation to queries pertaining to any health condition. Please contact Khoo Teck Puat Hospital at () 6555 8828 if you wish to make an appointment to consult with our dietitians or pharmacists. You may download and print this",
+    "gi": "65",
+    "gi_category": "high",
+    "section": "Miscellaneous"
+  }
+]

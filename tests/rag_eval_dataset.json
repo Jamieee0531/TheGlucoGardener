@@ -1,0 +1,587 @@
+{
+  "version": "1.0",
+  "created": "2026-04-01",
+  "description": "GlucoGardener RAG 独立评测集。required_concepts 基于医学知识独立制定，不参考知识库文档内容。评测标准：检索到的上下文是否覆盖回答该问题所需的核心概念。",
+  "cases": [
+
+    // ══════════════════════════════════════════════════════
+    // 单轮 — 药物 (6 cases)
+    // ══════════════════════════════════════════════════════
+    {
+      "id": "med_01",
+      "type": "single",
+      "query": "I just started metformin and I keep feeling sick after eating. Is this normal?",
+      "lang": "English",
+      "category": "medication",
+      "difficulty": "easy",
+      "required_concepts": [
+        "metformin gastrointestinal side effects are common",
+        "nausea/diarrhoea typically improves over time",
+        "taking with food reduces discomfort"
+      ],
+      "rationale": "Common new patient concern; answer requires knowing metformin GI side effects are expected and manageable"
+    },
+    {
+      "id": "med_02",
+      "type": "single",
+      "query": "My doctor added gliclazide to my metformin. What should I watch out for?",
+      "lang": "English",
+      "category": "medication",
+      "difficulty": "medium",
+      "required_concepts": [
+        "sulphonylurea class stimulates insulin secretion",
+        "hypoglycaemia risk increases when combined",
+        "recognise hypoglycaemia symptoms"
+      ],
+      "rationale": "Tests whether retriever finds sulphonylurea combination risk, not just individual drug info"
+    },
+    {
+      "id": "med_03",
+      "type": "single",
+      "query": "我的医生给我开了胰岛素，我很害怕打针，可以不用吗？",
+      "lang": "Chinese",
+      "category": "medication",
+      "difficulty": "medium",
+      "required_concepts": [
+        "insulin is necessary when oral medications insufficient",
+        "injection technique can be learned",
+        "fear is common but manageable"
+      ],
+      "rationale": "中文查询，测试跨语言检索胰岛素相关内容"
+    },
+    {
+      "id": "med_04",
+      "type": "single",
+      "query": "Can I take my diabetes medication with grapefruit juice?",
+      "lang": "English",
+      "category": "medication",
+      "difficulty": "hard",
+      "required_concepts": [
+        "grapefruit interacts with certain medications via CYP3A4",
+        "specific drug-grapefruit interactions"
+      ],
+      "rationale": "Specific drug interaction query; tests depth of medication content"
+    },
+    {
+      "id": "med_05",
+      "type": "single",
+      "query": "Boleh saya minum ubat diabetes pada waktu pagi atau malam?",
+      "lang": "Malay",
+      "category": "medication",
+      "difficulty": "easy",
+      "required_concepts": [
+        "medication timing depends on drug type",
+        "metformin taken with meals",
+        "follow doctor prescription for timing"
+      ],
+      "rationale": "马来文药物时间查询，测试跨语言"
+    },
+    {
+      "id": "med_06",
+      "type": "single",
+      "query": "I missed my metformin dose this morning. Should I take double dose now?",
+      "lang": "English",
+      "category": "medication",
+      "difficulty": "easy",
+      "required_concepts": [
+        "do not double dose",
+        "skip missed dose if close to next dose time",
+        "resume normal schedule"
+      ],
+      "rationale": "Missed dose is a very common patient question"
+    },
+
+    // ══════════════════════════════════════════════════════
+    // 单轮 — 饮食 (7 cases)
+    // ══════════════════════════════════════════════════════
+    {
+      "id": "food_01",
+      "type": "single",
+      "query": "Is white rice bad for diabetes? I eat it every day.",
+      "lang": "English",
+      "category": "food",
+      "difficulty": "easy",
+      "required_concepts": [
+        "white rice has high glycaemic index",
+        "portion control is key",
+        "alternatives such as brown rice or smaller portions"
+      ],
+      "rationale": "Core Singapore food concern; white rice is dietary staple"
+    },
+    {
+      "id": "food_02",
+      "type": "single",
+      "query": "我每天早上喝咖啡加炼奶，这样对血糖有影响吗？",
+      "lang": "Chinese",
+      "category": "food",
+      "difficulty": "medium",
+      "required_concepts": [
+        "condensed milk is high in sugar",
+        "sweetened drinks raise blood glucose rapidly",
+        "switch to kopi-O kosong or unsweetened options"
+      ],
+      "rationale": "Singapore-specific: kopi with condensed milk is extremely common"
+    },
+    {
+      "id": "food_03",
+      "type": "single",
+      "query": "What is the healthiest hawker food option for a diabetic?",
+      "lang": "English",
+      "category": "food",
+      "difficulty": "medium",
+      "required_concepts": [
+        "clear soup noodles better than fried",
+        "yong tau foo or thunder tea rice recommended",
+        "choose more vegetables less rice"
+      ],
+      "rationale": "Singapore-specific hawker food guidance"
+    },
+    {
+      "id": "food_04",
+      "type": "single",
+      "query": "Can I eat fruit? I heard fruit has a lot of sugar.",
+      "lang": "English",
+      "category": "food",
+      "difficulty": "medium",
+      "required_concepts": [
+        "fruit contains natural sugars but also fibre",
+        "moderate portions acceptable",
+        "whole fruit better than juice",
+        "some fruits have lower GI"
+      ],
+      "rationale": "Common patient misconception that all fruit is forbidden"
+    },
+    {
+      "id": "food_05",
+      "type": "single",
+      "query": "Semasa bulan puasa, apa yang patut saya makan waktu sahur?",
+      "lang": "Malay",
+      "category": "food",
+      "difficulty": "medium",
+      "required_concepts": [
+        "suhoor should be low GI slow-release foods",
+        "adequate hydration before fast",
+        "avoid high sugar foods at suhoor"
+      ],
+      "rationale": "马来文斋月饮食查询"
+    },
+    {
+      "id": "food_06",
+      "type": "single",
+      "query": "எனக்கு இரவு சாப்பிட்ட பிறகு இரத்த சர்க்கரை எப்போதும் அதிகமாக இருக்கிறது. என்ன சாப்பிடலாம்?",
+      "lang": "Tamil",
+      "category": "food",
+      "difficulty": "medium",
+      "required_concepts": [
+        "post-meal blood glucose management",
+        "low GI foods reduce post-meal spike",
+        "portion size and food combination matter"
+      ],
+      "rationale": "泰米尔文餐后高血糖饮食查询，触发改写链路"
+    },
+    {
+      "id": "food_07",
+      "type": "single",
+      "query": "My colleague says diabetics cannot eat any carbs. Is that true?",
+      "lang": "English",
+      "category": "food",
+      "difficulty": "easy",
+      "required_concepts": [
+        "carbohydrates are not forbidden",
+        "choose complex/low GI carbohydrates",
+        "portion control rather than elimination"
+      ],
+      "rationale": "Common misconception test"
+    },
+
+    // ══════════════════════════════════════════════════════
+    // 单轮 — 血糖管理 (5 cases)
+    // ══════════════════════════════════════════════════════
+    {
+      "id": "bg_01",
+      "type": "single",
+      "query": "What should my blood sugar be before and after meals?",
+      "lang": "English",
+      "category": "management",
+      "difficulty": "easy",
+      "required_concepts": [
+        "fasting target typically 4-7 mmol/L",
+        "post-meal 2-hour target below 8-10 mmol/L",
+        "individual targets set by doctor"
+      ],
+      "rationale": "Fundamental target knowledge every patient needs"
+    },
+    {
+      "id": "bg_02",
+      "type": "single",
+      "query": "I woke up with blood sugar 4.1 mmol/L, I feel a bit shaky. What do I do?",
+      "lang": "English",
+      "category": "management",
+      "difficulty": "medium",
+      "required_concepts": [
+        "4.1 is borderline low",
+        "treat with fast-acting glucose if symptomatic",
+        "15-15 rule for mild hypoglycaemia",
+        "recheck after 15 minutes"
+      ],
+      "rationale": "Borderline hypoglycaemia with symptoms - requires specific action plan"
+    },
+    {
+      "id": "bg_03",
+      "type": "single",
+      "query": "My HbA1c is 8.5%, my doctor says it's too high. What does this mean?",
+      "lang": "English",
+      "category": "management",
+      "difficulty": "medium",
+      "required_concepts": [
+        "HbA1c reflects average glucose over 3 months",
+        "target generally below 7% or individualised",
+        "8.5% indicates suboptimal control",
+        "lifestyle and medication adjustment needed"
+      ],
+      "rationale": "HbA1c interpretation is frequently misunderstood"
+    },
+    {
+      "id": "bg_04",
+      "type": "single",
+      "query": "每次站起来就头晕，坐下来又好了，是血糖低吗？",
+      "lang": "Chinese",
+      "category": "management",
+      "difficulty": "hard",
+      "required_concepts": [
+        "symptoms on standing suggest postural hypotension not hypoglycaemia",
+        "postural hypotension is different from low blood sugar",
+        "stand up slowly as management"
+      ],
+      "rationale": "关键鉴别诊断：体位性低血压 vs 低血糖，错误建议（吃东西）可能有害"
+    },
+    {
+      "id": "bg_05",
+      "type": "single",
+      "query": "Can stress affect my blood sugar levels?",
+      "lang": "English",
+      "category": "management",
+      "difficulty": "medium",
+      "required_concepts": [
+        "stress hormones raise blood glucose",
+        "both physical and emotional stress affect glucose",
+        "stress management is part of diabetes care"
+      ],
+      "rationale": "Tests psychosocial aspect of diabetes management"
+    },
+
+    // ══════════════════════════════════════════════════════
+    // 单轮 — 运动 (4 cases)
+    // ══════════════════════════════════════════════════════
+    {
+      "id": "ex_01",
+      "type": "single",
+      "query": "Is it safe to exercise when my blood sugar is 14 mmol/L?",
+      "lang": "English",
+      "category": "exercise",
+      "difficulty": "hard",
+      "required_concepts": [
+        "exercise with high blood glucose has risks",
+        "threshold above which exercise not recommended",
+        "check glucose before exercise"
+      ],
+      "rationale": "Hyperglycaemia + exercise safety threshold"
+    },
+    {
+      "id": "ex_02",
+      "type": "single",
+      "query": "What kind of exercise is best for lowering blood sugar?",
+      "lang": "English",
+      "category": "exercise",
+      "difficulty": "easy",
+      "required_concepts": [
+        "aerobic exercise reduces blood glucose",
+        "resistance training also beneficial",
+        "150 minutes moderate intensity per week recommended",
+        "walking is accessible option"
+      ],
+      "rationale": "Standard exercise prescription for diabetes"
+    },
+    {
+      "id": "ex_03",
+      "type": "single",
+      "query": "我做完运动血糖反而升高了，是正常的吗？",
+      "lang": "Chinese",
+      "category": "exercise",
+      "difficulty": "hard",
+      "required_concepts": [
+        "short-term glucose rise possible after intense exercise",
+        "stress hormone response to high intensity",
+        "moderate intensity exercise more consistent benefit"
+      ],
+      "rationale": "常见困惑：运动后血糖反升，测试知识库深度"
+    },
+    {
+      "id": "ex_04",
+      "type": "single",
+      "query": "My feet get numb when I walk. Should I still exercise?",
+      "lang": "English",
+      "category": "exercise",
+      "difficulty": "hard",
+      "required_concepts": [
+        "peripheral neuropathy affects exercise safety",
+        "foot inspection before and after exercise",
+        "low-impact exercise options for neuropathy",
+        "consult doctor before starting exercise programme"
+      ],
+      "rationale": "Complication (neuropathy) affecting exercise decisions"
+    },
+
+    // ══════════════════════════════════════════════════════
+    // 单轮 — 并发症 (3 cases)
+    // ══════════════════════════════════════════════════════
+    {
+      "id": "comp_01",
+      "type": "single",
+      "query": "I have a small cut on my foot that's not healing. What should I do?",
+      "lang": "English",
+      "category": "complication",
+      "difficulty": "medium",
+      "required_concepts": [
+        "diabetic foot wounds require prompt attention",
+        "clean and dress wound",
+        "see doctor if not healing within days",
+        "do not ignore foot wounds in diabetes"
+      ],
+      "rationale": "Diabetic foot emergency - delayed treatment is dangerous"
+    },
+    {
+      "id": "comp_02",
+      "type": "single",
+      "query": "My vision has been blurry lately. Is it related to my diabetes?",
+      "lang": "English",
+      "category": "complication",
+      "difficulty": "medium",
+      "required_concepts": [
+        "blurry vision can be diabetic retinopathy",
+        "high blood glucose affects lens and retina",
+        "regular eye screening recommended",
+        "seek medical attention"
+      ],
+      "rationale": "Retinopathy is a common complication patients miss"
+    },
+    {
+      "id": "comp_03",
+      "type": "single",
+      "query": "How do I check my feet properly?",
+      "lang": "English",
+      "category": "complication",
+      "difficulty": "easy",
+      "required_concepts": [
+        "daily inspection including between toes",
+        "check for cuts blisters redness swelling",
+        "use mirror for sole inspection",
+        "moisturise but not between toes"
+      ],
+      "rationale": "Routine foot care procedure"
+    },
+
+    // ══════════════════════════════════════════════════════
+    // 单轮 — 超出范围 (4 cases)
+    // ══════════════════════════════════════════════════════
+    {
+      "id": "oos_01",
+      "type": "single",
+      "query": "What is the best mobile phone to buy in Singapore?",
+      "lang": "English",
+      "category": "out_of_scope",
+      "difficulty": "easy",
+      "required_concepts": [],
+      "expect_empty": true,
+      "rationale": "完全无关查询，应返回空"
+    },
+    {
+      "id": "oos_02",
+      "type": "single",
+      "query": "How do I apply for HDB flat?",
+      "lang": "English",
+      "category": "out_of_scope",
+      "difficulty": "easy",
+      "required_concepts": [],
+      "expect_empty": true,
+      "rationale": "新加坡相关但非医疗查询"
+    },
+    {
+      "id": "oos_03",
+      "type": "single",
+      "query": "Can you help me write a cover letter?",
+      "lang": "English",
+      "category": "out_of_scope",
+      "difficulty": "easy",
+      "required_concepts": [],
+      "expect_empty": true,
+      "rationale": "非医疗请求"
+    },
+    {
+      "id": "oos_04",
+      "type": "single",
+      "query": "What are the symptoms of COVID-19?",
+      "lang": "English",
+      "category": "out_of_scope",
+      "difficulty": "medium",
+      "required_concepts": [],
+      "expect_empty": true,
+      "rationale": "医疗查询但不在知识库范围内（非糖尿病相关）"
+    },
+
+    // ══════════════════════════════════════════════════════
+    // 多轮对话 (8 conversations)
+    // ══════════════════════════════════════════════════════
+    {
+      "id": "multi_01",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "I feel dizzy and shaky right now."},
+        {"role": "assistant", "content": "Can you check your blood sugar now? And are you feeling this way after standing up, or has it been ongoing?"}
+      ],
+      "query": "I just checked, it's 3.2 mmol/L.",
+      "lang": "English",
+      "category": "management",
+      "difficulty": "medium",
+      "required_concepts": [
+        "3.2 mmol/L is hypoglycaemia",
+        "treat immediately with fast-acting glucose",
+        "15g carbohydrate rule",
+        "recheck after 15 minutes"
+      ],
+      "rationale": "多轮对话：确认低血糖后的处理，需要结合上文"
+    },
+    {
+      "id": "multi_02",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "I ate nasi lemak for breakfast today."},
+        {"role": "assistant", "content": "How much did you have? The coconut rice in nasi lemak can raise blood sugar quite a bit."}
+      ],
+      "query": "A full plate with fried chicken and all the sides. My sugar is now 13.",
+      "lang": "English",
+      "category": "food",
+      "difficulty": "medium",
+      "required_concepts": [
+        "nasi lemak is high GI high fat",
+        "13 mmol/L is high post-meal",
+        "light walking can help reduce post-meal glucose"
+      ],
+      "rationale": "多轮对话：食物 + 餐后高血糖处理"
+    },
+    {
+      "id": "multi_03",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "我上个月开始打胰岛素了。"},
+        {"role": "assistant", "content": "开始打胰岛素是很大的一步，你适应得怎么样？"}
+      ],
+      "query": "有时候打完之后血糖会掉得很低，怎么办？",
+      "lang": "Chinese",
+      "category": "medication",
+      "difficulty": "medium",
+      "required_concepts": [
+        "insulin-induced hypoglycaemia",
+        "timing of insulin relative to meals",
+        "always carry fast-acting glucose",
+        "report to doctor to adjust dose"
+      ],
+      "rationale": "中文多轮：胰岛素低血糖处理"
+    },
+    {
+      "id": "multi_04",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "Doctor says I need to exercise more but my knees hurt."},
+        {"role": "assistant", "content": "Knee pain can make exercise tricky. Is the pain there all the time or only with certain movements?"}
+      ],
+      "query": "Only when I walk for more than 10 minutes or go up stairs.",
+      "lang": "English",
+      "category": "exercise",
+      "difficulty": "medium",
+      "required_concepts": [
+        "low-impact exercise alternatives for knee problems",
+        "swimming or cycling reduces knee load",
+        "chair-based exercises possible",
+        "physiotherapy referral if needed"
+      ],
+      "rationale": "多轮对话：运动障碍（膝痛）的替代方案"
+    },
+    {
+      "id": "multi_05",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "Ramadan is starting next week. I'm a bit worried."},
+        {"role": "assistant", "content": "That's understandable. Have you spoken to your doctor yet about adjusting your medications for fasting?"}
+      ],
+      "query": "Not yet. What should I tell my doctor?",
+      "lang": "English",
+      "category": "management",
+      "difficulty": "medium",
+      "required_concepts": [
+        "pre-Ramadan medication review needed",
+        "inform doctor about current medications",
+        "discuss glucose monitoring frequency during fast",
+        "know when to break the fast thresholds"
+      ],
+      "rationale": "多轮对话：斋月前医疗准备"
+    },
+    {
+      "id": "multi_06",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "My wound on my toe has been there for 3 weeks already."},
+        {"role": "assistant", "content": "3 weeks is a long time for a wound not to heal. Is it getting bigger, deeper, or does it smell?"}
+      ],
+      "query": "It's the same size but a bit red around it now.",
+      "lang": "English",
+      "category": "complication",
+      "difficulty": "hard",
+      "required_concepts": [
+        "redness around wound indicates possible infection",
+        "diabetic foot infection requires urgent medical attention",
+        "do not wait longer — see doctor today",
+        "risk of serious complication if untreated"
+      ],
+      "rationale": "多轮对话：糖尿病足感染迹象，需要紧急建议"
+    },
+    {
+      "id": "multi_07",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "சாப்பிட்ட பிறகு எனது இரத்த சர்க்கரை 11 ஆக இருக்கிறது."},
+        {"role": "assistant", "content": "11 mmol/L is a bit high after meals. What did you eat?"}
+      ],
+      "query": "நான் வெள்ளை சோறும் மீன் கறியும் சாப்பிட்டேன்.",
+      "lang": "Tamil",
+      "category": "food",
+      "difficulty": "medium",
+      "required_concepts": [
+        "white rice is high GI",
+        "fish curry is acceptable protein",
+        "reduce rice portion to lower post-meal glucose",
+        "add more vegetables"
+      ],
+      "rationale": "泰米尔多轮对话：餐后高血糖 + 饮食建议"
+    },
+    {
+      "id": "multi_08",
+      "type": "multi",
+      "history": [
+        {"role": "user", "content": "I've been feeling really tired lately."},
+        {"role": "assistant", "content": "Fatigue can have several causes with diabetes. Have you checked your blood sugar recently?"}
+      ],
+      "query": "Yes, it's been around 9-10 most of the time.",
+      "lang": "English",
+      "category": "management",
+      "difficulty": "medium",
+      "required_concepts": [
+        "consistently elevated glucose causes fatigue",
+        "9-10 mmol/L above typical targets",
+        "lifestyle and medication review needed",
+        "rule out other causes with doctor"
+      ],
+      "rationale": "多轮对话：慢性高血糖导致的疲劳"
+    }
+  ]
+}

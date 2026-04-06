@@ -1,0 +1,11 @@
+# One-time PDF ingestion dependencies
+# Run these only when re-parsing raw_docs/ into the vector database.
+# Not needed for normal backend operation.
+#
+# Usage:
+#   pip install -r requirements-ingest.txt
+#   python -m chatbot.memory.rag.pdf_parser
+
+pymupdf>=1.24.0       # Text-based PDF extraction (fitz)
+pdf2image>=1.17.0     # Scanned PDF → image (OCR pre-step); requires poppler-utils
+pytesseract>=0.3.10   # Tesseract OCR wrapper; requires: sudo apt install tesseract-ocr
