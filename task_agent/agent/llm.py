@@ -5,5 +5,5 @@ from task_agent.config import settings
 llm_writer = SeaLionClient(
     temperature=0.6,
     max_tokens=256,
-    api_key=settings.sea_lion_api_key,
+    api_key=settings.sealion_api_key,
 )

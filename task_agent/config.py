@@ -3,10 +3,10 @@ from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # .env lives at the repo root (TheGlucoGardener/.env)
-_ENV_FILE = Path(__file__).parent / ".env"
+_ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 class Settings(BaseSettings):
-    sea_lion_api_key: str = "dummy_key"
+    sealion_api_key: str = "dummy_key"
     google_maps_api_key: str = "dummy_key"
     gemini_api_key: str = "dummy_key"
     database_url: str = "sqlite:///./task_agent.db"

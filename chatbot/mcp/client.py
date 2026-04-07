@@ -5,7 +5,7 @@ GlucoGardener MCP Client
 通过 JSON-RPC 2.0 over HTTP 调用 MCP Server 暴露的工具。
 
 使用方式：
-    client = MCPClient("http://localhost:8001")
+    client = MCPClient("http://localhost:8002")
     result = client.call_tool("search_pubmed", {"query": "metformin HbA1c", "max_results": 3})
 
 亦支持并发调用（call_tools_parallel），用于同时拉取 PubMed + OpenFDA。
@@ -18,7 +18,7 @@ from typing import Any
 
 import httpx
 
-DEFAULT_MCP_URL = "http://localhost:8001"
+DEFAULT_MCP_URL = "http://localhost:8002"
 TIMEOUT = 15.0
 
 

@@ -14,7 +14,7 @@ GlucoGardener MCP Server
   - get_drug_info      → OpenFDA 药物说明书查询
   - search_local_rag   → 本地混合 RAG 知识库检索
 
-启动：python -m chatbot.mcp.server（默认 port 8001）
+启动：python -m chatbot.mcp.server（默认 port 8002）
 """
 import asyncio
 import json
@@ -249,4 +249,4 @@ def _sse_event(event: str, data: str) -> str:
 # ─────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    uvicorn.run("chatbot.mcp.server:app", host="0.0.0.0", port=8001, reload=False)
+    uvicorn.run("chatbot.mcp.server:app", host="0.0.0.0", port=8002, reload=False)
