@@ -77,6 +77,23 @@ const dict = {
   waist_cm: { English: "Current Waist (cm)", Chinese: "当前腰围（厘米）", Malay: "Pinggang Semasa (cm)", Tamil: "தற்போதைய இடுப்பு (செமீ)" },
   weight_kg: { English: "Current Weight (kg)", Chinese: "当前体重（公斤）", Malay: "Berat Semasa (kg)", Tamil: "தற்போதைய எடை (கிகி)" },
 
+  // ── Warm up ──
+  warmup_greeting: { English: "Good morning,", Chinese: "早安，", Malay: "Selamat Pagi,", Tamil: "காலை வணக்கம்," },
+  warmup_pattern_confirm: { English: "I see you usually do", Chinese: "我注意到你通常会做", Malay: "Saya perasan anda biasanya", Tamil: "நீங்கள் வழக்கமாக செய்வது" },
+  warmup_pattern_at: { English: "at", Chinese: "在", Malay: "pada", Tamil: "மணிக்கு" },
+  warmup_keep_plan: { English: "Shall we keep that plan for today?", Chinese: "今天也按这个计划来吗？", Malay: "Kekalkan rancangan itu untuk hari ini?", Tamil: "இன்றும் அந்த திட்டத்தை தொடரலாமா?" },
+  warmup_yes: { English: "Yes, same as usual", Chinese: "是的，照旧", Malay: "Ya, seperti biasa", Tamil: "ஆம், வழக்கம் போல்" },
+  warmup_no: { English: "No, different plan", Chinese: "不，换个计划", Malay: "Tidak, rancangan lain", Tamil: "இல்லை, வேறு திட்டம்" },
+  warmup_no_exercise: { English: "It's been a while since your last workout. Even a short walk can help with blood sugar! Would you like to plan some exercise for today?", Chinese: "你好久没运动了。哪怕短短散步也对血糖有帮助！今天要不要安排点运动？", Malay: "Sudah lama anda tidak bersenam. Berjalan kaki singkat pun boleh membantu gula darah! Mahu merancang senaman hari ini?", Tamil: "உங்கள் கடைசி உடற்பயிற்சி நீண்ட நாட்களாகியது. குறுகிய நடைப்பயிற்சி கூட இரத்த சர்க்கரைக்கு உதவும்! இன்று உடற்பயிற்சி திட்டமிட விரும்புகிறீர்களா?" },
+  warmup_yes_plan: { English: "Yes, let's plan!", Chinese: "好的，来安排！", Malay: "Ya, jom rancang!", Tamil: "ஆம், திட்டமிடுவோம்!" },
+  warmup_not_today: { English: "Not today", Chinese: "今天不了", Malay: "Tidak hari ini", Tamil: "இன்று வேண்டாம்" },
+  warmup_enjoy_workout: { English: "Great, enjoy your workout! 💪", Chinese: "太好了，运动愉快！💪", Malay: "Bagus, selamat bersenam! 💪", Tamil: "அருமை, உடற்பயிற்சியை அனுபவியுங்கள்! 💪" },
+  warmup_enjoy_day: { English: "No worries, enjoy your day! 🌸", Chinese: "没关系，祝你今天愉快！🌸", Malay: "Tiada masalah, nikmati hari anda! 🌸", Tamil: "பரவாயில்லை, உங்கள் நாளை அனுபவியுங்கள்! 🌸" },
+  warmup_what_plan: { English: "What's your exercise plan for today?", Chinese: "你今天打算做什么运动？", Malay: "Apakah rancangan senaman anda hari ini?", Tamil: "இன்று உங்கள் உடற்பயிற்சி திட்டம் என்ன?" },
+  warmup_input_placeholder: { English: "Tell me your plan...", Chinese: "告诉我你的计划...", Malay: "Beritahu saya rancangan anda...", Tamil: "உங்கள் திட்டத்தைச் சொல்லுங்கள்..." },
+  mini_chat_placeholder: { English: "Ask about this food...", Chinese: "问问这个食物...", Malay: "Tanya tentang makanan ini...", Tamil: "இந்த உணவைப் பற்றி கேளுங்கள்..." },
+  mini_chat_eaten: { English: "I've eaten this ✓", Chinese: "我已经吃了 ✓", Malay: "Saya sudah makan ✓", Tamil: "நான் இதை சாப்பிட்டேன் ✓" },
+
   // ── Garden ──
   garden_title: { English: "Garden", Chinese: "花园", Malay: "Taman", Tamil: "தோட்டம்" },
   friends: { English: "Friends", Chinese: "好友", Malay: "Rakan", Tamil: "நண்பர்கள்" },
