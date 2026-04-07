@@ -3,7 +3,12 @@ state/chat_state.py
 LangGraph 共享状态定义
 """
 import operator
-from typing import Annotated, TypedDict, Literal, Optional
+import sys
+if sys.version_info >= (3, 9):
+    from typing import Annotated, TypedDict, Literal, Optional
+else:
+    from typing import TypedDict, Literal, Optional
+    from typing_extensions import Annotated
 
 
 class ChatState(TypedDict):
@@ -23,6 +28,7 @@ class ChatState(TypedDict):
     # ── Triage 路由结果 ──────────────────────────────────
     intent:             Optional[str]
     all_intents:        Optional[list]
+    emotion_intensity:  Optional[str]   # none | mild | high（triage_gemini 输出）
 
     # ── 对话记忆 ─────────────────────────────────────────
     history:            Annotated[list, operator.add]

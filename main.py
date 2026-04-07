@@ -7,10 +7,21 @@ History is automatically persisted by LangGraph Checkpointer; main.py does not n
 from dotenv import load_dotenv
 load_dotenv()   # Must run before all model/DB imports
 
+import threading
 from apscheduler.schedulers.background import BackgroundScheduler
 from chatbot.graph.builder import app
 from chatbot.jobs.daily_summary import run_daily_summary
 from chatbot.utils.memory import get_user_profile
+from chatbot.memory.rag.retriever import get_retriever
+
+
+def _warmup_rag():
+    """Pre-initialize RAG retriever in background so first user query is fast."""
+    try:
+        get_retriever()._init()
+        print("[Warmup] RAG retriever ready")
+    except Exception as e:
+        print(f"[Warmup] RAG warmup failed: {e}")
 
 
 # ── 每轮重置的字段（不依赖 checkpointer）──────────────────────────
@@ -67,6 +78,9 @@ def run_cli():
 
     user_id = "user_001"
     config  = {"configurable": {"thread_id": user_id}}
+
+    # RAG 预热（后台线程，不阻塞启动）
+    threading.Thread(target=_warmup_rag, daemon=True).start()
 
     # 每日 23:59 情绪汇总定时任务
     scheduler = BackgroundScheduler()

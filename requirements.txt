@@ -1,0 +1,58 @@
+# Web framework
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart>=0.0.9
+
+# Data validation
+pydantic>=2.7.4
+pydantic-settings>=2.3.1
+
+# Database
+sqlalchemy>=2.0.36
+asyncpg==0.30.0
+psycopg2-binary>=2.9.9
+
+# Task queue
+celery==5.4.0
+redis==5.0.6
+
+# Data pipeline scheduler (independent of Celery)
+apscheduler==3.10.4
+
+# LangGraph & LangChain
+langgraph>=0.2.0
+langchain-core>=0.3.0
+langchain-text-splitters>=0.3.0
+langchain-openai>=0.3.0
+openai>=1.30.0
+
+# HTTP client
+httpx==0.27.0
+requests>=2.31.0
+
+# Image processing (Vision Agent)
+Pillow>=10.0.0
+
+# RAG - Chroma + BM25 hybrid retrieval (embedding/reranker via SiliconFlow API)
+chromadb>=0.5.0
+pysqlite3-binary               # WSL SQLite compatibility (Chroma requires >=3.35.0)
+rank-bm25>=0.2.2
+
+# Multilingual support
+langdetect>=1.0.9              # Language detection: en | zh | ms | ta
+
+# Logging
+structlog==24.2.0
+
+# Utilities
+python-dotenv==1.0.1
+numpy==1.26.4
+
+# Twilio (emergency voice calls)
+twilio==9.0.5
+
+# Testing
+pytest==8.2.2
+pytest-asyncio==0.23.7
+pytest-mock==3.14.0
+pytest-cov>=7.0.0

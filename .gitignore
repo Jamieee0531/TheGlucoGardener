@@ -58,5 +58,8 @@ chatbot/*.db
 test_images/medicaiton/
 test_images/food/
 
+# Local config merges (review separately before committing)
+merged_configs/
+
 # Coverage
 .coverage

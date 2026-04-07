@@ -4,6 +4,7 @@ SEA-LION 试用版 API 调用封装
 对话模型：aisingapore/Qwen-SEA-LION-v4-32B-IT
 推理模型：aisingapore/Llama-SEA-LION-v3.5-70B-R
 备用：Cloudflare Gemma-SEA-LION-v4（限流时自动切换）
+OpenAI：结构化 JSON 输出（Triage 分诊用）
 """
 import json as _json
 import os
@@ -176,6 +177,52 @@ def call_sealion_with_history_stream(
         if cb:
             cb(content)
         return content
+
+
+def call_openai_stream(system_prompt: str, messages: list) -> str:
+    """
+    Call OpenAI gpt-4o-mini with streaming. Returns full response string.
+    Used by hybrid_agent for reliable instruction-following.
+    """
+    from openai import OpenAI
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""), timeout=30)
+    full_messages = [{"role": "system", "content": system_prompt}] + messages
+    stream = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=full_messages,
+        stream=True,
+        temperature=0.7,
+    )
+    full_content = ""
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content or ""
+        if delta:
+            print(delta, end="", flush=True)
+            full_content += delta
+            cb = _get_token_callback()
+            if cb:
+                cb(delta)
+    print()
+    return full_content
+
+
+def call_openai_json(prompt: str, schema: dict) -> dict:
+    """
+    Call OpenAI gpt-4o-mini with strict JSON schema output.
+    Returns parsed dict. Raises on API error.
+    """
+    from openai import OpenAI
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""), timeout=10)
+    resp = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        response_format={
+            "type": "json_schema",
+            "json_schema": {"name": "response", "schema": schema, "strict": True},
+        },
+        temperature=0,
+    )
+    return _json.loads(resp.choices[0].message.content)
 
 
 def format_history_for_sealion(history: list) -> list:
