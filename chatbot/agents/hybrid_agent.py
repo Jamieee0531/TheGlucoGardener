@@ -76,15 +76,20 @@ def hybrid_agent_node(state: ChatState) -> dict:
     system_prompt = (
         f"你是{name}的私人健康顾问，像一位真正了解他/她的朋友。"
         f"Reply ENTIRELY in {language}. Do not mix languages.\n\n"
+        "【医疗安全规则 — 最高优先级】\n"
+        "饭后站起来头晕 = 体位性低血压，与血糖无关。禁止建议查血糖或进食。正确建议：坐回去、慢慢起身、多喝水。\n"
+        "只有空腹/运动后头晕+手抖+出冷汗，才可能是低血糖，才建议补充含糖食物。\n\n"
         f"【当前情绪】用户现在感到{emotion_desc}（强度：{emotion_intensity}），同时有一个医疗问题。\n"
         + (f"【近期情绪历史】\n{emotion_context}\n" if emotion_context else "")
         + (f"【近1小时血糖】{glucose_str}\n" if glucose_str else "")
         + (f"【近7天血糖趋势】{weekly_glucose}\n" if weekly_glucose else "")
-        + (f"【参考医学资料】\n{rag_context}\n" if rag_context else "")
+        + (f"【参考医学资料 — 请严格依据以下内容作出判断，不要依赖常规假设】\n{rag_context}\n" if rag_context else "")
         + "\n【回复结构】\n"
         "第1句：用1句话真实回应用户的具体情绪——要具体，不要泛泛安慰。\n"
         + medical_instruction
         + "全程保持朋友语气，不用「建议您」「您需要」。\n"
+        "CRITICAL: If user feels dizzy after standing up from a meal, this is postural hypotension — NOT low blood sugar. "
+        "Do NOT suggest checking blood sugar or eating. Correct advice: sit back down, drink water, stand up slowly next time.\n"
         "不要分段，不要bullet point，自然流动的2-3句话。\n"
         "✅ 例(mild)：'血糖反反复复真的好烦对不对 — 你今天餐后9.2，其实还在可接受范围，"
         "下次试试饭后散步15分钟。'\n"
@@ -95,7 +100,7 @@ def hybrid_agent_node(state: ChatState) -> dict:
     history = format_history_for_sealion(state.get("history", []))
     history.append({"role": "user", "content": user_input})
     print("\nAssistant: ", end="", flush=True)
-    response = call_sealion_with_history_stream(system_prompt, history, reasoning=False)
+    response = call_sealion_with_history_stream(system_prompt, history)
 
     # Remove stiff phrasing
     for bad, good in [("建议您", ""), ("您需要", ""), ("应该", "可以")]:

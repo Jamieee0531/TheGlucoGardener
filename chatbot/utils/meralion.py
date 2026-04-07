@@ -9,6 +9,7 @@ import base64
 import math
 import os
 import requests
+from typing import Tuple
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,7 +26,7 @@ _AUDIO_PROMPT = "Instruction: {query} \nFollow the text instruction based on the
 _EMOTION_QUERY = "Analyze the speaker's emotion from both tone and content. Reply with a single word only, one of: angry sad fearful happy neutral"
 
 
-def _parse_emotion_from_logprobs(data: dict) -> tuple[str, float]:
+def _parse_emotion_from_logprobs(data: dict) -> Tuple[str, float]:
     """
     从 top_logprobs 扫描，取第一个在 VALID_EMOTIONS 里的候选及其概率。
     模型有时输出截断词（'an'、'frust'），直接取 content 字段不可靠。
@@ -80,7 +81,7 @@ def _transcribe(audio_b64: str, content_type: str) -> str:
     return text
 
 
-def _analyze_audio_emotion(audio_b64: str, content_type: str) -> tuple[str, float]:
+def _analyze_audio_emotion(audio_b64: str, content_type: str) -> Tuple[str, float]:
     data = _call_audio_api(audio_b64, content_type,
                            query=_EMOTION_QUERY, max_tokens=5, logprobs=True)
     emotion_label, confidence = _parse_emotion_from_logprobs(data)
@@ -110,7 +111,7 @@ def process_voice_input(audio_path: str) -> dict:
 
 # ── 文字情绪识别 ──────────────────────────────────────────────────
 
-def _analyze_text_emotion(text: str) -> tuple[str, float]:
+def _analyze_text_emotion(text: str) -> Tuple[str, float]:
     resp = requests.post(
         f"{MERALION_BASE_URL}/v1/chat/completions",
         headers={"Authorization": f"Bearer {MERALION_API_KEY}"},

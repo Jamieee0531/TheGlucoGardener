@@ -80,19 +80,53 @@ _DEFAULT_PROFILE = {
 
 
 def get_user_profile(user_id: str) -> dict:
-    """
-    获取用户档案
-    实际项目中替换为数据库查询
-    """
+    """从 PostgreSQL users 表读取用户档案，失败降级 mock。"""
+    try:
+        from chatbot.db.connection import db_cursor
+        with db_cursor() as cur:
+            cur.execute(
+                """
+                SELECT name, language, conditions, medications, preferences
+                FROM users WHERE user_id = %s
+                """,
+                (user_id,),
+            )
+            row = cur.fetchone()
+        if row:
+            return {
+                "name":        row["name"] or "患者",
+                "language":    row["language"] or "Chinese",
+                "conditions":  list(row["conditions"] or []),
+                "medications": list(row["medications"] or []),
+                "preferences": dict(row["preferences"] or {}),
+            }
+    except Exception as e:
+        print(f"[Memory] 用户档案 DB 失败（{e}），使用 mock")
     return _USER_PROFILES.get(user_id, _DEFAULT_PROFILE.copy())
 
 
 def update_user_profile(user_id: str, updates: dict) -> dict:
-    """
-    更新用户档案
-    实际项目中替换为数据库写入
-    """
-    profile = get_user_profile(user_id)
-    profile.update(updates)
-    _USER_PROFILES[user_id] = profile
-    return profile
+    """更新用户档案（写 PostgreSQL，失败降级 in-memory）。"""
+    try:
+        from chatbot.db.connection import db_cursor
+        allowed = {"name", "language", "conditions", "medications", "preferences"}
+        fields = {k: v for k, v in updates.items() if k in allowed}
+        if fields:
+            import json
+            set_clauses = []
+            values = []
+            for k, v in fields.items():
+                set_clauses.append(f"{k} = %s")
+                values.append(json.dumps(v) if isinstance(v, (dict, list)) else v)
+            values.append(user_id)
+            with db_cursor(commit=True) as cur:
+                cur.execute(
+                    f"UPDATE users SET {', '.join(set_clauses)} WHERE user_id = %s",
+                    values,
+                )
+    except Exception as e:
+        print(f"[Memory] 用户档案更新 DB 失败（{e}），仅更新 in-memory")
+        profile = _USER_PROFILES.get(user_id, _DEFAULT_PROFILE.copy())
+        profile.update(updates)
+        _USER_PROFILES[user_id] = profile
+    return get_user_profile(user_id)

@@ -127,7 +127,7 @@ def expert_agent_node(state: ChatState) -> dict:
         f"{f'- 当餐饮食：{diet_str}{chr(10)}' if diet_str else ''}"
         f"{f'【近7天血糖趋势】{chr(10)}- {weekly_glucose_str}{chr(10)}' if weekly_glucose_str else ''}"
         f"{f'【近7天饮食历史】{chr(10)}{weekly_diet_str}{chr(10)}' if weekly_diet_str else ''}"
-        f"{f'【参考医学资料】{chr(10)}{rag_context}{chr(10)}' if rag_context else ''}"
+        f"{f'【参考医学资料 — 请严格依据以下内容作出判断，不要依赖常规假设】{chr(10)}{rag_context}{chr(10)}' if rag_context else ''}"
         f"{emotion_hint}"
         + (
         f"【Food Photo Analysis Mode】\n"

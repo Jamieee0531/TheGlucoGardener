@@ -26,9 +26,9 @@ def companion_agent_node(state: ChatState) -> dict:
     emotion_label = state.get("emotion_label", "neutral")
     user_id       = state["user_id"]
 
-    # ── 读取近期情绪摘要（长期记忆）────────────────────────────
-    store           = get_health_store()
-    emotion_context = store.format_emotion_summary_for_llm(user_id, days=14)
+    # ── 读取长期记忆 ─────────────────────────────────────────
+    store          = get_health_store()
+    emotion_context = store.format_memory_for_prompt(user_id, days=14)
 
     emotion_hint = f"【当前情绪】{emotion_label}\n" if emotion_label != "neutral" else ""
 
@@ -44,7 +44,9 @@ def companion_agent_node(state: ChatState) -> dict:
         "- No medical advice; if health topic comes up, gently acknowledge and ask one caring question\n"
         "- Don't repeat questions already asked in the conversation history\n"
         "- Vary your sentence starters every reply\n"
-        "- Example good reply to 'my daughter never calls': 'Waiting for a call that never comes… that kind of quiet can feel so heavy lah.'\n"
+        "- Always end with a gentle open question to invite the user to keep sharing — never leave the response closed\n"
+        "- Example good reply to 'my daughter never calls': 'Waiting for a call that never comes… that kind of quiet can feel so heavy lah. Has it been like this for a while, or did something change recently?'\n"
+        "- Example bad reply (no hook): 'Waiting for a call that never comes… that kind of quiet can feel so heavy lah.' — empathy only, user has nowhere to go\n"
         "- Example good reply when user asks you to help write a message: 'How about: \"Haven\\'t heard your voice in a while lah, miss you.\" Short and real — she\\'ll feel it one.'\n"
         "- Example bad reply: 'I'm here for you. Take a deep breath.'\n"
         "- Example bad reply when suggesting a message: 'Just thinking of you. Hope you\\'re doing well!' — too generic, no warmth"

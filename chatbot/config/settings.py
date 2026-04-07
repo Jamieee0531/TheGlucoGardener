@@ -2,6 +2,7 @@
 全局配置：模型名称、API地址、参数
 """
 import os
+from typing import Optional
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,12 +39,16 @@ MAX_HISTORY_CHARS = 2000 # 历史字符上限
 
 
 # 意图类别
-INTENT_MEDICAL   = "medical"     # 医疗咨询
-INTENT_COMPANION = "companion"   # 陪伴/闲聊
+INTENT_MEDICAL   = "medical"    # 医疗咨询
+INTENT_COMPANION = "companion"  # 陪伴/闲聊
+INTENT_HYBRID    = "hybrid"     # 医疗 + 强情绪并存
+INTENT_CRISIS    = "crisis"     # 危机干预
 
 ALL_INTENTS = [
     INTENT_MEDICAL,
     INTENT_COMPANION,
+    INTENT_HYBRID,
+    INTENT_CRISIS,
 ]
 
 
@@ -64,7 +69,7 @@ def get_active_api_key() -> str:
         return OPENAI_API_KEY
     raise ValueError("未配置任何 API Key，请检查 .env 文件")
 
-def get_active_base_url() -> str | None:
+def get_active_base_url() -> Optional[str]:
     """根据环境返回当前可用的 base_url"""
     if SEALION_API_KEY:
         return SEALION_BASE_URL
