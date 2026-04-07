@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import TopBar from "../components/TopBar";
 import SugarChart from "../components/SugarChart";
@@ -11,8 +12,18 @@ import { fetchInterventions } from "../lib/gatewayApi";
 const API_BASE = "http://localhost:8080";
 
 export default function HomePage() {
+  const router = useRouter();
   const { user, loading } = useAuth();
   const { t } = useTranslation();
+
+  // ── Warm-up gate: redirect if not done today ──
+  useEffect(() => {
+    if (loading || !user) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (!localStorage.getItem(`warmup_done_${today}`)) {
+      router.push("/warmup");
+    }
+  }, [user, loading, router]);
   const [bmi, setBmi] = useState("—");
   const [mealsLogged, setMealsLogged] = useState("0/3");
 
