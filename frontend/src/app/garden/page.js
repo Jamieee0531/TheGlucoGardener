@@ -39,6 +39,23 @@ export default function GardenPage() {
 
   const flowerCount = points ? getFlowerCount(points.accumulated_points) : 0;
 
+  // Sort friends by points (descending) for ranking
+  const rankedFriends = [...friends].sort(
+    (a, b) => (b.accumulated_points || 0) - (a.accumulated_points || 0)
+  );
+
+  // Hardcoded messages for demo (Mdm Chen scenario)
+  const messages = user.user_id === "user_001"
+    ? [
+        { from: "Sarah (daughter)", text: "妈妈，加油！💪", time: "Today, 9:12 AM" },
+        { from: "Marcus", text: "Keep it up, Mdm Chen! 🌻", time: "Yesterday, 3:45 PM" },
+      ]
+    : user.user_id === "user_002"
+    ? [
+        { from: "Mdm Chen", text: "Marcus, you're doing great! 🌸", time: "Today, 10:30 AM" },
+      ]
+    : [];
+
   // Render flowers: center big, sides small, grow from center outward
   const renderFlowers = () => {
     if (flowerCount === 0) return null;
@@ -79,7 +96,7 @@ export default function GardenPage() {
       <TopBar title={t("garden_title")} transparent />
 
       {/* ── Garden display ── */}
-      <div className="flex items-end justify-center w-full px-2 mt-20 mb-2 overflow-hidden">
+      <div className="flex items-end justify-center w-full px-2 mt-8 mb-2">
         {renderFlowers()}
       </div>
 
@@ -90,21 +107,50 @@ export default function GardenPage() {
         </p>
       )}
 
+      {/* ── Message Board ── */}
+      {messages.length > 0 && (
+        <div className="px-6 mb-4">
+          <h3 className="text-xl font-bold italic text-[#7cb342] mb-2">{t("message_board")}</h3>
+          <div className="space-y-2">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className="bg-white/80 rounded-xl px-4 py-3 shadow-sm border border-[#e8e0d4]"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-bold text-[#5a8a2e]">{msg.from}</span>
+                  <span className="text-xs text-gray-400">{msg.time}</span>
+                </div>
+                <p className="text-sm text-gray-700">{msg.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Friends section ── */}
       <div className="px-6 pb-6">
         <h3 className="text-xl font-bold italic text-[#7cb342] mb-3">{t("friends")}</h3>
 
         <div>
-          {friends.map((friend, i) => (
+          {rankedFriends.map((friend, i) => (
             <div key={friend.user_id}>
               <div className="flex items-center py-3 px-4 bg-[#f0e6d6] rounded-lg">
+                {/* Rank */}
+                <span className="text-lg font-bold italic text-[#7cb342] w-6 text-center mr-2">
+                  {i + 1}
+                </span>
                 <img
                   src={friend.avatar}
                   alt={friend.name}
                   className="w-[55px] h-[55px] rounded-full object-cover"
                 />
-                <span className="ml-3 text-sm font-semibold text-gray-700">{friend.name}</span>
-                <span className="flex-1" />
+                <div className="ml-3 flex-1">
+                  <span className="text-sm font-semibold text-gray-700">{friend.name}</span>
+                  <p className="text-xs text-[#7cb342]">
+                    🌸 ×{getFlowerCount(friend.accumulated_points || 0)} {t("flowers")}
+                  </p>
+                </div>
                 <button
                   onClick={() => router.push(`/garden/visit?id=${friend.user_id}`)}
                   className="text-sm font-semibold text-gray-800 hover:text-[#7cb342] transition-colors"
@@ -112,7 +158,7 @@ export default function GardenPage() {
                   {t("visit")}
                 </button>
               </div>
-              {i < friends.length - 1 && <div className="h-3" />}
+              {i < rankedFriends.length - 1 && <div className="h-3" />}
             </div>
           ))}
           {friends.length === 0 && (
