@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import TopBar from "../../components/TopBar";
+import MiniChat from "../../components/MiniChat";
 import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
 
@@ -62,6 +63,8 @@ export default function TaskPage() {
   const [dbDailyCompleted, setDbDailyCompleted] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [resultModal, setResultModal] = useState(null); // { success, title, message }
+  const [mealChatOpen, setMealChatOpen] = useState(false);
+  const [mealImageFile, setMealImageFile] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -184,66 +187,38 @@ export default function TaskPage() {
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
-    if (!file || activeTaskId !== "meals") {
-      // Non-meal photo tasks: just mark complete locally
-      if (file) {
-        completeTask(activeTaskId);
-        setShowPhotoModal(false);
-        setActiveTaskId(null);
-      }
-      e.target.value = "";
-      return;
-    }
-
-    // Meal photo: call Vision Agent via API
-    setUploading(true);
-    setShowPhotoModal(false);
-    try {
-      const form = new FormData();
-      form.append("user_id", user.user_id);
-      form.append("image", file);
-
-      const res = await fetch(`${API_BASE}/health/log-meal`, {
-        method: "POST",
-        body: form,
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        completeTask("meals");
-        // Refresh points and daily tasks
-        fetch(`${API_BASE}/garden/my?user_id=${user.user_id}`)
-          .then((r) => r.json())
-          .then((d) => {
-            setTotalPts(d.total_points || 0);
-            setPlantProgress(d.accumulated_points % 500);
-          });
-        fetch(`${API_BASE}/health/daily-tasks?user_id=${user.user_id}`)
-          .then((r) => r.json())
-          .then((d) => setDbDailyCompleted(d.completed || 0));
-        setResultModal({
-          success: true,
-          title: data.food_name,
-          message: `${data.total_calories} kcal · ${data.gi_level} GI\n+${data.reward_points} pts earned!`,
-        });
-      } else {
-        setResultModal({
-          success: false,
-          title: t("upload_failed") || "Upload Failed",
-          message: data.message,
-        });
-      }
-    } catch (err) {
-      console.error("Log meal failed:", err);
-      setResultModal({
-        success: false,
-        title: t("upload_failed") || "Upload Failed",
-        message: "Failed to upload. Please try again.",
-      });
-    }
-    setUploading(false);
-    setActiveTaskId(null);
     e.target.value = "";
+    if (!file) return;
+
+    if (activeTaskId === "meals") {
+      // Open mini chat with the image
+      setMealImageFile(file);
+      setMealChatOpen(true);
+      setShowPhotoModal(false);
+      setActiveTaskId(null);
+    } else {
+      // Non-meal photo tasks: just mark complete locally
+      completeTask(activeTaskId);
+      setShowPhotoModal(false);
+      setActiveTaskId(null);
+    }
+  };
+
+  const handleMealConfirm = () => {
+    completeTask("meals");
+    setMealChatOpen(false);
+    setMealImageFile(null);
+    // Refresh points and daily tasks
+    const uid = user.user_id;
+    fetch(`${API_BASE}/garden/my?user_id=${uid}`)
+      .then((r) => r.json())
+      .then((d) => {
+        setTotalPts(d.total_points || 0);
+        setPlantProgress(d.accumulated_points % 500);
+      });
+    fetch(`${API_BASE}/health/daily-tasks?user_id=${uid}`)
+      .then((r) => r.json())
+      .then((d) => setDbDailyCompleted(d.completed || 0));
   };
 
   const handleBodySubmit = async () => {
@@ -481,6 +456,23 @@ export default function TaskPage() {
             );
           })}
         </div>
+
+        {/* Mini Chat overlay for meals */}
+        {mealChatOpen && (
+          <div className="px-4 mt-2">
+            <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#A7CBED" }}>
+              <MiniChat
+                userId={user.user_id}
+                imageFile={mealImageFile}
+                onConfirmEaten={handleMealConfirm}
+                onClose={() => {
+                  setMealChatOpen(false);
+                  setMealImageFile(null);
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Stats Section */}
         <div className="flex items-start px-5 mt-6">
