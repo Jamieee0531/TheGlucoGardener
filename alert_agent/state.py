@@ -28,6 +28,8 @@ class AgentState(TypedDict):
     estimated_glucose_drop: Optional[float]  # deterministic: mean of last 3 session drops
     projected_glucose: Optional[float]       # deterministic: current_glucose - avg_drop
 
+    food_intake_today: Optional[dict]     # today's meals, total_kcal, last_meal_hours_ago
+
     # ── Reflector fills (LLM reasoning only) ─────────────────
     risk_level: Optional[str]
     reasoning_summary: Optional[str]

@@ -19,7 +19,12 @@ export default function HomePage() {
   // Alert states
   const [softAlert, setSoftAlert] = useState(null);   // { message_sent, trigger_type, ... }
   const [softDismissedId, setSoftDismissedId] = useState(null); // ID of dismissed intervention
+  const [softShowReasoning, setSoftShowReasoning] = useState(false); // show reasoning_summary
+  const [softFeedbackMode, setSoftFeedbackMode] = useState(false); // show feedback textarea
+  const [softFeedbackText, setSoftFeedbackText] = useState("");
+  const [softFeedbackThanks, setSoftFeedbackThanks] = useState(false); // show thanks message
   const [hardAlert, setHardAlert] = useState(null);    // { trigger_type, glucose, ... }
+  const [showPush, setShowPush] = useState(null); // "soft" | "hard" | null
 
   useEffect(() => {
     if (!user) return;
@@ -90,11 +95,39 @@ export default function HomePage() {
     };
   }, [user, softAlert, softDismissedId]);
 
+  // ── Show push notification when alerts arrive ──
+  useEffect(() => {
+    if (softAlert && !softDismissedId) {
+      setShowPush("soft");
+      const timer = setTimeout(() => setShowPush((v) => v === "soft" ? null : v), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [softAlert, softDismissedId]);
+
+  useEffect(() => {
+    if (hardAlert) {
+      setShowPush("hard");
+      const timer = setTimeout(() => setShowPush((v) => v === "hard" ? null : v), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [hardAlert]);
+
   // ── Dismiss handlers ──
   const dismissSoftAlert = useCallback(() => {
     if (softAlert?.id) setSoftDismissedId(softAlert.id);
     setSoftAlert(null);
+    setSoftShowReasoning(false);
+    setSoftFeedbackMode(false);
+    setSoftFeedbackText("");
+    setSoftFeedbackThanks(false);
   }, [softAlert]);
+
+  const handleSoftFeedbackSubmit = useCallback(() => {
+    setSoftFeedbackThanks(true);
+    setTimeout(() => {
+      dismissSoftAlert();
+    }, 1500);
+  }, [dismissSoftAlert]);
 
   const dismissHardAlert = useCallback(() => {
     setHardAlert(null);
@@ -145,51 +178,22 @@ export default function HomePage() {
             {t("good_morning")} {user.name.split(" ")[0]}!
           </h2>
 
-          {softAlert ? (
-            <>
-              {/* Soft alert state */}
-              <h3 className="text-lg font-bold italic text-[#F4B95D] mt-1.5">
-                {t("heads_up")}
-              </h3>
-              <p className="text-base italic text-[#F4B95D] mt-1 leading-snug max-w-[260px]">
-                {softAlert.message_sent}
-              </p>
+          <p className="text-base italic text-[#F4B95D] mt-0.5">
+            {t("how_feeling")}
+          </p>
 
-              <Link
-                href="/chat"
-                className="inline-block mt-2 px-6 py-2 text-sm font-medium text-gray-700 border border-[#e8c8a0] rounded-full bg-[#fce8d0]/40 hover:bg-[#fce8d0] w-fit"
-              >
-                {t("chat_with_ai")}
-              </Link>
+          <Link
+            href="/chat"
+            className="inline-block mt-3 px-6 py-2 text-sm font-medium text-gray-700 border border-[#e8c8a0] rounded-full bg-[#fce8d0]/40 hover:bg-[#fce8d0] w-fit"
+          >
+            {t("chat_with_ai")}
+          </Link>
 
-              <button
-                onClick={dismissSoftAlert}
-                className="block mt-2 px-5 py-1.5 text-sm font-bold text-white bg-[#e8927c] rounded-full hover:bg-[#d4816c]"
-              >
-                Mark as read
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Default state */}
-              <p className="text-base italic text-[#F4B95D] mt-0.5">
-                {t("how_feeling")}
-              </p>
-
-              <Link
-                href="/chat"
-                className="inline-block mt-3 px-6 py-2 text-sm font-medium text-gray-700 border border-[#e8c8a0] rounded-full bg-[#fce8d0]/40 hover:bg-[#fce8d0] w-fit"
-              >
-                {t("chat_with_ai")}
-              </Link>
-
-              <img
-                src="/healthy_life.jpg"
-                alt="Healthy lifestyle"
-                className="w-[160px] h-auto object-contain mt-2 -ml-1"
-              />
-            </>
-          )}
+          <img
+            src="/healthy_life.jpg"
+            alt="Healthy lifestyle"
+            className="w-[160px] h-auto object-contain mt-2 -ml-1"
+          />
         </div>
 
         {/* ====== SECTION 2: Middle-right — Snapshot + Stats + Tasks + Flower ====== */}
@@ -228,20 +232,132 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* ── Soft Alert Modal Overlay ── */}
+      {softAlert && (
+        <>
+          <div className="fixed inset-0 bg-black/30 z-40" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-8">
+            <div className="bg-white rounded-2xl p-6 shadow-xl max-w-[340px] w-full border-2 border-yellow-400">
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 rounded-xl bg-yellow-50 flex items-center justify-center text-3xl">
+                  ⚠️
+                </div>
+              </div>
+
+              {/* Title */}
+              <h3 className="text-xl font-bold text-yellow-600 mb-2 text-center">
+                {t("better_safe")}
+              </h3>
+
+              {/* Confidence badge */}
+              <div className="flex justify-center mb-3">
+                {(() => {
+                  let confidence;
+                  try {
+                    const decision = softAlert.agent_decision
+                      ? JSON.parse(softAlert.agent_decision) : null;
+                    confidence = decision?.confidence || "MEDIUM";
+                  } catch { confidence = "MEDIUM"; }
+                  const colors = {
+                    HIGH: "bg-green-100 text-green-700 border-green-300",
+                    MEDIUM: "bg-yellow-100 text-yellow-700 border-yellow-300",
+                    LOW: "bg-red-100 text-red-700 border-red-300",
+                  };
+                  return (
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${colors[confidence] || colors.MEDIUM}`}>
+                      {t("soft_alert_confidence")}: {confidence}
+                    </span>
+                  );
+                })()}
+              </div>
+
+              {/* Message */}
+              <p className="text-sm text-gray-600 leading-relaxed text-center">
+                {softAlert.message_sent || t("soft_alert_msg")}
+              </p>
+
+              {/* State machine: buttons → reasoning → feedback → thanks */}
+              {softFeedbackThanks ? (
+                <p className="text-center mt-4 text-sm font-semibold text-green-600">
+                  {t("soft_alert_feedback_thanks")}
+                </p>
+              ) : softFeedbackMode ? (
+                /* Feedback textarea */
+                <div className="mt-4">
+                  <textarea
+                    className="w-full border border-gray-300 rounded-lg p-2 text-sm resize-none focus:outline-none focus:border-yellow-400"
+                    rows={3}
+                    placeholder={t("soft_alert_feedback_placeholder")}
+                    value={softFeedbackText}
+                    onChange={(e) => setSoftFeedbackText(e.target.value)}
+                  />
+                  <button
+                    onClick={handleSoftFeedbackSubmit}
+                    disabled={!softFeedbackText.trim()}
+                    className="mt-2 w-full py-2 text-sm font-medium text-white bg-yellow-500 rounded-full hover:bg-yellow-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {t("soft_alert_feedback_submit")}
+                  </button>
+                </div>
+              ) : softShowReasoning ? (
+                /* Reasoning summary + Good Enough / Give Feedback */
+                <div className="mt-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p className="text-xs text-gray-700 leading-relaxed">
+                      {(() => {
+                        try {
+                          const decision = softAlert.agent_decision
+                            ? JSON.parse(softAlert.agent_decision)
+                            : null;
+                          return decision?.reasoning_summary || t("soft_alert_demo_reasoning");
+                        } catch { return t("soft_alert_demo_reasoning"); }
+                      })()}
+                    </p>
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    <button
+                      onClick={dismissSoftAlert}
+                      className="w-full py-2 text-sm font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-600"
+                    >
+                      {t("soft_alert_good_enough")}
+                    </button>
+                    <button
+                      onClick={() => setSoftFeedbackMode(true)}
+                      className="w-full py-2 text-sm font-medium text-yellow-600 border border-yellow-400 rounded-full hover:bg-yellow-50"
+                    >
+                      {t("soft_alert_not_helpful")}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Initial buttons */
+                <div className="mt-5 space-y-2">
+                  <button
+                    onClick={dismissSoftAlert}
+                    className="w-full py-2 text-sm font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-600"
+                  >
+                    {t("soft_alert_got_it")}
+                  </button>
+                  <button
+                    onClick={() => setSoftShowReasoning(true)}
+                    className="w-full py-2 text-sm font-medium text-yellow-600 border border-yellow-400 rounded-full hover:bg-yellow-50"
+                  >
+                    {t("soft_alert_why")}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* ── Hard Alert Modal Overlay ── */}
       {hardAlert && (
         <>
           <div className="fixed inset-0 bg-black/30 z-40" />
           <div className="fixed inset-0 z-50 flex items-center justify-center px-8">
-            <div className="bg-white rounded-2xl p-6 shadow-xl relative max-w-[340px] w-full border-2 border-red-400">
-              {/* Close button */}
-              <button
-                onClick={dismissHardAlert}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-lg"
-              >
-                &times;
-              </button>
-
+            <div className="bg-white rounded-2xl p-6 shadow-xl max-w-[340px] w-full border-2 border-red-400">
               {/* Icon */}
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-xl bg-red-100 flex items-center justify-center text-3xl">
@@ -255,7 +371,7 @@ export default function HomePage() {
               </h3>
 
               {/* Message */}
-              <p className="text-base text-gray-600 leading-relaxed text-center">
+              <p className="text-sm text-gray-600 leading-relaxed text-center">
                 {t("alert_hypo_msg")}
               </p>
 
@@ -264,9 +380,45 @@ export default function HomePage() {
                   Current glucose: {hardAlert.glucose} mmol/L
                 </p>
               )}
+
+              <button
+                onClick={dismissHardAlert}
+                className="mt-5 w-full py-2 text-sm font-bold text-white bg-red-500 rounded-full hover:bg-red-600"
+              >
+                {t("soft_alert_got_it")}
+              </button>
             </div>
           </div>
         </>
+      )}
+
+      {/* ── Simulated Push Notification ── */}
+      {showPush && (
+        <div
+          className="fixed top-4 left-4 right-4 z-[60] animate-slide-down cursor-pointer"
+          onClick={() => setShowPush(null)}
+        >
+          <div className={`flex items-center gap-3 p-3 rounded-2xl shadow-lg backdrop-blur-md ${
+            showPush === "hard"
+              ? "bg-red-50/95 border border-red-200"
+              : "bg-yellow-50/95 border border-yellow-200"
+          }`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${
+              showPush === "hard" ? "bg-red-100" : "bg-yellow-100"
+            }`}>
+              {showPush === "hard" ? "🍬" : "⚠️"}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-gray-900 uppercase tracking-wide">
+                {t(showPush === "hard" ? "hard_push_title" : "soft_push_title")}
+              </p>
+              <p className="text-xs text-gray-600 truncate">
+                {t(showPush === "hard" ? "hard_push_body" : "soft_push_body")}
+              </p>
+            </div>
+            <span className="text-[10px] text-gray-400 shrink-0">now</span>
+          </div>
+        </div>
       )}
     </div>
   );

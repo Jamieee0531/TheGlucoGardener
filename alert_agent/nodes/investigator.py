@@ -10,6 +10,7 @@ import structlog
 
 from alert_agent.state import AgentState
 from alert_agent.tools.emotion_context_tool import get_emotion_context
+from alert_agent.tools.food_intake_tool import get_food_intake
 from alert_agent.tools.location_context_tool import get_semantic_location
 from alert_agent.tools.patient_history_tool import get_patient_context
 from config import settings
@@ -39,7 +40,7 @@ async def investigator_node(state: AgentState) -> dict:
     task = state["task"]
     user_id = task["user_id"]
 
-    location, history, emotion = await asyncio.gather(
+    location, history, emotion, food_intake = await asyncio.gather(
         call_location_context_mcp(
             task.get("gps_lat"),
             task.get("gps_lng"),
@@ -47,6 +48,7 @@ async def investigator_node(state: AgentState) -> dict:
         ),
         call_patient_history_mcp(user_id, task.get("trigger_at", "")),
         call_emotion_context_mcp(user_id),
+        call_food_intake_mcp(user_id, task.get("trigger_at", "")),
     )
 
     # Resolve null emotion to default
@@ -97,6 +99,7 @@ async def investigator_node(state: AgentState) -> dict:
         "glucose_weekly_profile": history.get("glucose_weekly_profile"),
         "estimated_glucose_drop": estimated_glucose_drop,
         "projected_glucose": projected_glucose,
+        "food_intake_today": food_intake,
     }
 
 
@@ -137,3 +140,13 @@ async def call_emotion_context_mcp(user_id: str) -> dict | None:
     except Exception as e:
         logger.error("tool_error", service="emotion_context", error=str(e))
         return None
+
+
+async def call_food_intake_mcp(user_id: str, reference_time: str) -> dict:
+    """Call Food Intake tool to fetch today's meal records."""
+    try:
+        data = await get_food_intake(user_id, reference_time)
+        return data if data else {"meals_today": [], "total_kcal": 0, "last_meal_hours_ago": None}
+    except Exception as e:
+        logger.error("tool_error", service="food_intake", error=str(e))
+        return {"meals_today": [], "total_kcal": 0, "last_meal_hours_ago": None}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import TopBar from "../../components/TopBar";
 import SugarChart from "../../components/SugarChart";
@@ -11,13 +11,19 @@ export default function HardAlertPage() {
   const { user, loading } = useAuth();
   const { t } = useTranslation();
   const [showAlert, setShowAlert] = useState(true);
+  const [showPush, setShowPush] = useState(true);
+
+  // Auto-dismiss push after 4s
+  useEffect(() => {
+    const timer = setTimeout(() => setShowPush(false), 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading || !user) return null;
 
   return (
     <div className="flex flex-col h-full bg-cream relative overflow-hidden">
       {/* ── Background blobs ── */}
-      {/* Gray/beige circle - LOWEST z, middle-right */}
       <div
         className="absolute z-0"
         style={{
@@ -26,7 +32,6 @@ export default function HardAlertPage() {
           top: 250, left: 100,
         }}
       />
-      {/* Pink circle - HIGH z, top-left quarter visible */}
       <div
         className="absolute z-[1]"
         style={{
@@ -35,7 +40,6 @@ export default function HardAlertPage() {
           top: -210, left: -250,
         }}
       />
-      {/* Mint circle - MID z, bottom-left, only top-right quarter visible */}
       <div
         className="absolute z-[1]"
         style={{
@@ -118,34 +122,56 @@ export default function HardAlertPage() {
         <>
           <div className="fixed inset-0 bg-black/30 z-40" />
           <div className="fixed inset-0 z-50 flex items-center justify-center px-8">
-            <div className="bg-white rounded-2xl p-6 shadow-xl relative max-w-[340px] w-full">
-              {/* Close button */}
-              <button
-                onClick={() => setShowAlert(false)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-lg"
-              >
-                &times;
-              </button>
-
-              {/* Candy icon on yellow background */}
+            <div className="bg-white rounded-2xl p-6 shadow-xl max-w-[340px] w-full border-2 border-red-400">
+              {/* Icon */}
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-xl bg-[#fef9e7] flex items-center justify-center text-3xl">
+                <div className="w-16 h-16 rounded-xl bg-red-100 flex items-center justify-center text-3xl">
                   🍬
                 </div>
               </div>
 
               {/* Title */}
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-bold text-red-600 mb-3 text-center">
                 {t("alert_hypo")}
               </h3>
 
-              {/* Description */}
-              <p className="text-base text-gray-400 leading-relaxed">
+              {/* Message */}
+              <p className="text-sm text-gray-600 leading-relaxed text-center">
                 {t("alert_hypo_msg")}
               </p>
+
+              <button
+                onClick={() => setShowAlert(false)}
+                className="mt-5 w-full py-2 text-sm font-bold text-white bg-red-500 rounded-full hover:bg-red-600"
+              >
+                {t("soft_alert_got_it")}
+              </button>
             </div>
           </div>
         </>
+      )}
+
+      {/* ── Simulated Push Notification ── */}
+      {showPush && (
+        <div
+          className="fixed top-4 left-4 right-4 z-[60] animate-slide-down cursor-pointer"
+          onClick={() => setShowPush(false)}
+        >
+          <div className="flex items-center gap-3 p-3 rounded-2xl shadow-lg backdrop-blur-md bg-red-50/95 border border-red-200">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-lg shrink-0">
+              🍬
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-gray-900 uppercase tracking-wide">
+                {t("hard_push_title")}
+              </p>
+              <p className="text-xs text-gray-600 truncate">
+                {t("hard_push_body")}
+              </p>
+            </div>
+            <span className="text-[10px] text-gray-400 shrink-0">now</span>
+          </div>
+        </div>
       )}
     </div>
   );
