@@ -91,7 +91,9 @@ def expert_agent_node(state: ChatState) -> dict:
     medications = profile.get("medications", [])
     all_intents = state.get("all_intents", ["medical"])
     user_input  = state.get("user_input", "")
-    language    = _detect_language(user_input) if user_input.strip() else profile.get("language", "Chinese")
+    transcribed = state.get("transcribed_text") or ""
+    lang_source = transcribed if transcribed.strip() else user_input
+    language    = _detect_language(lang_source) if lang_source.strip() else profile.get("language", "Chinese")
 
     # ── 血糖数据 ─────────────────────────────────────────────
     glucose_str = _fmt_glucose(state.get("glucose_readings") or [])
@@ -101,6 +103,11 @@ def expert_agent_node(state: ChatState) -> dict:
 
     # ── 饮食（Vision Agent）───────────────────────────────────
     diet_str = _fmt_diet(state.get("vision_result") or [])
+    vision_failed = (
+        bool(state.get("image_paths"))
+        and not diet_str
+        and any(vr.get("error") for vr in (state.get("vision_result") or []))
+    )
 
     # ── RAG：仅在医学相关查询时触发 ──────────────────────────
     _RAG_KEYWORDS = ["药", "血糖", "饮食", "建议", "副作用", "怎么", "为什么", "能不能",
@@ -131,14 +138,33 @@ def expert_agent_node(state: ChatState) -> dict:
         f"{emotion_hint}"
         + (
         f"【Food Photo Analysis Mode】\n"
-        f"A food photo was uploaded. Give a friendly nutritional breakdown like this:\n"
-        f"1. Name each dish and its approximate carbs/GI impact in plain language (1 line each)\n"
-        f"2. One specific swap or adjustment suggestion (e.g. 'less rice, more veg')\n"
-        f"3. Rough prediction: 'your 2-hour post-meal blood sugar might be around X mmol/L'\n"
-        f"Tone: like a friend who knows nutrition, not a clinical report. Use 'lah', 'try', 'maybe'.\n"
-        f"Never start with 'I understand' or 'As a diabetic'.\n"
-        f"Never add disclaimers like 'I am an AI' or 'consult a healthcare professional' — absolutely forbidden.\n"
+        f"A food photo was uploaded. Reply in this exact structure:\n"
+        f"\n"
+        f"[Opening — 1 warm sentence reacting to the food like a friend seeing your lunch photo, e.g. '哇，云吞捞面！hawker 经典 lah。' Be specific to the actual dish, not generic.]\n"
+        f"\n"
+        f"**【食物分析】**\n"
+        f"- [Dish name]: [GI level]，约[X]大卡 — [main carb/sugar source，plus why/how fast it raises blood sugar]\n"
+        f"(one bullet per dish if multiple items visible)\n"
+        f"\n"
+        f"**【建议】**\n"
+        f"- 分量/替换：[1 specific swap or portion change that's realistic for this dish]\n"
+        f"- 餐后活动：[1 post-meal tip, e.g. '饭后散步15分钟 lah，血糖会稳很多']\n"
+        f"\n"
+        f"**【预测】**\n"
+        f"- 饭后2小时血糖大概在 X–Y mmol/L。[what pushes it higher or lower]\n"
+        f"\n"
+        f"[Closing — 1 light, natural question that invites the user to keep chatting, e.g. '今天在哪里吃的？' or '平时喜欢加什么配料？' — match the vibe of the conversation, not scripted]\n"
+        f"\n"
+        f"Tone throughout: like a nutritionist friend texting after seeing your food photo — warm, specific, never preachy.\n"
+        f"Use 'lah', '不妨', 'try lah', local SG food names. Each bullet 1–2 sentences max.\n"
+        f"NEVER write long prose paragraphs. NEVER start with 'I understand' or 'As a diabetic'. NO disclaimers.\n"
         if diet_str else
+        f"【Photo Recognition Failed Mode】\n"
+        f"A photo was uploaded but couldn't be analyzed automatically (API hiccup).\n"
+        f"Reply in 2 sentences: 1st — warmly acknowledge the photo with a light apology for the glitch; 2nd — ask what dish it is in a natural, curious way so you can still help.\n"
+        f"✅ Example: '哎，这次识别好像出了点小问题 lah，看不太清楚是哪道菜。是什么来的？告诉我一下，我帮你分析分析！'\n"
+        f"NEVER say 'API error', 'system error', or anything technical. Keep it casual and warm.\n"
+        if vision_failed else
         f"【回复规则】\n"
         f"只说2句话：第1句回应患者感受，第2句给一个落地建议。\n"
         f"❌ Wrong: 'I understand you're wondering... You should reduce portion size and add vegetables.'\n"

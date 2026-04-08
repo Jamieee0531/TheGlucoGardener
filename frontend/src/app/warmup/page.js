@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
 import { sendMessageStream } from "../../lib/api";
+import { webmToWav } from "../../lib/audioUtils";
 
 const API_BASE = "http://localhost:8080";
 
@@ -19,9 +20,14 @@ export default function WarmupPage() {
   const [transitionMsg, setTransitionMsg] = useState("");
   const [inputText, setInputText] = useState("");
   const [aiReply, setAiReply] = useState("");
+  const [transcribedText, setTranscribedText] = useState("");
   const [sending, setSending] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   const inputRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const streamRef = useRef(null);
 
   // Check if already done today (per user)
   useEffect(() => {
@@ -100,28 +106,56 @@ export default function WarmupPage() {
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
-  const handleSendPlan = () => {
-    const text = inputText.trim();
-    if (!text || sending) return;
+  const sendPlan = ({ text, audio }) => {
     setSending(true);
-
     let reply = "";
     sendMessageStream({
       userId: user.user_id,
       text,
-      onToken: (token) => {
-        reply += token;
-        setAiReply(reply);
-      },
-      onDone: () => {
+      audio,
+      onToken: (token) => { reply += token; setAiReply(reply); },
+      onDone: (data) => {
+        if (data.transcribed_text) {
+          setTranscribedText(data.transcribed_text);
+          setInputText(data.transcribed_text);
+        }
         setSending(false);
         setTimeout(() => markDoneAndGo(t("warmup_enjoy_workout")), 2000);
       },
-      onError: () => {
-        setSending(false);
-        markDoneAndGo(t("warmup_enjoy_day"));
-      },
+      onError: () => { setSending(false); markDoneAndGo(t("warmup_enjoy_day")); },
     });
+  };
+
+  const handleSendPlan = () => {
+    const text = inputText.trim();
+    if (!text || sending) return;
+    sendPlan({ text });
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      chunksRef.current = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        const webmBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+        stream.getTracks().forEach((t) => t.stop());
+        if (webmBlob.size > 1000) {
+          try { sendPlan({ audio: await webmToWav(webmBlob) }); }
+          catch { sendPlan({ audio: webmBlob }); }
+        }
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch (err) { console.error("Mic access denied:", err); }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+    setIsRecording(false);
   };
 
   const handleKeyDown = (e) => {
@@ -143,6 +177,11 @@ export default function WarmupPage() {
             {t("warmup_what_plan")}
           </p>
 
+          {transcribedText && (
+            <div className="bg-white/60 rounded-xl px-4 py-2 mb-2 text-right">
+              <p className="text-sm text-gray-500 italic">🎙 "{transcribedText}"</p>
+            </div>
+          )}
           {aiReply && (
             <div className="bg-white/80 rounded-xl px-4 py-3 mb-4 text-left shadow-sm border border-[#e8e0d4]">
               <p className="text-sm text-gray-700">{aiReply}</p>
@@ -159,6 +198,15 @@ export default function WarmupPage() {
               className="flex-1 bg-white rounded-full px-4 py-3 text-sm outline-none border border-gray-200"
               disabled={sending}
             />
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={sending}
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all disabled:opacity-40 ${
+                isRecording ? "bg-red-400 scale-110" : "bg-gray-200"
+              }`}
+            >
+              🎙
+            </button>
             <button
               onClick={handleSendPlan}
               disabled={!inputText.trim() || sending}

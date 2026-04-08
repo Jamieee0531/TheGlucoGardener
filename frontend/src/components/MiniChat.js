@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { sendMessageStream } from "../lib/api";
+import { webmToWav } from "../lib/audioUtils";
 import { useTranslation } from "../lib/i18n";
 
 export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose }) {
@@ -11,8 +12,12 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
   const [sending, setSending] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
   const scrollRef = useRef(null);
   const msgIdRef = useRef(0);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const streamRef = useRef(null);
 
   const nextId = () => ++msgIdRef.current;
 
@@ -29,6 +34,79 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      chunksRef.current = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        const webmBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+        stream.getTracks().forEach((t) => t.stop());
+        if (webmBlob.size > 1000) {
+          try {
+            const wavBlob = await webmToWav(webmBlob);
+            handleSendAudio(wavBlob);
+          } catch {
+            handleSendAudio(webmBlob);
+          }
+        }
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Mic access denied:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+    setIsRecording(false);
+  };
+
+  const handleSendAudio = (audioBlob) => {
+    const userMsgId = nextId();
+    setMessages((prev) => [...prev, { id: userMsgId, role: "user", content: "", pendingVoice: true }]);
+    const aiMsgId = nextId();
+    setMessages((prev) => [...prev, { id: aiMsgId, role: "assistant", content: "" }]);
+    setSending(true);
+
+    sendMessageStream({
+      userId,
+      sessionId,
+      audio: audioBlob,
+      mode: "task",
+      onToken: (token) => {
+        setMessages((prev) => prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m)));
+      },
+      onDone: (data) => {
+        if (!sessionId) setSessionId(data.session_id);
+        setMessages((prev) => prev.map((m) => {
+          if (m.id === aiMsgId && data.reply) return { ...m, content: data.reply };
+          if (m.id === userMsgId) return {
+            ...m,
+            pendingVoice: false,
+            content: data.transcribed_text
+              ? "🎙 " + data.transcribed_text
+              : "🎙 " + (t("voice_unclear") || "（听不清楚）"),
+          };
+          return m;
+        }));
+        setSending(false);
+      },
+      onError: () => {
+        setMessages((prev) => prev.map((m) => {
+          if (m.id === aiMsgId) return { ...m, content: "Sorry, something went wrong." };
+          if (m.id === userMsgId) return { ...m, pendingVoice: false, content: "🎙 Voice message" };
+          return m;
+        }));
+        setSending(false);
+      },
+    });
+  };
 
   const handleSend = () => {
     const text = inputText.trim();
@@ -53,6 +131,7 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
       sessionId,
       text,
       image: isFirstMessage ? imageFile : undefined,
+      mode: "task",
       onToken: (token) => {
         setMessages((prev) =>
           prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m))
@@ -110,7 +189,22 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
                   : "bg-white/40 text-gray-900"
               }`}
             >
-              {msg.content || "..."}
+              {msg.pendingVoice ? (
+                <span className="flex items-center gap-1.5 text-gray-500">
+                  <span>🎙</span>
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.15s]" />
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.3s]" />
+                </span>
+              ) : msg.role === "assistant" && !msg.content ? (
+                <div className="flex gap-1 py-0.5">
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.15s]" />
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.3s]" />
+                </div>
+              ) : msg.role === "assistant" ? (
+                <span>🌿 {msg.content}</span>
+              ) : msg.content}
             </div>
           </div>
         ))}
@@ -127,6 +221,15 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
             className="flex-1 bg-white/80 rounded-full px-3 py-2 text-sm outline-none"
             disabled={sending}
           />
+          <button
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={sending}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all disabled:opacity-40 ${
+              isRecording ? "bg-red-400 scale-110" : "bg-white/70"
+            }`}
+          >
+            🎙
+          </button>
           <button
             onClick={handleSend}
             disabled={!inputText.trim() || sending}

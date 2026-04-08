@@ -74,7 +74,7 @@ def _call_audio_api(audio_b64: str, content_type: str, query: str,
 
 def _transcribe(audio_b64: str, content_type: str) -> str:
     data = _call_audio_api(audio_b64, content_type,
-                           query="Please transcribe this speech.",
+                           query="Transcribe the speech exactly as spoken. Preserve the original language — do NOT translate. Output only the spoken words, nothing else.",
                            max_tokens=256, logprobs=False)
     text = data["choices"][0]["message"]["content"].strip()
     print(f"[MERaLiON] 转录完成：{text[:60]}{'...' if len(text) > 60 else ''}")
