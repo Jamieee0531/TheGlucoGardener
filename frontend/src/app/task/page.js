@@ -67,7 +67,9 @@ export default function TaskPage() {
   const [dynEarned, setDynEarned] = useState(null);
   const [dynPoints, setDynPoints] = useState(null);
   const [dynTitle, setDynTitle] = useState(null);
+  const [dynPhase, setDynPhase] = useState("parks"); // parks | generating | ready
   const dynFileRef = useRef(null);
+  const dynPollRef = useRef(null);
   const [totalPts, setTotalPts] = useState(0);
   const [plantProgress, setPlantProgress] = useState(0);
   const [dbDailyCompleted, setDbDailyCompleted] = useState(0);
@@ -115,7 +117,17 @@ export default function TaskPage() {
       try {
         const res = await fetch(`${TASK_AGENT_API}/tasks/dynamic/active?user_id=${user.user_id}`);
         const data = await res.json();
-        if (active && data.task_id) setDynTask(data);
+        if (active && data.task_id) {
+          setDynTask(data);
+          // Determine phase based on task state
+          if (data.task_content?.title) {
+            setDynPhase("ready");
+          } else if (data.parks?.length > 0 && !data.selected_park) {
+            setDynPhase("parks");
+          } else {
+            setDynPhase("generating");
+          }
+        }
       } catch {}
     };
     poll();
@@ -126,6 +138,36 @@ export default function TaskPage() {
   if (loading || !user) return null;
 
   const dailyPts = dbDailyCompleted * PTS_PER_TASK;
+
+  const handleSelectPark = async (parkIndex) => {
+    if (!dynTask) return;
+    setDynPhase("generating");
+    try {
+      await fetch(
+        `${TASK_AGENT_API}/tasks/dynamic/${dynTask.task_id}/select-destination?user_id=${user.user_id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ park_index: parkIndex }),
+        }
+      );
+      // Poll for task copy to be ready
+      const pollCopy = setInterval(async () => {
+        try {
+          const res = await fetch(`${TASK_AGENT_API}/tasks/dynamic/active?user_id=${user.user_id}`);
+          const data = await res.json();
+          if (data.task_content?.title) {
+            setDynTask(data);
+            setDynPhase("ready");
+            clearInterval(pollCopy);
+          }
+        } catch {}
+      }, 2000);
+      dynPollRef.current = pollCopy;
+    } catch {
+      setDynPhase("parks");
+    }
+  };
 
   const handleDynUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -345,7 +387,7 @@ export default function TaskPage() {
                 ) : (
                   <div
                     style={{
-                      maxHeight: isExpanded ? 150 : 0,
+                      maxHeight: isExpanded ? (isDyn && dynPhase === "parks" ? 400 : 150) : 0,
                       opacity: isExpanded ? 1 : 0,
                       overflow: "hidden",
                       transition: "max-height 300ms ease, opacity 300ms ease",
@@ -360,7 +402,33 @@ export default function TaskPage() {
                       {isDyn ? task.desc : t(task.descKey)}
                     </p>
 
-                    {isDyn && !isCompleted && (
+                    {isDyn && !isCompleted && dynPhase === "parks" && dynTask?.parks?.length > 0 && (
+                      <div className="mt-2 space-y-2" onClick={(e) => e.stopPropagation()}>
+                        <p className="text-xs text-white/80 font-semibold uppercase tracking-wide">Choose a park nearby:</p>
+                        {dynTask.parks.map((park, pi) => (
+                          <button
+                            key={pi}
+                            onClick={() => handleSelectPark(pi)}
+                            className="w-full text-left px-3 py-2 rounded-xl bg-white/20 hover:bg-white/30 transition-colors"
+                          >
+                            <p className="text-sm font-semibold text-white">{park.name}</p>
+                            {park.distance && <p className="text-xs text-white/70">{park.distance}</p>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {isDyn && !isCompleted && dynPhase === "generating" && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4 text-white/70" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                        <p className="text-sm text-white/80 italic">{t("task_quest_personalising")}</p>
+                      </div>
+                    )}
+
+                    {isDyn && !isCompleted && dynPhase === "ready" && (
                       <button
                         disabled={dynUploading}
                         onClick={(e) => {
@@ -495,6 +563,8 @@ export default function TaskPage() {
               setDynEarned(null);
               setDynPoints(null);
               setDynTitle(null);
+              setDynPhase("parks");
+              if (dynPollRef.current) clearInterval(dynPollRef.current);
               setCompletedTasks(new Set());
               // Refresh all data
               const uid = user.user_id;

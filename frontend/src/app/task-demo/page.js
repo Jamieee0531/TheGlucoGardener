@@ -319,7 +319,7 @@ export default function TaskDemoPage() {
         {/* Step 2: Park Selection */}
         {step === 1 && parks.length > 0 && (
           <div className="bg-white rounded-2xl p-4 shadow-sm mb-3">
-            <p className="font-bold text-sm text-gray-800 mb-3">🌳 Choose a park near Auntie Lin</p>
+            <p className="font-bold text-sm text-gray-800 mb-3">🌳 Choose a park near {profile?.name ?? "you"}</p>
             <div className="space-y-2">
               {parks.map((park, i) => (
                 <button
