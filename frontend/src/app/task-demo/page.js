@@ -3,14 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import TopBar from "../../components/TopBar";
+import { useAuth } from "../../lib/useAuth";
 
 const API = "http://localhost:8001";
-const USER_ID = "user_003";
 
 
 const STEP_LABELS = ["Setup", "Rule Engine", "Park Selection", "Task Copy", "Arrival"];
 
 export default function TaskDemoPage() {
+  const { user } = useAuth();
+  const USER_ID = user?.user_id || "user_003";
   const [step, setStep] = useState(0);       // 0=idle, 1=triggered, 2=park, 3=copy, 4=done
   const [loading, setLoading] = useState(false);
   const [log, setLog] = useState([]);
@@ -29,8 +31,9 @@ export default function TaskDemoPage() {
 
   const addLog = (msg) => setLog((prev) => [...prev, msg]);
 
-  // Load profile from DB on mount
+  // Load profile from DB when user is ready
   useEffect(() => {
+    if (!user) return;
     fetch(`${API}/internal/user-context/${USER_ID}`)
       .then((r) => r.json())
       .then((data) => {
@@ -51,7 +54,7 @@ export default function TaskDemoPage() {
         });
       })
       .catch(() => {});
-  }, []);
+  }, [user, USER_ID]);
 
   // ── Step 0 → 1: Setup + Trigger ─────────────────────────────────────────
   async function handleStart() {

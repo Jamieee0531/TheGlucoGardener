@@ -13,8 +13,9 @@ export default function WarmupPage() {
   const { user, loading } = useAuth();
   const { t } = useTranslation();
 
-  const [patterns, setPatterns] = useState(null);    // null = loading
-  const [phase, setPhase] = useState("question");    // question | input | transition
+  const [patterns, setPatterns] = useState(null);
+  const [recentCount, setRecentCount] = useState(null);
+  const [phase, setPhase] = useState("question");
   const [transitionMsg, setTransitionMsg] = useState("");
   const [inputText, setInputText] = useState("");
   const [aiReply, setAiReply] = useState("");
@@ -22,42 +23,66 @@ export default function WarmupPage() {
 
   const inputRef = useRef(null);
 
-  // Check if already done today
+  // Check if already done today (per user)
   useEffect(() => {
+    if (!user) return;
     const today = new Date().toISOString().slice(0, 10);
-    if (localStorage.getItem(`warmup_done_${today}`)) {
+    if (localStorage.getItem(`warmup_done_${user.user_id}_${today}`)) {
       router.replace("/");
-      return;
     }
-  }, [router]);
+  }, [router, user]);
 
-  // Fetch exercise patterns
+  // Fetch exercise patterns + recent exercise count
   useEffect(() => {
     if (!user) return;
     fetch(`${API_BASE}/users/${user.user_id}/exercise-patterns`)
       .then((r) => r.json())
       .then((data) => setPatterns(data.patterns || []))
       .catch(() => setPatterns([]));
+
+    fetch(`${API_BASE}/health/recent-exercise?user_id=${user.user_id}&days=7`)
+      .then((r) => r.json())
+      .then((data) => setRecentCount(data.count))
+      .catch(() => setRecentCount(0));
   }, [user]);
 
-  if (loading || !user || patterns === null) return null;
+  if (loading || !user || patterns === null || recentCount === null) return null;
 
-  const hasPattern = patterns.length > 0;
+  // Find today's pattern (day_of_week is a number: 0=sunday, 1=monday, ...)
+  const todayDow = new Date().getDay();
+  const todayPattern = patterns.find((p) => Number(p.day_of_week) === todayDow);
 
-  // Find today's pattern (match day_of_week)
-  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-  const todayDay = days[new Date().getDay()];
-  const todayPattern = patterns.find((p) => p.day_of_week?.toLowerCase() === todayDay);
+  // Scenario A: has pattern for today AND exercised recently
+  // Scenario B: no pattern for today OR hasn't exercised in past week
+  const showScenarioA = todayPattern && recentCount > 0;
+
+  const logExercise = (exerciseType, startTime, endTime) => {
+    const today = new Date().toISOString().slice(0, 10);
+    fetch(`${API_BASE}/health/log-exercise`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: user.user_id,
+        exercise_type: exerciseType,
+        started_at: `${today}T${startTime}:00`,
+        ended_at: `${today}T${endTime}:00`,
+      }),
+    }).catch(() => {});
+  };
 
   const markDoneAndGo = (msg) => {
     setTransitionMsg(msg);
     setPhase("transition");
     const today = new Date().toISOString().slice(0, 10);
-    localStorage.setItem(`warmup_done_${today}`, "true");
+    localStorage.setItem(`warmup_done_${user.user_id}_${today}`, "true");
     setTimeout(() => router.push("/"), 1500);
   };
 
   const handleYesSameAsUsual = () => {
+    // Write today's exercise to DB based on pattern
+    if (todayPattern) {
+      logExercise(todayPattern.activity_type, todayPattern.start_time, todayPattern.end_time);
+    }
     markDoneAndGo(t("warmup_enjoy_workout"));
   };
 
@@ -90,7 +115,6 @@ export default function WarmupPage() {
       },
       onDone: () => {
         setSending(false);
-        // After AI confirms, wait a moment then transition
         setTimeout(() => markDoneAndGo(t("warmup_enjoy_workout")), 2000);
       },
       onError: () => {
@@ -107,7 +131,6 @@ export default function WarmupPage() {
     }
   };
 
-  // ── Render ──
   return (
     <div className="flex flex-col h-full bg-cream items-center justify-center px-8">
       {phase === "transition" ? (
@@ -120,14 +143,12 @@ export default function WarmupPage() {
             {t("warmup_what_plan")}
           </p>
 
-          {/* AI reply */}
           {aiReply && (
             <div className="bg-white/80 rounded-xl px-4 py-3 mb-4 text-left shadow-sm border border-[#e8e0d4]">
               <p className="text-sm text-gray-700">{aiReply}</p>
             </div>
           )}
 
-          {/* Input */}
           <div className="flex items-center gap-2">
             <input
               ref={inputRef}
@@ -148,18 +169,22 @@ export default function WarmupPage() {
           </div>
         </div>
       ) : (
-        /* ── Question phase ── */
         <div className="w-full max-w-[340px] text-center">
-          {/* Greeting */}
           <p className="text-2xl font-bold italic text-[#e8927c] mb-2">
             {t("warmup_greeting")} {user.name.split(" ")[0]}! 🌿
           </p>
 
-          {hasPattern && todayPattern ? (
-            /* Scenario A — has exercise habit */
+          {showScenarioA ? (
             <>
               <p className="text-base text-gray-600 mt-4 leading-relaxed">
-                {t("warmup_pattern_confirm")} <span className="font-semibold">{todayPattern.activity_type}</span> {t("warmup_pattern_at")} <span className="font-semibold">{todayPattern.start_time}</span>.
+                {t("warmup_pattern_confirm")} <span className="font-semibold">{todayPattern.activity_type}</span> {t("warmup_pattern_at")} <span className="font-semibold">{todayPattern.start_time}</span>
+                {todayPattern.end_time && (
+                  <span> — <span className="font-semibold">{todayPattern.end_time}</span> ({(() => {
+                    const [sh, sm] = todayPattern.start_time.split(":").map(Number);
+                    const [eh, em] = todayPattern.end_time.split(":").map(Number);
+                    return (eh * 60 + em) - (sh * 60 + sm);
+                  })()} min)</span>
+                )}.
               </p>
               <p className="text-base text-gray-600 mt-2">
                 {t("warmup_keep_plan")}
@@ -182,7 +207,6 @@ export default function WarmupPage() {
               </div>
             </>
           ) : (
-            /* Scenario B — no recent exercise */
             <>
               <p className="text-base text-gray-600 mt-4 leading-relaxed">
                 {t("warmup_no_exercise")}

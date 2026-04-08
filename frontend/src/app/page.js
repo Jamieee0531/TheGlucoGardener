@@ -20,7 +20,7 @@ export default function HomePage() {
   useEffect(() => {
     if (loading || !user) return;
     const today = new Date().toISOString().slice(0, 10);
-    if (!localStorage.getItem(`warmup_done_${today}`)) {
+    if (!localStorage.getItem(`warmup_done_${user.user_id}_${today}`)) {
       router.push("/warmup");
     }
   }, [user, loading, router]);

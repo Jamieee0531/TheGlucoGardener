@@ -9,7 +9,7 @@ import { useTranslation } from "../../lib/i18n";
 const API_BASE = "http://localhost:8080";
 const TASK_AGENT_API = "http://localhost:8001";
 
-const TASKS = [
+const STATIC_TASKS = [
   {
     id: "meals",
     titleKey: "task_log_meals",
@@ -34,6 +34,17 @@ const TASKS = [
   },
 ];
 
+const DYN_TASK = {
+  id: "dynamic",
+  title: "Sunset walk at West Coast Park",
+  emoji: "🌅",
+  color: "#F4BAC1",
+  desc: "You're 200 kcal short today. A 30-min walk at West Coast Park would help — and the sunset is lovely this evening!",
+  logType: "none",
+  completable: true,
+  buttonColor: "#e89098",
+};
+
 const PTS_PER_TASK = 20;
 const MAX_DAILY_PTS = 60;
 const MAX_PLANT_PTS = 100;
@@ -41,7 +52,7 @@ const MAX_PLANT_PTS = 100;
 export default function TaskPage() {
   const { user, loading } = useAuth();
   const { t } = useTranslation();
-  const [expandedId, setExpandedId] = useState(null);
+  const [expandedId, setExpandedId] = useState("body");
   const [completedTasks, setCompletedTasks] = useState(new Set());
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [activeTaskId, setActiveTaskId] = useState(null);
@@ -50,14 +61,13 @@ export default function TaskPage() {
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
-  const dynFileRef = useRef(null);
-
   const [dynTask, setDynTask] = useState(null);
   const [dynCompleted, setDynCompleted] = useState(false);
   const [dynUploading, setDynUploading] = useState(false);
-  const [dynPoints, setDynPoints] = useState(null);
   const [dynEarned, setDynEarned] = useState(null);
+  const [dynPoints, setDynPoints] = useState(null);
   const [dynTitle, setDynTitle] = useState(null);
+  const dynFileRef = useRef(null);
   const [totalPts, setTotalPts] = useState(0);
   const [plantProgress, setPlantProgress] = useState(0);
   const [dbDailyCompleted, setDbDailyCompleted] = useState(0);
@@ -100,16 +110,17 @@ export default function TaskPage() {
   // Poll task_agent for dynamic task
   useEffect(() => {
     if (!user) return;
+    let active = true;
     const poll = async () => {
       try {
         const res = await fetch(`${TASK_AGENT_API}/tasks/dynamic/active?user_id=${user.user_id}`);
         const data = await res.json();
-        if (data.task_id) setDynTask(data);
+        if (active && data.task_id) setDynTask(data);
       } catch {}
     };
     poll();
     const id = setInterval(poll, 5000);
-    return () => clearInterval(id);
+    return () => { active = false; clearInterval(id); };
   }, [user]);
 
   if (loading || !user) return null;
@@ -122,8 +133,7 @@ export default function TaskPage() {
     e.target.value = "";
     setDynUploading(true);
     try {
-      // Save title before clearing task
-      const savedTitle = dynTask.task_content?.title || "Chase the golden hour";
+      const savedTitle = dynTask.task_content?.title || "Dynamic Quest";
 
       // 1. Baseline points
       const beforePts = await fetch(`${TASK_AGENT_API}/points/summary?user_id=${user.user_id}`)
@@ -204,7 +214,16 @@ export default function TaskPage() {
     }
   };
 
-  const handleMealConfirm = () => {
+  const handleMealConfirm = async () => {
+    // Call log-meal API with the image to save food data to DB
+    if (mealImageFile) {
+      try {
+        const form = new FormData();
+        form.append("user_id", user.user_id);
+        form.append("image", mealImageFile);
+        await fetch(`${API_BASE}/health/log-meal`, { method: "POST", body: form });
+      } catch {}
+    }
     completeTask("meals");
     setMealChatOpen(false);
     setMealImageFile(null);
@@ -266,103 +285,16 @@ export default function TaskPage() {
     <div className="flex flex-col h-full bg-cream">
       <TopBar title={t("task_title")} transparent />
       <div className="flex-1 overflow-y-auto pb-4">
-        {/* Dynamic Quest Card */}
-        <div className="px-4 mt-2 mb-1">
-          <div className="rounded-2xl p-4" style={{ backgroundColor: "#F4BAC1" }}>
-            {dynCompleted ? (
-              /* Completed state */
-              <>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-bold italic text-lg leading-tight">
-                    Chase the golden hour 🌅
-                  </p>
-                  <div className="w-8 h-8 rounded-full bg-white flex-shrink-0 ml-2" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <p className="text-white text-xl">🌸</p>
-                  <div>
-                    <p className="text-white font-bold italic text-base">{t("task_quest_complete")}</p>
-                    <p className="text-white/90 text-sm">
-                      {dynEarned != null ? `+${dynEarned} pts` : "+50 pts"}{" "}
-                      {dynPoints != null && <span className="text-white/70">· Total: {dynPoints} pts</span>}
-                    </p>
-                  </div>
-                </div>
-              </>
-            ) : dynTask?.task_content?.title ? (
-              /* Active — copy ready */
-              <>
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-white text-xs font-semibold uppercase tracking-wide opacity-80">
-                    {t("task_quest_today")} ✨
-                  </p>
-                  <div className="w-8 h-8 rounded-full bg-white flex-shrink-0" />
-                </div>
-                <p className="text-white font-bold italic text-lg leading-tight">
-                  {dynTask.task_content.title} 🌅
-                </p>
-                <p className="text-white/90 text-sm mt-2 mb-3">
-                  {dynTask.task_content.body}
-                </p>
-                <button
-                  disabled={dynUploading}
-                  onClick={() => dynFileRef.current?.click()}
-                  className="px-5 py-2 rounded-full text-sm font-semibold text-white flex items-center gap-2"
-                  style={{ backgroundColor: dynUploading ? "#c08890" : "#e89098" }}
-                >
-                  {dynUploading ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                      </svg>
-                      {t("task_logging")}
-                    </>
-                  ) : `📸 ${t("task_log_proof")}`}
-                </button>
-              </>
-            ) : dynTask ? (
-              /* Task exists but copy not ready yet */
-              <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 py-1 flex-1">
-                <svg className="animate-spin h-5 w-5 text-white/70 flex-shrink-0" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                <div>
-                  <p className="text-white font-semibold text-sm italic">Chase the golden hour 🌅</p>
-                  <p className="text-white/70 text-xs mt-0.5">{t("task_quest_personalising")}</p>
-                </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-white flex-shrink-0" />
-              </div>
-            ) : (
-              /* Locked — no task yet */
-              <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <p className="text-white font-bold italic text-base">Chase the golden hour 🌅</p>
-                <p className="text-white/80 text-sm mt-1 mb-3">
-                  {t("task_quest_locked")} 🌿
-                </p>
-                <button
-                  disabled
-                  className="px-5 py-2 rounded-full text-sm font-semibold opacity-40"
-                  style={{ backgroundColor: "#e89098", color: "white" }}
-                >
-                  📸 {t("task_log_proof")}
-                </button>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-white flex-shrink-0 mt-1" />
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Card Stack */}
         <div className="px-4 mt-2">
-          {TASKS.map((task) => {
+          {(dynTask ? [{
+            ...DYN_TASK,
+            title: dynTask.task_content?.title || DYN_TASK.title,
+            desc: dynTask.task_content?.body || DYN_TASK.desc,
+          }, ...STATIC_TASKS] : STATIC_TASKS).map((task, idx) => {
             const isExpanded = expandedId === task.id;
-            const isCompleted = completedTasks.has(task.id);
+            const isDyn = task.id === "dynamic";
+            const isCompleted = isDyn ? dynCompleted : completedTasks.has(task.id);
 
             return (
               <div
@@ -374,7 +306,7 @@ export default function TaskPage() {
                   borderRadius: 20,
                   padding: "16px 20px",
                   transition: "all 300ms ease",
-                  zIndex: TASKS.indexOf(task),
+                  zIndex: idx,
                 }}
               >
                 {/* Header row */}
@@ -385,11 +317,11 @@ export default function TaskPage() {
                       textDecoration: isCompleted ? "line-through" : "none",
                     }}
                   >
-                    {t(task.titleKey)} {task.emoji}
+                    {isDyn ? task.title : t(task.titleKey)} {task.emoji}
                   </h3>
                   {isCompleted ? (
                     <span className="text-sm font-bold italic text-[#ff6b8a]">
-                      20 {t("task_pt_earned")}
+                      {isDyn ? (dynEarned != null ? `+${dynEarned}` : "50") : "20"} {t("task_pt_earned")}
                     </span>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-white" />
@@ -397,82 +329,96 @@ export default function TaskPage() {
                 </div>
 
                 {/* Expanded content */}
-                <div
-                  style={{
-                    maxHeight: isExpanded ? 120 : 0,
-                    opacity: isExpanded ? 1 : 0,
-                    overflow: "hidden",
-                    transition: "max-height 300ms ease, opacity 300ms ease",
-                  }}
-                >
-                  <p
-                    className="text-sm text-white/90 mt-2"
+                {task.id === "meals" && mealChatOpen ? (
+                  /* Mini Chat embedded inside meals card */
+                  <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                    <MiniChat
+                      userId={user.user_id}
+                      imageFile={mealImageFile}
+                      onConfirmEaten={handleMealConfirm}
+                      onClose={() => {
+                        setMealChatOpen(false);
+                        setMealImageFile(null);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div
                     style={{
-                      textDecoration: isCompleted ? "line-through" : "none",
+                      maxHeight: isExpanded ? 150 : 0,
+                      opacity: isExpanded ? 1 : 0,
+                      overflow: "hidden",
+                      transition: "max-height 300ms ease, opacity 300ms ease",
                     }}
                   >
-                    {t(task.descKey)}
-                  </p>
-
-                  {task.extraInfo && (
-                    <p className="text-sm text-white mt-2">
-                      <span className="font-semibold">{task.extraInfo}</span>
-                    </p>
-                  )}
-
-                  {task.logType !== "none" && (
-                    <button
-                      disabled={isCompleted || (uploading && task.id === "meals")}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLogClick(task);
-                      }}
-                      className="mt-3 px-6 py-2 rounded-full text-sm font-semibold text-white flex items-center gap-2"
+                    <p
+                      className="text-sm text-white/90 mt-2"
                       style={{
-                        backgroundColor: isCompleted
-                          ? "#8bc34a"
-                          : (uploading && task.id === "meals")
-                          ? "#999"
-                          : task.buttonColor,
+                        textDecoration: isCompleted ? "line-through" : "none",
                       }}
                     >
-                      {uploading && task.id === "meals" ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                          </svg>
-                          {t("analysing") || "Analysing..."}
-                        </>
-                      ) : isCompleted ? (
-                        t(task.completedKey)
-                      ) : (
-                        t("task_log_here")
-                      )}
-                    </button>
-                  )}
-                </div>
+                      {isDyn ? task.desc : t(task.descKey)}
+                    </p>
+
+                    {isDyn && !isCompleted && (
+                      <button
+                        disabled={dynUploading}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dynFileRef.current?.click();
+                        }}
+                        className="mt-3 px-6 py-2 rounded-full text-sm font-semibold text-white flex items-center gap-2"
+                        style={{ backgroundColor: dynUploading ? "#c08890" : task.buttonColor }}
+                      >
+                        {dynUploading ? (
+                          <>
+                            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                            </svg>
+                            {t("task_logging")}
+                          </>
+                        ) : `📸 ${t("task_log_proof")}`}
+                      </button>
+                    )}
+
+                    {!isDyn && task.logType !== "none" && (
+                      <button
+                        disabled={isCompleted || (uploading && task.id === "meals")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLogClick(task);
+                        }}
+                        className="mt-3 px-6 py-2 rounded-full text-sm font-semibold text-white flex items-center gap-2"
+                        style={{
+                          backgroundColor: isCompleted
+                            ? "#8bc34a"
+                            : (uploading && task.id === "meals")
+                            ? "#999"
+                            : task.buttonColor,
+                        }}
+                      >
+                        {uploading && task.id === "meals" ? (
+                          <>
+                            <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            {t("analysing") || "Analysing..."}
+                          </>
+                        ) : isCompleted ? (
+                          t(task.completedKey)
+                        ) : (
+                          t("task_log_here")
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
-
-        {/* Mini Chat overlay for meals */}
-        {mealChatOpen && (
-          <div className="px-4 mt-2">
-            <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#A7CBED" }}>
-              <MiniChat
-                userId={user.user_id}
-                imageFile={mealImageFile}
-                onConfirmEaten={handleMealConfirm}
-                onClose={() => {
-                  setMealChatOpen(false);
-                  setMealImageFile(null);
-                }}
-              />
-            </div>
-          </div>
-        )}
 
         {/* Stats Section */}
         <div className="flex items-start px-5 mt-6">
@@ -542,6 +488,13 @@ export default function TaskPage() {
               const form = new FormData();
               form.append("user_id", user.user_id);
               await fetch(`${API_BASE}/health/reset-tasks`, { method: "POST", body: form });
+              // Also reset dynamic task
+              await fetch(`${TASK_AGENT_API}/internal/test/reset-tasks?user_id=${user.user_id}`, { method: "DELETE" }).catch(() => {});
+              setDynTask(null);
+              setDynCompleted(false);
+              setDynEarned(null);
+              setDynPoints(null);
+              setDynTitle(null);
               setCompletedTasks(new Set());
               // Refresh all data
               const uid = user.user_id;

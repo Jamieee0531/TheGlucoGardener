@@ -1,10 +1,10 @@
-"""Health API — glucose readings, meal counts, body check-in, meal logging."""
+"""Health API — glucose readings, meal counts, body check-in, meal logging, exercise logging."""
 import tempfile
 from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, File, Form, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from chatbot.api.db import get_conn
 from chatbot.agents.triage import analyze_image
@@ -218,6 +218,60 @@ async def body_checkin(req: BodyCheckinRequest) -> BodyCheckinResponse:
     finally:
         conn.close()
 
+
+# ── Recent exercise ──────────────────────────────────────────────
+
+class RecentExerciseResponse(BaseModel):
+    count: int
+    days: int
+
+
+@router.get("/recent-exercise", response_model=RecentExerciseResponse)
+async def recent_exercise(user_id: str, days: int = 7) -> RecentExerciseResponse:
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        since = datetime.now() - timedelta(days=days)
+        cur.execute(
+            """SELECT COUNT(*) FROM user_exercise_log
+               WHERE user_id = %s AND started_at >= %s""",
+            (user_id, since),
+        )
+        count = cur.fetchone()[0]
+        return RecentExerciseResponse(count=count, days=days)
+    finally:
+        conn.close()
+
+
+# ── Log exercise ─────────────────────────────────────────────────
+
+class LogExerciseRequest(BaseModel):
+    user_id: str
+    exercise_type: str
+    started_at: str
+    ended_at: str
+
+
+class LogExerciseResponse(BaseModel):
+    message: str
+    success: bool
+
+
+@router.post("/log-exercise", response_model=LogExerciseResponse)
+async def log_exercise(req: LogExerciseRequest) -> LogExerciseResponse:
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """INSERT INTO user_exercise_log
+               (user_id, exercise_type, started_at, ended_at)
+               VALUES (%s, %s, %s, %s)""",
+            (req.user_id, req.exercise_type, req.started_at, req.ended_at),
+        )
+        conn.commit()
+        return LogExerciseResponse(message="Exercise logged", success=True)
+    finally:
+        conn.close()
 
 @router.post("/reset-tasks")
 async def reset_tasks(user_id: str = Form(...)):
