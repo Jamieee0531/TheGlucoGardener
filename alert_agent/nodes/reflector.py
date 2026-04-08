@@ -75,6 +75,13 @@ Step 2 — Apply trend adjustment
   A falling trend downgrades the safety of the current value.
   Example: glucose = 5.2, slope = -0.12 → treat as if glucose were ~4.8.
 
+Step 2.5 — Consider food intake
+  When was the last meal? If > 3h ago, glucose buffer is likely depleted — lower the safe threshold.
+  If total calories today are low (< 800 kcal by afternoon), the user has limited glycogen reserves — higher hypo risk.
+  A recent high-GI meal (< 1h ago) may temporarily mask falling glucose — still flag if trend is down.
+  If last meal contained low-GI foods, glucose release is slower and more sustained — slightly less urgent.
+  Include food intake observations in reasoning_summary when relevant.
+
 Step 3 — Project forward
   The estimated_glucose_drop and projected_glucose are pre-computed by the Investigator.
   Your job is to ASSESS their risk implications, not recalculate.
@@ -190,6 +197,11 @@ USER_PROMPT_TEMPLATE = """
 {exercise_history}
 - Session count available: {session_count}
 
+## Today's Food Intake
+{food_intake_summary}
+- Last meal: {last_meal_hours_ago} hours ago
+- Total calories today: {total_kcal_today} kcal
+
 ## Today's Calories Burned So Far
 {today_calories_burned} kcal
 
@@ -230,6 +242,19 @@ async def reflector_node(state: AgentState) -> dict:
         f"  - Session {i+1}: started {s.get('started_at')}, glucose_drop={s.get('glucose_drop')} mmol/L"
         for i, s in enumerate(exercise_hist)
     ) or "  No matching exercise history available"
+
+    # Format food intake
+    food = state.get("food_intake_today") or {}
+    meals = food.get("meals_today", [])
+    food_intake_str = "\n".join(
+        f"  - {m.get('time')} {m.get('meal_type','')}: {m.get('food_name','')} "
+        f"({m.get('kcal', 'N/A')} kcal, GI: {m.get('gi_level', 'N/A')})"
+        for m in meals
+    ) or "  No meals recorded today"
+
+    last_meal_hours = food.get("last_meal_hours_ago")
+    last_meal_str = f"{last_meal_hours}" if last_meal_hours is not None else "N/A (no meals today)"
+    total_kcal_today = food.get("total_kcal", 0)
 
     # Get pre-computed values from Investigator
     pre_drop = state.get("estimated_glucose_drop")
@@ -274,6 +299,9 @@ async def reflector_node(state: AgentState) -> dict:
         duration_min=upcoming.get("duration_min", "N/A"),
         exercise_history=ex_history_str,
         session_count=len(exercise_hist),
+        food_intake_summary=food_intake_str,
+        last_meal_hours_ago=last_meal_str,
+        total_kcal_today=total_kcal_today,
         today_calories_burned=state.get("today_calories_burned", 0),
         estimated_glucose_drop=pre_drop if pre_drop is not None else "N/A",
         projected_glucose=pre_projected if pre_projected is not None else "N/A",

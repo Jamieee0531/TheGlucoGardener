@@ -380,8 +380,30 @@ async def seed() -> None:
                     gi_level=gi, total_calories=cal,
                 ))
                 food_count += 1
+        # ── 8b. Today's Food Log (demo scenario) ─────────────────
+        # Marcus had an early breakfast and a light lunch before
+        # the soft_trigger_pre_exercise scenario fires at ~13:31.
+        # This ensures food_intake_tool returns meaningful data for
+        # the Reflector to reason about (low total kcal, early meals).
+        session.add(UserFoodLog(
+            user_id=USER_ID,
+            recorded_at=datetime.combine(today, time(6, 30)),
+            food_name="Kaya Toast + Kopi",
+            meal_type="breakfast",
+            gi_level="medium",
+            total_calories=320,
+        ))
+        session.add(UserFoodLog(
+            user_id=USER_ID,
+            recorded_at=datetime.combine(today, time(11, 30)),
+            food_name="Chicken Sandwich",
+            meal_type="lunch",
+            gi_level="medium",
+            total_calories=350,
+        ))
+        food_count += 2
         await session.commit()
-        print(f"  ✓ Food log: {food_count} entries (7 days)")
+        print(f"  ✓ Food log: {food_count} entries (7 days + today)")
 
         # ── 9. Emotion Log (past 3 days) ───────────────────────
         emotions = [

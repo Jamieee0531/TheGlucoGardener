@@ -17,6 +17,14 @@ const INVESTIGATOR_DATA = {
     ],
     estimated_glucose_drop: 0.86,
     projected_glucose: 4.04,
+    food_intake: {
+      meals: [
+        { time: "06:30", meal_type: "breakfast", food_name: "Kaya Toast + Kopi", kcal: 320, gi: "medium" },
+        { time: "11:30", meal_type: "lunch", food_name: "Chicken Sandwich", kcal: 350, gi: "medium" },
+      ],
+      total_kcal: 670,
+      last_meal_hours_ago: 2.0,
+    },
     emotion: "No recent emotion data",
   },
 };
@@ -112,6 +120,26 @@ export default function InvestigatorPanel({ visible = false, scenarioId = "" }) 
                 value={`${data.projected_glucose} mmol/L`}
                 highlight
               />
+            </div>
+          </div>
+
+          {/* Food Intake */}
+          <div>
+            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
+              Today&apos;s Food Intake
+            </h4>
+            <div className="bg-gray-50 rounded p-2">
+              {data.food_intake.meals.map((m, i) => (
+                <DataRow
+                  key={i}
+                  label={`${m.time} ${m.meal_type}`}
+                  value={`${m.food_name} (${m.kcal} kcal, GI: ${m.gi})`}
+                />
+              ))}
+              <div className="border-t border-gray-200 mt-1 pt-1">
+                <DataRow label="Total calories" value={`${data.food_intake.total_kcal} kcal`} />
+                <DataRow label="Last meal" value={`${data.food_intake.last_meal_hours_ago}h ago`} />
+              </div>
             </div>
           </div>
 

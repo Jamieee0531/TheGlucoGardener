@@ -196,22 +196,40 @@ const dict = {
   start_gardening: { English: "Start Gardening", Chinese: "开始种花", Malay: "Mula Berkebun", Tamil: "தோட்டம் தொடங்கு" },
 
   // ── Soft Alert ──
-  heads_up: { English: "Heads up!", Chinese: "注意！", Malay: "Perhatian!", Tamil: "கவனம்!" },
+  better_safe: { English: "Better Safe Than Sorry", Chinese: "小心驶得万年船", Malay: "Lebih Baik Berjaga-jaga", Tamil: "பாதுகாப்பாக இருப்பது நல்லது" },
   soft_alert_msg: {
     English: "Your glucose is 4.9 mmol/L. If you start resistance training, it could drop to 4.04 mmol/L. Consider a small apple or handful of nuts (15-30g slow-release carbs) beforehand. Stay safe and strong!",
     Chinese: "您的血糖是 4.9 mmol/L。如果您开始力量训练，血糖可能降至 4.04 mmol/L。建议先吃一个小苹果或一把坚果（15-30克缓释碳水）。注意安全！",
     Malay: "Glukosa anda 4.9 mmol/L. Jika anda mula latihan rintangan, ia boleh turun ke 4.04 mmol/L. Pertimbangkan epal kecil atau segenggam kacang (15-30g karbohidrat lepasan perlahan) sebelumnya. Kekal selamat!",
     Tamil: "உங்கள் குளுக்கோஸ் 4.9 mmol/L. நீங்கள் எதிர்ப்பு பயிற்சி தொடங்கினால், 4.04 mmol/L ஆகக் குறையலாம். முன்கூட்டியே ஒரு சிறிய ஆப்பிள் அல்லது ஒரு கைப்பிடி கொட்டைகள் (15-30g மெதுவாக வெளியிடும் கார்ப்ஸ்) சாப்பிடுங்கள்.",
   },
+  soft_alert_confidence: { English: "Confidence", Chinese: "置信度", Malay: "Keyakinan", Tamil: "நம்பிக்கை" },
+  soft_alert_got_it: { English: "Got it", Chinese: "收到", Malay: "Faham", Tamil: "புரிந்தது" },
+  soft_alert_why: { English: "Why am I seeing this?", Chinese: "为什么我会看到这个？", Malay: "Mengapa saya melihat ini?", Tamil: "இதை நான் ஏன் காண்கிறேன்?" },
+  soft_alert_good_enough: { English: "Good Enough", Chinese: "分析合理", Malay: "Cukup Baik", Tamil: "போதுமானது" },
+  soft_alert_not_helpful: { English: "Not Helpful? Give Feedback", Chinese: "分析不合理？给反馈", Malay: "Tidak Membantu? Beri Maklum Balas", Tamil: "உதவியாக இல்லையா? கருத்து தெரிவிக்கவும்" },
+  soft_alert_feedback_placeholder: { English: "Tell us what went wrong...", Chinese: "告诉我们哪里不对...", Malay: "Beritahu kami apa yang salah...", Tamil: "என்ன தவறு என்று சொல்லுங்கள்..." },
+  soft_alert_feedback_submit: { English: "Submit feedback", Chinese: "提交反馈", Malay: "Hantar maklum balas", Tamil: "கருத்தை சமர்ப்பி" },
+  soft_alert_feedback_thanks: { English: "Thanks for your feedback!", Chinese: "感谢您的反馈！", Malay: "Terima kasih atas maklum balas!", Tamil: "உங்கள் கருத்துக்கு நன்றி!" },
+  soft_alert_demo_reasoning: {
+    English: "Your current glucose is 4.9 mmol/L, which is in the pre-exercise buffer zone. Based on your last 3 resistance training sessions, your glucose dropped an average of 0.86 mmol/L, projecting to ~4.04 mmol/L mid-exercise. Your last meal was 3 hours ago with moderate carbs. Given the falling trend and upcoming activity, a small snack is recommended.",
+    Chinese: "您当前血糖为 4.9 mmol/L，处于运动前缓冲区。根据您最近 3 次力量训练，血糖平均下降 0.86 mmol/L，预计运动中降至约 4.04 mmol/L。您上一餐在 3 小时前，碳水适中。考虑到下降趋势和即将开始的运动，建议补充少量零食。",
+    Malay: "Glukosa semasa anda ialah 4.9 mmol/L, dalam zon penimbal pra-senaman. Berdasarkan 3 sesi latihan rintangan terakhir, glukosa anda turun purata 0.86 mmol/L, diunjurkan ~4.04 mmol/L semasa senaman. Hidangan terakhir 3 jam lalu dengan karbohidrat sederhana. Snek kecil disyorkan.",
+    Tamil: "உங்கள் தற்போதைய குளுக்கோஸ் 4.9 mmol/L, உடற்பயிற்சிக்கு முந்தைய இடையக மண்டலத்தில் உள்ளது. கடைசி 3 எதிர்ப்பு பயிற்சி அமர்வுகளின் அடிப்படையில், சராசரியாக 0.86 mmol/L குறைந்து ~4.04 mmol/L ஆக கணிக்கப்படுகிறது. சிறிய சிற்றுண்டி பரிந்துரைக்கப்படுகிறது.",
+  },
+  soft_push_title: { English: "GlucoGardener", Chinese: "GlucoGardener", Malay: "GlucoGardener", Tamil: "GlucoGardener" },
+  soft_push_body: { English: "Your glucose may drop during exercise. Tap for details.", Chinese: "运动期间血糖可能下降，点击查看详情。", Malay: "Glukosa anda mungkin turun semasa senaman. Ketik untuk butiran.", Tamil: "உடற்பயிற்சியின் போது குளுக்கோஸ் குறையலாம். விவரங்களுக்கு தட்டவும்." },
 
   // ── Hard Alert ──
   alert_hypo: { English: "Alert! Potential Hypoglycemia", Chinese: "警报！可能发生低血糖", Malay: "Amaran! Potensi Hipoglisemia", Tamil: "எச்சரிக்கை! சாத்தியமான இரத்தச் சர்க்கரைக் குறைவு" },
   alert_hypo_msg: {
-    English: "Your blood sugar level appears to be low. Please consider having a quick source of sugar and check your level again.",
-    Chinese: "您的血糖水平似乎偏低。请考虑补充快速糖分来源，然后再次检查您的血糖水平。",
-    Malay: "Paras gula darah anda nampaknya rendah. Sila pertimbangkan untuk mengambil sumber gula cepat dan semak paras anda semula.",
-    Tamil: "உங்கள் இரத்த சர்க்கரை அளவு குறைவாக உள்ளது. விரைவான சர்க்கரை ஆதாரத்தை எடுத்துக்கொண்டு மீண்டும் சோதிக்கவும்.",
+    English: "Your blood sugar level appears to be critically low. Please have a fast-acting source of sugar immediately. Your emergency contact has been notified.",
+    Chinese: "您的血糖水平可能严重偏低，请立即补充快速糖分。已向您的紧急联系人发送通知。",
+    Malay: "Paras gula darah anda nampaknya sangat rendah. Sila ambil sumber gula bertindak pantas segera. Kenalan kecemasan anda telah dimaklumkan.",
+    Tamil: "உங்கள் இரத்த சர்க்கரை அளவு மிகக் குறைவாக உள்ளது. உடனடியாக விரைவான சர்க்கரை ஆதாரத்தை எடுங்கள். உங்கள் அவசர தொடர்பாளருக்கு அறிவிக்கப்பட்டுள்ளது.",
   },
+  hard_push_title: { English: "GlucoGardener", Chinese: "GlucoGardener", Malay: "GlucoGardener", Tamil: "GlucoGardener" },
+  hard_push_body: { English: "Urgent: Blood sugar critically low. Emergency contact notified.", Chinese: "紧急：血糖严重偏低，已通知紧急联系人。", Malay: "Segera: Gula darah sangat rendah. Kenalan kecemasan dimaklumkan.", Tamil: "அவசரம்: இரத்த சர்க்கரை மிகக் குறைவு. அவசர தொடர்பாளருக்கு அறிவிக்கப்பட்டது." },
 
   // ── Sugar Chart ──
   blood: { English: "Blood", Chinese: "血糖", Malay: "Gula", Tamil: "இரத்த" },
