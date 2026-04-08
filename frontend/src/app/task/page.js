@@ -5,9 +5,7 @@ import TopBar from "../../components/TopBar";
 import MiniChat from "../../components/MiniChat";
 import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
-
-const API_BASE = "http://localhost:8080";
-const TASK_AGENT_API = "http://localhost:8001";
+import { API_BASE, TASK_AGENT_API } from "../../lib/config";
 
 const STATIC_TASKS = [
   {

@@ -8,8 +8,7 @@ import SugarChart from "../components/SugarChart";
 import { useAuth } from "../lib/useAuth";
 import { useTranslation } from "../lib/i18n";
 import { fetchInterventions } from "../lib/gatewayApi";
-
-const API_BASE = "http://localhost:8080";
+import { API_BASE } from "../lib/config";
 
 export default function HomePage() {
   const router = useRouter();

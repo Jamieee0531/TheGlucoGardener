@@ -6,8 +6,7 @@ import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
 import { sendMessageStream } from "../../lib/api";
 import { webmToWav } from "../../lib/audioUtils";
-
-const API_BASE = "http://localhost:8080";
+import { API_BASE } from "../../lib/config";
 
 export default function WarmupPage() {
   const router = useRouter();

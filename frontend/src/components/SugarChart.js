@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslation } from "../lib/i18n";
-
-const API_BASE = "http://localhost:8080";
+import { API_BASE } from "../lib/config";
 
 export default function SugarChart({ userId }) {
   const { t } = useTranslation();

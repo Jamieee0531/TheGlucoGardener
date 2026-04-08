@@ -1,5 +1,7 @@
-const API_URL = "http://localhost:8080/chat/message";
-const STREAM_URL = "http://localhost:8080/chat/stream";
+import { API_BASE } from "./config";
+
+const API_URL = `${API_BASE}/chat/message`;
+const STREAM_URL = `${API_BASE}/chat/stream`;
 
 export async function sendMessage({ userId, sessionId, text, image, audio }) {
   const form = new FormData();

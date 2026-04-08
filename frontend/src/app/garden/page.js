@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import TopBar from "../../components/TopBar";
 import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
-
-const API_BASE = "http://localhost:8080";
+import { API_BASE } from "../../lib/config";
 
 function getFlowerCount(points) {
   return Math.min(Math.floor(points / 500), 25);
