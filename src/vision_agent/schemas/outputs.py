@@ -17,6 +17,7 @@ class SceneType(str, Enum):
 
 class FoodOutput(BaseModel):
     scene_type: SceneType = SceneType.FOOD
+    visual_observations: Optional[str] = None       # chain-of-thought visual description
     food_name: str                                  # comma-separated if multiple items
     gi_level: str                                   # high / medium / low
     total_calories: float                           # kcal

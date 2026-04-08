@@ -54,7 +54,7 @@ class GeminiVLM(BaseVLM):
                 }
             ],
             "generationConfig": {
-                "temperature": 0.1,
+                "temperature": 0.0,
                 "maxOutputTokens": 4096,
             },
         }
@@ -97,7 +97,7 @@ class GeminiVLM(BaseVLM):
         payload = {
             "contents": [{"parts": parts}],
             "generationConfig": {
-                "temperature": 0.1,
+                "temperature": 0.0,
                 "maxOutputTokens": 4096,
             },
         }

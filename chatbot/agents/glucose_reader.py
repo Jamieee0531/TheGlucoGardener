@@ -39,26 +39,7 @@ _MOCK_WEEKLY_GLUCOSE = {
     ],
 }
 
-_MOCK_WEEKLY_DIET = {
-    "user_001": [
-        {"date": "2026-03-08", "meals": "早餐：燕麦粥；午餐：鸡饭（少饭）；晚餐：蒸鱼 + 蔬菜"},
-        {"date": "2026-03-09", "meals": "早餐：全麦面包；午餐：杂菜饭；晚餐：汤面"},
-        {"date": "2026-03-10", "meals": "早餐：咖椰吐司 + 半熟蛋；午餐：laksa；晚餐：蒸鸡 + 豆腐"},
-        {"date": "2026-03-11", "meals": "早餐：燕麦粥；午餐：云吞面（少量）；晚餐：鱼片米粉汤"},
-        {"date": "2026-03-12", "meals": "早餐：全麦面包；午餐：沙拉 + 烤鸡；晚餐：蒸鱼 + 糙米"},
-        {"date": "2026-03-13", "meals": "早餐：燕麦；午餐：chicken rice；晚餐：炒蔬菜 + 豆腐"},
-        {"date": "2026-03-14", "meals": "早餐：全麦面包；午餐：杂菜饭（少饭多菜）"},
-    ],
-    "user_002": [
-        {"date": "2026-03-08", "meals": "Breakfast: Oats; Lunch: Nasi lemak (small portion); Dinner: Grilled chicken + salad"},
-        {"date": "2026-03-09", "meals": "Breakfast: Wholemeal bread; Lunch: Mixed rice; Dinner: Fish soup"},
-        {"date": "2026-03-10", "meals": "Breakfast: Roti prata (1 piece); Lunch: Chicken rice; Dinner: Stir-fried veg + tofu"},
-        {"date": "2026-03-11", "meals": "Breakfast: Oats; Lunch: Wonton noodle (small); Dinner: Steamed fish + brown rice"},
-        {"date": "2026-03-12", "meals": "Breakfast: Wholemeal bread; Lunch: Salad + grilled chicken; Dinner: Steamed fish"},
-        {"date": "2026-03-13", "meals": "Breakfast: Oats; Lunch: Chicken rice; Dinner: Mixed veg + tofu"},
-        {"date": "2026-03-14", "meals": "Breakfast: Wholemeal bread; Lunch: Mixed rice (less carbs)"},
-    ],
-}
+_MOCK_WEEKLY_DIET: dict = {}
 
 
 def glucose_reader_node(state: ChatState) -> dict:

@@ -25,6 +25,7 @@ export async function sendMessageStream({
   text,
   image,
   audio,
+  mode,
   onToken,
   onDone,
   onError,
@@ -36,6 +37,7 @@ export async function sendMessageStream({
   if (text) form.append("text", text);
   if (image) form.append("image", image);
   if (audio) form.append("audio", audio, "recording.wav");
+  if (mode) form.append("mode", mode);
 
   try {
     const res = await fetch(STREAM_URL, { method: "POST", body: form });

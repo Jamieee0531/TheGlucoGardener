@@ -18,14 +18,17 @@ class HealthEventStore:
 
     def log_emotion(self, user_id: str, emotion_label: str, user_input: str) -> None:
         """每轮对话写入一条情绪记录。"""
-        with db_cursor(commit=True) as cur:
-            cur.execute(
-                """
-                INSERT INTO user_emotion_log (user_id, user_input, emotion_label, source, recorded_at)
-                VALUES (%s, %s, %s, %s, NOW())
-                """,
-                (user_id, user_input, emotion_label, "openai"),
-            )
+        try:
+            with db_cursor(commit=True) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO user_emotion_log (user_id, user_input, emotion_label, source, recorded_at)
+                    VALUES (%s, %s, %s, %s, NOW())
+                    """,
+                    (user_id, user_input, emotion_label, "openai"),
+                )
+        except Exception as e:
+            print(f"[Memory] log_emotion 跳过（{e}）")
 
     def get_today_emotions(self, user_id: str) -> list:
         """获取今日所有情绪记录（供 23:59 汇总用）。"""

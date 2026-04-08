@@ -122,11 +122,13 @@ def input_node(state: ChatState) -> dict:
         "transcribed_text":   user_input,
         "emotion_label":      emotion_result["emotion_label"],
         "emotion_confidence": emotion_result["emotion_confidence"],
+        # Always reset vision_result so stale data from the previous turn
+        # does not bleed into text-only follow-up messages.
+        "vision_result":      vision_result,
     }
 
     if image_paths:
         updates["user_input"] = user_input
-        updates["vision_result"] = vision_result
 
     return updates
 
@@ -160,6 +162,20 @@ def _full_triage(state: ChatState) -> dict:
     """意图判断：关键词预分类 + LLM兜底。情绪由 input_node 已通过 MERaLiON 设好。"""
     emotion_label = state.get("emotion_label", "neutral")
     user_input    = state["user_input"]
+
+    # ── Step 0: Food/medication/report photo → always medical ──
+    vision_result = state.get("vision_result") or []
+    if vision_result:
+        top_scene = vision_result[0].get("scene_type", "UNKNOWN")
+        if top_scene in ("FOOD", "MEDICATION", "REPORT"):
+            get_health_store().log_emotion(state["user_id"], emotion_label, user_input)
+            _prefetch_rag(state["user_id"], user_input)
+            print(f"[Triage] 图片{top_scene}→medical | 情绪：{emotion_label}")
+            return {
+                "intent":        "medical",
+                "all_intents":   ["medical"],
+                "emotion_label": emotion_label,
+            }
 
     # ── Step 1: Try keyword pre-classification ──────────
     keyword_intent = keyword_preclassify(user_input)
