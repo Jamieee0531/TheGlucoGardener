@@ -102,6 +102,7 @@ export default function GardenPage() {
   return (
     <div className="flex flex-col h-full bg-cream">
       <TopBar title={t("garden_title")} transparent />
+      <div className="flex-1 overflow-y-auto">
 
       {/* ── Garden display ── */}
       <div className="flex items-end justify-center w-full px-2 mt-8 mb-2">
@@ -177,6 +178,7 @@ export default function GardenPage() {
             <p className="text-sm text-gray-400 italic">{t("no_friends_yet") || "No friends yet"}</p>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
