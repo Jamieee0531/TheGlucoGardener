@@ -39,8 +39,15 @@ export default function GardenPage() {
 
   const flowerCount = points ? getFlowerCount(points.accumulated_points) : 0;
 
-  // Sort friends by points (descending) for ranking
-  const rankedFriends = [...friends].sort(
+  // Sort friends + self by points (descending) for ranking
+  const selfEntry = points ? {
+    user_id: user.user_id,
+    name: user.name,
+    avatar: user.avatar || `/${user.user_id === "user_001" ? "avatar_1" : user.user_id === "user_002" ? "avatar_2" : "avatar_3"}.jpg`,
+    accumulated_points: points.accumulated_points || 0,
+    isSelf: true,
+  } : null;
+  const rankedFriends = [...friends, ...(selfEntry ? [selfEntry] : [])].sort(
     (a, b) => (b.accumulated_points || 0) - (a.accumulated_points || 0)
   );
 
@@ -52,6 +59,7 @@ export default function GardenPage() {
       ]
     : user.user_id === "user_002"
     ? [
+        { from: "Sarah (daughter)", text: "爸爸，加油！💪", time: "Today, 8:45 AM" },
         { from: "Mdm Chen", text: "Marcus, you're doing great! 🌸", time: "Today, 10:30 AM" },
       ]
     : [];
@@ -146,17 +154,21 @@ export default function GardenPage() {
                   className="w-[55px] h-[55px] rounded-full object-cover"
                 />
                 <div className="ml-3 flex-1">
-                  <span className="text-sm font-semibold text-gray-700">{friend.name}</span>
+                  <span className="text-sm font-semibold text-gray-700">
+                    {friend.name}{friend.isSelf ? " (You)" : ""}
+                  </span>
                   <p className="text-xs text-[#7cb342]">
                     🌸 ×{getFlowerCount(friend.accumulated_points || 0)} {t("flowers")}
                   </p>
                 </div>
-                <button
-                  onClick={() => router.push(`/garden/visit?id=${friend.user_id}`)}
-                  className="text-sm font-semibold text-gray-800 hover:text-[#7cb342] transition-colors"
-                >
-                  {t("visit")}
-                </button>
+                {!friend.isSelf && (
+                  <button
+                    onClick={() => router.push(`/garden/visit?id=${friend.user_id}`)}
+                    className="text-sm font-semibold text-gray-800 hover:text-[#7cb342] transition-colors"
+                  >
+                    {t("visit")}
+                  </button>
+                )}
               </div>
               {i < rankedFriends.length - 1 && <div className="h-3" />}
             </div>
