@@ -29,14 +29,7 @@ export default function WarmupPage() {
   const chunksRef = useRef([]);
   const streamRef = useRef(null);
 
-  // Check if already done today (per user)
-  useEffect(() => {
-    if (!user) return;
-    const today = new Date().toISOString().slice(0, 10);
-    if (localStorage.getItem(`warmup_done_${user.user_id}_${today}`)) {
-      router.replace("/");
-    }
-  }, [router, user]);
+  // Always show warm up when navigated to directly (no auto-redirect)
 
   // Fetch exercise patterns + recent exercise count
   useEffect(() => {

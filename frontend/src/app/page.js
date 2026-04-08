@@ -16,14 +16,6 @@ export default function HomePage() {
   const { user, loading } = useAuth();
   const { t } = useTranslation();
 
-  // ── Warm-up gate: redirect if not done today ──
-  useEffect(() => {
-    if (loading || !user) return;
-    const today = new Date().toISOString().slice(0, 10);
-    if (!localStorage.getItem(`warmup_done_${user.user_id}_${today}`)) {
-      router.push("/warmup");
-    }
-  }, [user, loading, router]);
   const [bmi, setBmi] = useState("—");
   const [mealsLogged, setMealsLogged] = useState("0/3");
 
