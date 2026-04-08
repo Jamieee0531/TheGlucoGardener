@@ -7,7 +7,8 @@ demo/seed_user_002.py
 
 Marcus 的故事:
 - 58 岁仓库主管, T2D 确诊 3 年, 每周健身 3-4 次
-- 过去 3 个周六运动期间血糖平均下降 0.86 mmol/L
+- Mon/Wed/Sat 做 HIIT (14:00-14:45)，Thu 做 cardio (18:00-19:00)
+- 过去 3 次 HIIT 期间血糖平均下降 1.03 mmol/L
 - 这个数据支撑 soft_trigger_pre_exercise 场景的 Agent 推理
 
 【环境变量依赖】
@@ -27,6 +28,8 @@ import sys
 from datetime import date, datetime, time, timedelta
 
 sys.path.insert(0, ".")
+
+from sqlalchemy import delete
 
 from alert_db.models import (
     RewardLog,
@@ -54,13 +57,13 @@ HOME_LAT, HOME_LNG = 1.3521, 103.8198
 GYM_LAT, GYM_LNG = 1.3200, 103.8400
 WAREHOUSE_LAT, WAREHOUSE_LNG = 1.2800, 103.8500
 
-# Resistance training glucose drop targets (avg = 0.86)
-# Applied to ALL resistance_training sessions (not just Saturdays)
+# HIIT glucose drop targets (avg = 1.03)
+# Applied to ALL hiit sessions (not just Saturdays)
 # because _get_exercise_history picks the last 3 matching sessions by type
-RT_DROPS = [
-    {"pre": 6.20, "post": 5.30},  # drop 0.90
-    {"pre": 5.80, "post": 5.00},  # drop 0.80
-    {"pre": 6.00, "post": 5.12},  # drop 0.88
+HIIT_DROPS = [
+    {"pre": 6.20, "post": 5.15},  # drop 1.05
+    {"pre": 5.80, "post": 4.85},  # drop 0.95
+    {"pre": 6.00, "post": 4.90},  # drop 1.10
 ]
 
 # Food menu rotation
@@ -112,26 +115,26 @@ def _baseline_glucose(hour: int) -> float:
         return 6.0 + random.gauss(0, 0.3)
 
 
-def _find_past_rt_days(today: date, count: int) -> list[date]:
-    """Return the most recent `count` resistance_training days before today, newest first."""
-    rt_days = []
+def _find_past_hiit_days(today: date, count: int) -> list[date]:
+    """Return the most recent `count` hiit days before today, newest first."""
+    hiit_days = []
     d = today - timedelta(days=1)
-    while len(rt_days) < count:
-        # Mon(0), Wed(2), Sat(5) are resistance_training days
+    while len(hiit_days) < count:
+        # Mon(0), Wed(2), Sat(5) are hiit days
         if d.weekday() in (0, 2, 5):
-            rt_days.append(d)
+            hiit_days.append(d)
         d -= timedelta(days=1)
-    return rt_days
+    return hiit_days
 
 
 def _exercise_schedule(d: date) -> list[tuple[str, time, time]]:
     """Return list of (activity_type, start_time, end_time) for a given date's dow."""
     dow = d.weekday()
     schedule = {
-        0: [("resistance_training", time(14, 0), time(15, 30))],  # Mon
-        2: [("resistance_training", time(14, 0), time(15, 30))],  # Wed
-        3: [("cardio", time(18, 0), time(19, 0))],                # Thu
-        5: [("resistance_training", time(14, 0), time(15, 30))],  # Sat
+        0: [("hiit", time(14, 0), time(14, 45))],    # Mon
+        2: [("hiit", time(14, 0), time(14, 45))],    # Wed
+        3: [("cardio", time(18, 0), time(19, 0))],   # Thu
+        5: [("hiit", time(14, 0), time(14, 45))],    # Sat
     }
     return schedule.get(dow, [])
 
@@ -141,9 +144,23 @@ async def seed() -> None:
     async with AsyncSessionLocal() as session:
         print(f"Seeding data for {USER_ID} (Marcus)...")
 
+        # ── 0. Clean up old data ──────────────────────────────
+        cleanup_tables = [
+            RewardLog, UserFriend, UserEmotionLog, UserFoodLog,
+            UserExerciseLog, UserHRLog, UserCGMLog,
+            UserGlucoseWeeklyProfile, UserGlucoseDailyStats,
+            UserKnownPlace, UserEmergencyContact, UserWeeklyPattern,
+        ]
+        for model in cleanup_tables:
+            await session.execute(
+                delete(model).where(model.user_id == USER_ID)
+            )
+        await session.commit()
+        print("  ✓ Cleaned up old data for user_002")
+
         today = datetime.now().date()
         today_start = datetime.combine(today, time(0, 0))
-        past_rt_days = _find_past_rt_days(today, 3)
+        past_hiit_days = _find_past_hiit_days(today, 3)
 
         # ── 1. User Profile ────────────────────────────────────
         user = User(
@@ -164,10 +181,10 @@ async def seed() -> None:
 
         # ── 2. Weekly Patterns ─────────────────────────────────
         patterns = [
-            (0, time(14, 0), time(15, 30), "resistance_training"),  # Mon
-            (2, time(14, 0), time(15, 30), "resistance_training"),  # Wed
-            (3, time(18, 0), time(19, 0), "cardio"),                # Thu
-            (5, time(14, 0), time(15, 30), "resistance_training"),  # Sat
+            (0, time(14, 0), time(14, 45), "hiit"),    # Mon
+            (2, time(14, 0), time(14, 45), "hiit"),    # Wed
+            (3, time(18, 0), time(19, 0), "cardio"),   # Thu
+            (5, time(14, 0), time(14, 45), "hiit"),    # Sat
         ]
         for dow, st, et, atype in patterns:
             session.add(UserWeeklyPattern(
@@ -178,7 +195,7 @@ async def seed() -> None:
                 activity_type=atype,
             ))
         await session.commit()
-        print("  ✓ Weekly patterns (Mon/Wed 14:00, Thu 18:00, Sat 14:00)")
+        print("  ✓ Weekly patterns (Mon/Wed/Sat 14:00 HIIT, Thu 18:00 cardio)")
 
         # ── 3. Known Places ────────────────────────────────────
         places = [
@@ -217,19 +234,19 @@ async def seed() -> None:
             day_base = datetime.combine(d, time(0, 0))
             day_glucose = []
 
-            # Check if this is one of the 3 target resistance_training days
-            rt_idx = None
-            if d in past_rt_days:
-                rt_idx = past_rt_days.index(d)
+            # Check if this is one of the 3 target hiit days
+            hiit_idx = None
+            if d in past_hiit_days:
+                hiit_idx = past_hiit_days.index(d)
 
             for minute_offset in range(0, 1440, 10):
                 ts = day_base + timedelta(minutes=minute_offset)
                 hour = ts.hour
                 minute = ts.minute
 
-                # Resistance training exercise window: craft specific drop curve
-                if rt_idx is not None and 13 <= hour <= 16:
-                    drop_cfg = RT_DROPS[rt_idx]
+                # HIIT exercise window: craft specific drop curve
+                if hiit_idx is not None and 13 <= hour <= 16:
+                    drop_cfg = HIIT_DROPS[hiit_idx]
                     pre_val = drop_cfg["pre"]
                     post_val = drop_cfg["post"]
 
@@ -240,23 +257,23 @@ async def seed() -> None:
                     elif hour == 13 and minute >= 50 or hour == 14 and minute == 0:
                         # 13:50-14:00: at pre-exercise level
                         glucose = pre_val + random.gauss(0, 0.05)
-                    elif 14 <= hour <= 15 and not (hour == 15 and minute > 30):
-                        # 14:00-15:30: linear drop during exercise
-                        mins_into_ex = (hour - 14) * 60 + minute
-                        total_ex_mins = 90
+                    elif hour == 14 and minute <= 45:
+                        # 14:00-14:45: steep drop during HIIT
+                        mins_into_ex = minute
+                        total_ex_mins = 45
                         frac = min(mins_into_ex / total_ex_mins, 1.0)
                         glucose = pre_val - (pre_val - post_val) * frac + random.gauss(0, 0.06)
-                    elif hour == 15 and minute > 30 or hour == 16:
-                        # 15:30-16:59: recovery, slow rise
-                        mins_after = (hour - 15) * 60 + minute - 30
-                        recovery = min(mins_after / 90.0, 1.0) * 0.5
+                    elif (hour == 14 and minute > 45) or hour == 15 or hour == 16:
+                        # 14:45-16:59: recovery, slow rise
+                        mins_after = (hour - 14) * 60 + minute - 45
+                        recovery = min(mins_after / 75.0, 1.0) * 0.5
                         glucose = post_val + recovery + random.gauss(0, 0.1)
                     else:
                         glucose = _baseline_glucose(hour)
                 # Other exercise days (cardio on Thu): mild drop during exercise
                 elif _exercise_schedule(d) and any(
                     st <= ts.time() <= et for _, st, et in _exercise_schedule(d)
-                ) and rt_idx is None:
+                ) and hiit_idx is None:
                     glucose = 5.8 + random.gauss(0, 0.3)  # general exercise dip
                 else:
                     glucose = _baseline_glucose(hour)
@@ -546,7 +563,7 @@ async def seed() -> None:
         # ── Summary ────────────────────────────────────────────
         print(f"\n✅ Seed complete for {USER_ID} (Marcus)")
         print("   Note: No data written for today — scenarios inject today's data.")
-        print(f"   Past 3 RT days used for exercise drop pattern: {past_rt_days}")
+        print(f"   Past 3 HIIT days used for exercise drop pattern: {past_hiit_days}")
         print(f"\n   Next step: python demo/seed_user_002.py  (done!)")
         print(f"   Then run scenarios via frontend ScenarioPlayer.")
 

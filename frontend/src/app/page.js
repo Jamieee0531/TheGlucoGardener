@@ -271,9 +271,9 @@ export default function HomePage() {
                     confidence = decision?.confidence || "MEDIUM";
                   } catch { confidence = "MEDIUM"; }
                   const colors = {
-                    HIGH: "bg-green-100 text-green-700 border-green-300",
+                    HIGH: "bg-red-100 text-red-700 border-red-300",
                     MEDIUM: "bg-yellow-100 text-yellow-700 border-yellow-300",
-                    LOW: "bg-red-100 text-red-700 border-red-300",
+                    LOW: "bg-green-100 text-green-700 border-green-300",
                   };
                   return (
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${colors[confidence] || colors.MEDIUM}`}>

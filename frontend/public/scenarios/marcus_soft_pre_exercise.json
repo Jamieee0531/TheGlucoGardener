@@ -1,7 +1,7 @@
 {
   "scenario_id": "marcus_soft_pre_exercise",
   "title": "Scenario A: Pre-Exercise Soft Alert",
-  "description": "Marcus arrives at gym, glucose 4.9. Agent predicts post-exercise drop to 4.04.",
+  "description": "Marcus arrives at gym, glucose 4.9.",
   "user_id": "user_002",
   "steps": [
     {
