@@ -108,6 +108,15 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
     });
   };
 
+  // ── Demo mock: first message with image triggers hardcoded contextual response ──
+  const DEMO_TRIGGER = /dinner|can i have|eat this|好吗|可以吃|晚餐/i;
+  const DEMO_RESPONSE =
+    "Your glucose is at 4.9 right now — a little on the lower side lah, " +
+    "and it's been about 3 hours since your last meal. " +
+    "This looks moderate GI, so dinner is fine, but maybe keep the portion a bit smaller. " +
+    "You've got exercise in about 4 hours, so eating now actually works out — " +
+    "just skip the extra rice and you should be good! 💪";
+
   const handleSend = () => {
     const text = inputText.trim();
     if (!text || sending) return;
@@ -125,6 +134,25 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
 
     // Only send image on first message
     const isFirstMessage = messages.length === 0;
+
+    // ── Demo mode: intercept first message with image + trigger phrase ──
+    if (isFirstMessage && imageFile && DEMO_TRIGGER.test(text)) {
+      let i = 0;
+      const words = DEMO_RESPONSE.split(" ");
+      const interval = setInterval(() => {
+        if (i < words.length) {
+          const token = (i === 0 ? "" : " ") + words[i];
+          setMessages((prev) =>
+            prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m))
+          );
+          i++;
+        } else {
+          clearInterval(interval);
+          setSending(false);
+        }
+      }, 60);
+      return;
+    }
 
     sendMessageStream({
       userId,
