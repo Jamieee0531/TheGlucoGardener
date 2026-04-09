@@ -74,6 +74,28 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
     setMessages((prev) => [...prev, { id: aiMsgId, role: "assistant", content: "" }]);
     setSending(true);
 
+    // ── Demo mock: first voice message with image ──
+    if (messages.length === 0 && imageFile) {
+      let i = 0;
+      const words = DEMO_RESPONSE.split(" ");
+      const interval = setInterval(() => {
+        if (i < words.length) {
+          const token = (i === 0 ? "" : " ") + words[i];
+          setMessages((prev) =>
+            prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m))
+          );
+          i++;
+        } else {
+          clearInterval(interval);
+          setMessages((prev) =>
+            prev.map((m) => (m.id === userMsgId ? { ...m, pendingVoice: false, content: "🎙 Can I have this for dinner?" } : m))
+          );
+          setSending(false);
+        }
+      }, 60);
+      return;
+    }
+
     sendMessageStream({
       userId,
       sessionId,
@@ -135,8 +157,8 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
     // Only send image on first message
     const isFirstMessage = messages.length === 0;
 
-    // ── Demo mode: intercept first message with image + trigger phrase ──
-    if (isFirstMessage && imageFile && DEMO_TRIGGER.test(text)) {
+    // ── Demo mode: intercept first message with image ──
+    if (isFirstMessage && imageFile) {
       let i = 0;
       const words = DEMO_RESPONSE.split(" ");
       const interval = setInterval(() => {
