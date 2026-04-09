@@ -49,7 +49,7 @@ structlog==24.2.0
 
 # Utilities
 python-dotenv==1.0.1
-numpy==1.26.4
+numpy>=1.26.4
 
 # Twilio (emergency voice calls)
 twilio==9.0.5
