@@ -74,27 +74,7 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
     setMessages((prev) => [...prev, { id: aiMsgId, role: "assistant", content: "" }]);
     setSending(true);
 
-    // ── Demo mock: first voice message with image ──
-    if (messages.length === 0 && imageFile) {
-      let i = 0;
-      const words = DEMO_RESPONSE.split(" ");
-      const interval = setInterval(() => {
-        if (i < words.length) {
-          const token = (i === 0 ? "" : " ") + words[i];
-          setMessages((prev) =>
-            prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m))
-          );
-          i++;
-        } else {
-          clearInterval(interval);
-          setMessages((prev) =>
-            prev.map((m) => (m.id === userMsgId ? { ...m, pendingVoice: false, content: "🎙 Can I have this for dinner?" } : m))
-          );
-          setSending(false);
-        }
-      }, 60);
-      return;
-    }
+    const isFirstVoiceWithImage = messages.length === 0 && imageFile;
 
     sendMessageStream({
       userId,
@@ -102,12 +82,14 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
       audio: audioBlob,
       mode: "task",
       onToken: (token) => {
-        setMessages((prev) => prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m)));
+        if (!isFirstVoiceWithImage) {
+          setMessages((prev) => prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m)));
+        }
       },
       onDone: (data) => {
         if (!sessionId) setSessionId(data.session_id);
+        // Show transcription first
         setMessages((prev) => prev.map((m) => {
-          if (m.id === aiMsgId && data.reply) return { ...m, content: data.reply };
           if (m.id === userMsgId) return {
             ...m,
             pendingVoice: false,
@@ -117,7 +99,30 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
           };
           return m;
         }));
-        setSending(false);
+        if (isFirstVoiceWithImage) {
+          // Stream mock response after transcription appears
+          let i = 0;
+          const words = DEMO_RESPONSE.split(" ");
+          const interval = setInterval(() => {
+            if (i < words.length) {
+              const token = (i === 0 ? "" : " ") + words[i];
+              setMessages((prev) =>
+                prev.map((m) => (m.id === aiMsgId ? { ...m, content: m.content + token } : m))
+              );
+              i++;
+            } else {
+              clearInterval(interval);
+              setSending(false);
+            }
+          }, 60);
+        } else {
+          if (data.reply) {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === aiMsgId ? { ...m, content: data.reply } : m))
+            );
+          }
+          setSending(false);
+        }
       },
       onError: () => {
         setMessages((prev) => prev.map((m) => {
