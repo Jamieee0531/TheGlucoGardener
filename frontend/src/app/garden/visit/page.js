@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "../../../lib/useAuth";
 import { useTranslation } from "../../../lib/i18n";
@@ -23,7 +23,15 @@ const GRID_POSITIONS = [
   [2, 2], // bottom-right
 ];
 
-export default function FriendGardenPage() {
+export default function FriendGardenPageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <FriendGardenPage />
+    </Suspense>
+  );
+}
+
+function FriendGardenPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading } = useAuth();
