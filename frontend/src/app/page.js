@@ -8,22 +8,13 @@ import SugarChart from "../components/SugarChart";
 import { useAuth } from "../lib/useAuth";
 import { useTranslation } from "../lib/i18n";
 import { fetchInterventions } from "../lib/gatewayApi";
-
-const API_BASE = "http://localhost:8080";
+import { API_BASE } from "../lib/config";
 
 export default function HomePage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { t } = useTranslation();
 
-  // ── Warm-up gate: redirect if not done today ──
-  useEffect(() => {
-    if (loading || !user) return;
-    const today = new Date().toISOString().slice(0, 10);
-    if (!localStorage.getItem(`warmup_done_${user.user_id}_${today}`)) {
-      router.push("/warmup");
-    }
-  }, [user, loading, router]);
   const [bmi, setBmi] = useState("—");
   const [mealsLogged, setMealsLogged] = useState("0/3");
 
@@ -271,9 +262,9 @@ export default function HomePage() {
                     confidence = decision?.confidence || "MEDIUM";
                   } catch { confidence = "MEDIUM"; }
                   const colors = {
-                    HIGH: "bg-green-100 text-green-700 border-green-300",
+                    HIGH: "bg-red-100 text-red-700 border-red-300",
                     MEDIUM: "bg-yellow-100 text-yellow-700 border-yellow-300",
-                    LOW: "bg-red-100 text-red-700 border-red-300",
+                    LOW: "bg-green-100 text-green-700 border-green-300",
                   };
                   return (
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${colors[confidence] || colors.MEDIUM}`}>

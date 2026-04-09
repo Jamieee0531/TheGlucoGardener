@@ -22,6 +22,7 @@ apscheduler==3.10.4
 
 # LangGraph & LangChain
 langgraph>=0.2.0
+langgraph-checkpoint-sqlite>=1.0.0
 langchain-core>=0.3.0
 langchain-text-splitters>=0.3.0
 langchain-google-genai>=2.0.0   # Vision Agent (Gemini)

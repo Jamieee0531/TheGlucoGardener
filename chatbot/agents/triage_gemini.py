@@ -61,6 +61,18 @@ def triage_node_gemini(state: ChatState) -> dict:
     user_input = state["user_input"]
     is_voice   = state.get("input_mode", "text") == "voice"
 
+    # 如果有图片上传，直接路由到 expert（食物/药物/报告分析都需要专业知识）
+    if state.get("image_paths") or state.get("vision_result"):
+        print("[Triage] image detected → force expert")
+        _prefetch_rag(state["user_id"], user_input)
+        return {
+            "intent":             INTENT_MEDICAL,
+            "all_intents":        [INTENT_MEDICAL],
+            "emotion_label":      "neutral",
+            "emotion_confidence": 1.0,
+            "emotion_intensity":  "none",
+        }
+
     # OpenAI 分类（文字 + 语音都调用，intent 和 emotion_intensity 都从这里来）
     try:
         result            = call_openai_json(_CLASSIFY_PROMPT + user_input, _CLASSIFY_SCHEMA)

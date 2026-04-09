@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import TopBar from "../../components/TopBar";
 import { useAuth } from "../../lib/useAuth";
-
-const API = "http://localhost:8001";
+import { TASK_AGENT_API as API } from "../../lib/config";
 
 
 const STEP_LABELS = ["Setup", "Rule Engine", "Park Selection", "Task Copy", "Arrival"];

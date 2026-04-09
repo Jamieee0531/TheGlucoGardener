@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { key: "nav_chat", href: "/chat" },
   { key: "nav_task", href: "/task" },
   { key: "nav_garden", href: "/garden" },
+  { key: "nav_warmup", suffix: "", href: "/warmup" },
   { key: "nav_setting", href: "/setting" },
   { key: "nav_soft_alert", suffix: "-Beta", href: "/soft-alert" },
   { key: "nav_hard_alert", suffix: "-Beta", href: "/hard-alert" },

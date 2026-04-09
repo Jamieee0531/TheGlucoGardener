@@ -6,8 +6,7 @@ import TopBar from "../../../components/TopBar";
 import { useAuth } from "../../../lib/useAuth";
 import { getCurrentUserId, saveProfile, AVATARS } from "../../../lib/users";
 import { useTranslation } from "../../../lib/i18n";
-
-const API_BASE = "http://localhost:8080";
+import { API_BASE } from "../../../lib/config";
 
 export default function AccountPage() {
   const router = useRouter();

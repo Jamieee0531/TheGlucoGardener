@@ -1,4 +1,4 @@
-const GATEWAY_URL = "http://localhost:8000";
+import { GATEWAY_URL } from "./config";
 
 /**
  * POST /telemetry/cgm — send glucose reading

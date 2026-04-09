@@ -5,9 +5,7 @@ import TopBar from "../../components/TopBar";
 import MiniChat from "../../components/MiniChat";
 import { useAuth } from "../../lib/useAuth";
 import { useTranslation } from "../../lib/i18n";
-
-const API_BASE = "http://localhost:8080";
-const TASK_AGENT_API = "http://localhost:8001";
+import { API_BASE, TASK_AGENT_API } from "../../lib/config";
 
 const STATIC_TASKS = [
   {
@@ -212,7 +210,6 @@ export default function TaskPage() {
       setDynPoints(ptsData.total_points);
       setDynTitle(savedTitle);
       setDynCompleted(true);
-      setDynTask(null);
     } catch (err) {
       setResultModal({ success: false, title: t("upload_failed") || "Upload failed", message: err.message });
     }
@@ -329,10 +326,10 @@ export default function TaskPage() {
       <div className="flex-1 overflow-y-auto pb-4">
         {/* Card Stack */}
         <div className="px-4 mt-2">
-          {(dynTask ? [{
+          {((dynTask || dynCompleted) ? [{
             ...DYN_TASK,
-            title: dynTask.task_content?.title || DYN_TASK.title,
-            desc: dynTask.task_content?.body || DYN_TASK.desc,
+            title: dynTask?.task_content?.title || dynTitle || DYN_TASK.title,
+            desc: dynTask?.task_content?.body || DYN_TASK.desc,
           }, ...STATIC_TASKS] : STATIC_TASKS).map((task, idx) => {
             const isExpanded = expandedId === task.id;
             const isDyn = task.id === "dynamic";
