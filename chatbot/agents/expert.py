@@ -109,7 +109,7 @@ def expert_agent_node(state: ChatState) -> dict:
         and any(vr.get("error") for vr in (state.get("vision_result") or []))
     )
 
-    # ── RAG：仅在医学相关查询时触发 ──────────────────────────
+    # ── RAG + PubMed：仅在医学相关查询时触发 ────────────────
     _RAG_KEYWORDS = ["药", "血糖", "饮食", "建议", "副作用", "怎么", "为什么", "能不能",
                      "头晕", "头痛", "恶心", "症状", "不舒服", "害怕", "心跳",
                      "medicine", "glucose", "diet", "recommend", "why", "how",
@@ -118,8 +118,15 @@ def expert_agent_node(state: ChatState) -> dict:
                      "stand", "pressure", "bp", "low", "high"]
     rag_context = ""
     if any(kw in user_input for kw in _RAG_KEYWORDS):
-        rag_query   = f"{user_input} 血糖 {glucose_str} 饮食 {diet_str}"
-        rag_context = consume_rag_prefetch(user_id, rag_query)
+        import concurrent.futures as _cf
+        from chatbot.mcp.tools.pubmed import search_pubmed, format_pubmed_results
+        rag_query = f"{user_input} 血糖 {glucose_str} 饮食 {diet_str}"
+        with _cf.ThreadPoolExecutor(max_workers=2) as ex:
+            rag_future    = ex.submit(consume_rag_prefetch, user_id, rag_query)
+            pubmed_future = ex.submit(search_pubmed, f"{user_input} diabetes Singapore", 2)
+        local_rag     = rag_future.result()
+        pubmed_text   = format_pubmed_results(pubmed_future.result())
+        rag_context   = "\n\n".join(p for p in [local_rag, pubmed_text] if p)
 
     emotion_label = state.get("emotion_label", "neutral")
     emotion_hint  = f"【当前情绪】{emotion_label}\n" if emotion_label != "neutral" else ""
