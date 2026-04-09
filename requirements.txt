@@ -37,7 +37,7 @@ Pillow>=10.0.0
 
 # RAG - Chroma + BM25 hybrid retrieval (embedding/reranker via Jina API)
 chromadb>=0.5.0
-# pysqlite3-binary             # 华为 OS / Linux 部署需要 (Chroma requires SQLite >=3.35.0)
+pysqlite3-binary             # 华为 OS / Linux 部署需要 (Chroma requires SQLite >=3.35.0)
 rank-bm25>=0.2.2
 
 # Multilingual support

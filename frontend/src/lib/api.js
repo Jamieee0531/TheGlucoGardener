@@ -1,5 +1,6 @@
-const API_URL = "http://localhost:8080/chat/message";
-const STREAM_URL = "http://localhost:8080/chat/stream";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_URL = `${BASE_URL}/chat/message`;
+const STREAM_URL = `${BASE_URL}/chat/stream`;
 
 export async function sendMessage({ userId, sessionId, text, image, audio }) {
   const form = new FormData();
