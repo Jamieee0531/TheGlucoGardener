@@ -43,8 +43,8 @@ const DYN_TASK = {
   buttonColor: "#e89098",
 };
 
-const PTS_PER_TASK = 20;
-const MAX_DAILY_PTS = 60;
+const PTS_PER_TASK = 10;
+const MAX_DAILY_PTS = 30;
 const MAX_PLANT_PTS = 100;
 
 export default function TaskPage() {
@@ -360,7 +360,7 @@ export default function TaskPage() {
                   </h3>
                   {isCompleted ? (
                     <span className="text-sm font-bold italic text-[#ff6b8a]">
-                      {isDyn ? (dynEarned != null ? `+${dynEarned}` : "50") : "20"} {t("task_pt_earned")}
+                      {isDyn ? (dynEarned != null ? `+${dynEarned}` : "+10") : "+10"} {t("task_pt_earned")}
                     </span>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-white" />
