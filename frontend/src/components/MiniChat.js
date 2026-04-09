@@ -111,11 +111,11 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
   // ── Demo mock: first message with image triggers hardcoded contextual response ──
   const DEMO_TRIGGER = /dinner|can i have|eat this|好吗|可以吃|晚餐/i;
   const DEMO_RESPONSE =
-    "Your glucose is at 4.9 right now — a little on the lower side lah, " +
-    "and it's been about 3 hours since your last meal. " +
-    "This looks moderate GI, so dinner is fine, but maybe keep the portion a bit smaller. " +
-    "You've got exercise in about 4 hours, so eating now actually works out — " +
-    "just skip the extra rice and you should be good! 💪";
+    "Wanton noodles — the wontons and choy sum are actually not bad, " +
+    "but that char siu glaze is pretty sugary and the noodles add up fast on the GI. " +
+    "Your glucose is looking okay right now, so you can have it — " +
+    "try asking for less noodles, skip the extra sauce drizzle, " +
+    "and the choy sum on the side will help slow things down. 👍";
 
   const handleSend = () => {
     const text = inputText.trim();
