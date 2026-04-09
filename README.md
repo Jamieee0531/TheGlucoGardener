@@ -307,7 +307,7 @@ SG_INNOVATION/
 | Bailey ([@baileybei](https://github.com/baileybei)) | Health Companion Chatbot (RAG, triage, voice) |
 | Chayi ([@Verse-Founder](https://github.com/Verse-Founder)) | Task Agent (dynamic task generation) |
 | Julia ([@juliawangjiayu](https://github.com/juliawangjiayu)) | Alert Agent, Gateway, Program Leader |
-| Ruiyu | UI/UX Design, Game & Interaction Design |
+| Ruiyu ([@Ruiyuyu-7](https://github.com/Ruiyuyu-7)) | UI/UX Design, Game & Interaction Design |
 | Congrong ([@Douliciouss](https://github.com/Douliciouss)) | Business Model, Data Analysis, Demo & Presentation |
 
 ## License
