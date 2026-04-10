@@ -13,6 +13,7 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
   const [sessionId, setSessionId] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const scrollRef = useRef(null);
   const msgIdRef = useRef(0);
   const mediaRecorderRef = useRef(null);
@@ -218,7 +219,7 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
   };
 
   return (
-    <div className="flex flex-col" style={{ height: "50vh" }}>
+    <div className="flex flex-col relative" style={{ height: "50vh" }}>
       {/* Header with image + close */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-white/30">
         <div className="flex items-center gap-2">
@@ -296,13 +297,38 @@ export default function MiniChat({ userId, imageFile, onConfirmEaten, onClose })
 
         {/* Confirm eaten button */}
         <button
-          onClick={onConfirmEaten}
+          onClick={() => setShowConfirm(true)}
           className="w-full mt-2 py-2 rounded-full text-white font-semibold text-sm"
           style={{ backgroundColor: "#7cb342" }}
         >
           {t("mini_chat_eaten")}
         </button>
       </div>
+
+      {/* Confirmation modal */}
+      {showConfirm && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 rounded-2xl">
+          <div className="bg-white rounded-2xl p-5 mx-6 shadow-lg text-center">
+            <p className="text-sm font-semibold text-gray-800 mb-1">Log this meal?</p>
+            <p className="text-xs text-gray-500 mb-4">This will save the record and earn you points.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 py-2 rounded-full text-sm font-semibold text-gray-600 bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowConfirm(false); onConfirmEaten(); }}
+                className="flex-1 py-2 rounded-full text-sm font-semibold text-white"
+                style={{ backgroundColor: "#7cb342" }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

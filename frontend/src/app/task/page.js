@@ -34,10 +34,10 @@ const STATIC_TASKS = [
 
 const DYN_TASK = {
   id: "dynamic",
-  title: "Sunset walk at West Coast Park",
-  emoji: "🌅",
+  title: "Time for a walk at a nearby park",
+  emoji: "🌿",
   color: "#F4BAC1",
-  desc: "You're 200 kcal short today. A 30-min walk at West Coast Park would help — and the sunset is lovely this evening!",
+  desc: "You're a bit short on activity today. A 30-min walk at a nearby park would help — fresh air and greenery are waiting!",
   logType: "none",
   completable: true,
   buttonColor: "#e89098",
@@ -190,8 +190,8 @@ export default function TaskPage() {
 
       // 3. Simulate arrival using destination coords
       const dest = dynTask.task_content?.destination || dynTask.destination || {};
-      const lat = dest.lat ?? 1.3526;
-      const lng = dest.lng ?? 103.8352;
+      const lat = dest.lat ?? 1.3065;
+      const lng = dest.lng ?? 103.7926;
       const arrRes = await fetch(
         `${TASK_AGENT_API}/tasks/dynamic/${dynTask.task_id}/arrive?user_id=${user.user_id}`,
         {

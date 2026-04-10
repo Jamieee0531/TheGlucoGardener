@@ -45,7 +45,7 @@ async def find_nearby_parks(
                     dist = int(haversine(lat, lng, p_lat, p_lng))
                     coord_key = (round(p_lat, 4), round(p_lng, 4))
 
-                    if dist > 500 and coord_key not in unique_coords:
+                    if dist > 100 and coord_key not in unique_coords:
                         candidates.append({
                             "name": r.get("name", "Nearby park"),
                             "lat": p_lat,
@@ -54,7 +54,7 @@ async def find_nearby_parks(
                         })
                         unique_coords.add(coord_key)
 
-                candidates.sort(key=lambda x: abs(x["distance_m"] - 1200))
+                candidates.sort(key=lambda x: x["distance_m"])
                 parks = candidates[:3]
             else:
                 logger.error(

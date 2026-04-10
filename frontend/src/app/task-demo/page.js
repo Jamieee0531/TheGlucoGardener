@@ -11,7 +11,7 @@ const STEP_LABELS = ["Setup", "Rule Engine", "Park Selection", "Task Copy", "Arr
 
 export default function TaskDemoPage() {
   const { user } = useAuth();
-  const USER_ID = user?.user_id || "user_003";
+  const USER_ID = user?.user_id || "user_002";
   const [step, setStep] = useState(0);       // 0=idle, 1=triggered, 2=park, 3=copy, 4=done
   const [loading, setLoading] = useState(false);
   const [log, setLog] = useState([]);
@@ -44,12 +44,12 @@ export default function TaskDemoPage() {
           name: u.name || USER_ID,
           age,
           bmi: u.bmi,
-          location: "Bishan, Singapore",
+          location: "Buona Vista, Singapore",
           caloriesToday: Math.round(ctx.calories_burned_today || 0),
           caloriesTarget: rr.adjusted_target || "—",
           glucose: ctx.avg_bg_last_2h ? ctx.avg_bg_last_2h.toFixed(1) : "—",
-          seedLat: ctx.last_gps?.lat ?? 1.3526,
-          seedLng: ctx.last_gps?.lng ?? 103.8352,
+          seedLat: 1.3065,
+          seedLng: 103.7926,
         });
       })
       .catch(() => {});
@@ -77,7 +77,7 @@ export default function TaskDemoPage() {
       await fetch(`${API}/internal/mock/sync-data`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: USER_ID, calories_burned: 80, cgm_value: 7.2, lat: profile?.seedLat ?? 1.3526, lng: profile?.seedLng ?? 103.8352 }),
+        body: JSON.stringify({ user_id: USER_ID, calories_burned: 80, cgm_value: 7.2, lat: profile?.seedLat ?? 1.3065, lng: profile?.seedLng ?? 103.7926 }),
       });
 
       // 3. Inject afternoon walk: 30 kcal → total 110 kcal today
@@ -85,7 +85,7 @@ export default function TaskDemoPage() {
       await fetch(`${API}/internal/mock/sync-data`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: USER_ID, calories_burned: 30, cgm_value: 5.6, lat: profile?.seedLat ?? 1.3526, lng: profile?.seedLng ?? 103.8352 }),
+        body: JSON.stringify({ user_id: USER_ID, calories_burned: 30, cgm_value: 5.6, lat: profile?.seedLat ?? 1.3065, lng: profile?.seedLng ?? 103.7926 }),
       });
 
       // 4. Trigger rule engine
@@ -189,7 +189,7 @@ export default function TaskDemoPage() {
         clearInterval(pollRef.current);
         // Show a fallback card so the demo can continue
         setTaskContent({
-          title: `Time for a walk, ${profile?.name ?? "Auntie Lin"}!`,
+          title: `Time for a walk, ${profile?.name ?? "Marcus"}!`,
           body: `Head to ${park?.name || "the park"} for a 30-minute moderate walk.`,
           cta: "I have arrived",
           _timeout: true,
@@ -230,7 +230,7 @@ export default function TaskDemoPage() {
 
         {/* Profile Card */}
         <div className="bg-[#A7CBED] rounded-2xl p-4 mt-2 mb-4">
-          <p className="text-white font-bold text-lg italic">👵 {profile?.name ?? "…"}</p>
+          <p className="text-white font-bold text-lg italic">👨 {profile?.name ?? "…"}</p>
           <p className="text-white/90 text-sm mt-1">
             {profile?.age ? `${profile.age}y · ` : ""}BMI {profile?.bmi != null ? Number(profile.bmi).toFixed(1) : "…"} · {profile?.location ?? "Singapore"}
           </p>
@@ -273,8 +273,8 @@ export default function TaskDemoPage() {
         {/* Step 0: Start */}
         {step === 0 && (
           <div className="bg-white rounded-2xl p-5 shadow-sm text-center">
-            <p className="text-sm text-gray-600 mb-1">Today {profile?.name ?? "Auntie Lin"} has only burned <strong>110 kcal</strong></p>
-            <p className="text-sm text-gray-600 mb-4">but her adjusted target is <strong>{profile?.caloriesTarget ?? 330} kcal</strong> — will the system trigger?</p>
+            <p className="text-sm text-gray-600 mb-1">Today {profile?.name ?? "Marcus"} has only burned <strong>110 kcal</strong></p>
+            <p className="text-sm text-gray-600 mb-4">but his adjusted target is <strong>{profile?.caloriesTarget ?? 330} kcal</strong> — will the system trigger?</p>
             <button
               onClick={handleStart}
               disabled={loading}
