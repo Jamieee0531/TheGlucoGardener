@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.jpg" alt="GlucoGardener Logo" width="280" />
+</p>
+
 # The GlucoGardener
 
 AI-powered proactive chronic disease management platform for diabetic patients in Singapore.
