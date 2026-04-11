@@ -2,7 +2,7 @@
 
 AI-powered proactive chronic disease management platform for diabetic patients in Singapore.
 
-Built for the **NUS-SYNAPXE-IMDA AI Innovation Challenge 2026** (Top 8 Finalist).
+Built for the **NUS-SYNAPXE-IMDA AI Innovation Challenge 2026** — selected as a **Top 8 Finalist out of 181 teams**.
 
 ![GlucoGardener Poster](docs/poster.png)
 
